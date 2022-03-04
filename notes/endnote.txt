@@ -1,0 +1,15 @@
+﻿@inproceedings{RN1,
+   author = {Tomari, Mohd Razali Md and Kobayashi, Yoshinori and Kuno, Yoshinori},
+   title = {Enhancing Wheelchair’s Control Operation of a Severe Impairment User},
+   publisher = {Singapore: Springer Singapore},
+   volume = {291},
+   pages = {65-72},
+   abstract = {Users with severe motor ability are unable to control their wheelchair using standard joystick and hence an alternative control input is preferred. However, using such an input, undoubtedly the navigation burden for the user is significantly increased. In this paper a method on how to reduce such a burden with the help of smart navigation platform is proposed. Initially, user information is inferred using an IMU sensor and a bite-like switch. Then information from the environment is obtained using combination of laser and Kinect sensors. Eventually, both information from the environment and the user is analyzed to decide the final control operation that according to the user intention, safe and comfortable to the people in the surrounding. Experimental results demonstrate the feasibility of the proposed approach.},
+   keywords = {Control operation
+Severe impairment user
+Wheelchair},
+   ISBN = {1876-1100},
+   DOI = {10.1007/978-981-4585-42-2_8},
+   type = {Conference Proceedings}
+}
+
