@@ -9,3 +9,6 @@
 *.log
 *.out
 *.run.xml
+*.lof
+*.lot
+*.toc
