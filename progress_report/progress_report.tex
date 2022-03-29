@@ -36,8 +36,28 @@
 
 \pagenumbering{arabic}
 \section{Introduction}
-% Powered wheelchairs do this.
-% Smart wheelchairs do this.
+Many people with motor disabilities rely on wheelchairs for movement, and
+powered wheelchairs have enabled greater independance for people with disability.
+Despite the huge benefit powered wheelchairs have granted,
+the use of this technology can be inaccessible or unsafe for people
+with amyotrophic lateral sclerosis (ALS) or vision impairment,
+who may be unable to use a joystick or see their environment clearly.
+
+Smart wheelchairs are wheelchairs with additional sensors and computers,
+enabling greater usability and safety. This can come in the form of alternative input methods,
+such as eye-gaze tracking \cite{eidNovelEyeGazeControlledWheelchair2016} or using a brain-computer
+interface \cite{kaufmannBraincomputerInterfaceBased2014} to control the wheelchair. For people with vision impairment,
+haptic feedback \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}
+has been used to improve awareness of the surrounding environment and make indoor navigation safer.
+
+Another form of smart wheelchair is semi-autonomy, where sensors are used to avoid obstacles and
+hazards. This allows the user to retain control over their movements, while still improving safety
+and ease of navigation.
+
+% Inputs
+% Semi-autonomy
+% Full autonomy
+
 % Indoor vs Outdoor assistance.
 % Sensors
 % Machine Learning
@@ -137,6 +157,20 @@ stereo camera, due to several reasons:
     \item When needed, the user can move the joystick control unit out of the way,
             which also moves the camera out of the way.
 \end{enumerate}
+However, there are some challenges faced when using this mounting point, which must be addressed.
+\begin{enumerate}
+    \item Shaky video footage due to low rigidity in joystick mount.
+    \item Close to the front of the wheelchair, which reduces visibility of the sides of the wheelchair.
+    \item Maximum camera width of \SI{150}{\milli\metre} before doorway manouverability is affected.
+\end{enumerate}
+
+To evaluate the effectiveness of this mounting point, a GoPro (Hero 4) was attached
+using a temporary mount and a 34 minute driving dataset was collected around Curtin University.
+% Images here
+It was found that camera shakiness could be reduced by using a stiffer mounting solution,
+however some shakiness would always remain due to the unstable mounting surface.
+It was also found that alternative sensors, such as 2D LIDAR, would be required for features such as doorway
+navigation and docking, due to the low field of view (FOV).
 
 \pagebreak
 
