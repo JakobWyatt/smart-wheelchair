@@ -21,6 +21,7 @@ dependencies:
  - jupyterlab
  - tensorflow-gpu
  - fastai
+ - ffmpeg
  - pip
  - pip:
    - opencv-python>=4.1.2
