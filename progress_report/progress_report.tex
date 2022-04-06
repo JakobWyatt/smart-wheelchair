@@ -130,15 +130,29 @@ on visual or spatial data to gain better knowledge about the surrounding environ
 Convolutional Neural Networks (CNNs) are commonly used for this application, as they
 are able to exploit the local nature of image features to reduce the number of required computations.
 
-Image classification is a core sub-problem within this field, and involves identifying the
+Image classification is a core problem within this field, and involves identifying the
 subject of an image (such as an animal or object).
-AlexNet \cite{krizhevskyImageNetClassificationDeep2012} was one of the first deep CNNs
-applied to this problem, performing well on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009}
-with an error of only 15.3\%.
+AlexNet \cite{krizhevskyImageNetClassificationDeep2012}, based on the earlier digit-recognition CNN LeNet-5
+\cite{lecunGradientbasedLearningApplied1998}, was one of the first deep CNNs
+applied to this problem. Alexnet was trained on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009}
+and achieved an error of only 15.3\%. The underlying architecture uses a series of 5 convolutional
+layers and 3 fully connected layers.
 Neural network architectures have become deeper and more accurate over time, enabled by both
-growth in computational power and dataset size.
+growth in computational power and dataset size. GoogLeNet \cite{szegedyGoingDeeperConvolutions2014}
+and VGG-16 \cite{simonyanVeryDeepConvolutional2014} are 22 and 16 layers deep respectively, and approached
+human performance on the ImageNet dataset. ResNet \cite{heDeepResidualLearning2016} is up to 156 layers deep,
+and exceeds human performance at image classification with an error of 3.57\%.
+ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies on
+the input of a previous layer.
 
-For our application, we want to be able to . YOLO (You Only Look Once)
+Object localization is another core problem within this field, and involves identifying the location of objects within an image,
+as well as classifying them. This is important for our wheelchair, as we want to be able to identify the location of
+a pedestrian or obstacle within the environment. % RCNN and YOLO
+
+Some 
+
+% classification, localization, segmentation, video, datasets
+% SLAM, mapping
 
 \subsection{Assistive Control}
 
