@@ -12,3 +12,4 @@
 *.lof
 *.lot
 *.toc
+.ipynb_checkpoints/
