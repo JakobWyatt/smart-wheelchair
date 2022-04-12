@@ -34,7 +34,8 @@ def PushFrame(p):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     if platform.system() == "Darwin":
         print("No GPU")
-    output = cv2.VideoWriter(f'test.mp4', fourcc, p.fps, (p.width,  p.height))
+    # This is a hack
+    output = cv2.VideoWriter(f'test.mp4', fourcc, p.fps, (p.width,  p.height * 2))
     cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
     def push_frame(frame):
         if frame is None:
@@ -46,10 +47,13 @@ def PushFrame(p):
     return push_frame
 
 def ProcessFrame(p):
-    model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_resnet50', pretrained=True)
-    model.eval()
+    # resnet50 resnet101 mobilenet_v3_large
+    seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
+    seg_model.eval()
     if torch.cuda.is_available():
-        model.to('cuda')
+        seg_model.to('cuda')
+    # nsmlx
+    yolo = torch.hub.load('ultralytics/yolov5', 'yolov5s')
     
     colors = np.random.randint(256, size=(21, 3), dtype=np.uint8)
     colors[0] = [0, 0, 0]
@@ -73,12 +77,19 @@ def ProcessFrame(p):
         return np.array(frame)
     
     def process_frame(frame):
+        # segmentation
         # opencv: 2d array, linear pixels, bgr, 0-255
         model_input = preprocess_frame(frame)
         with torch.no_grad():
-            output = model(model_input)
+            output = seg_model(model_input)
         output_predictions = output['out'][0].argmax(0).byte().cpu().numpy()
-        return np.vstack((frame, postprocess_frame(output_predictions)))
+        # yolo
+        detected = yolo(frame)
+        detected.render()
+        detected = detected.imgs[0]
+
+        stacked = np.vstack((detected, postprocess_frame(output_predictions)))
+        return stacked
     return process_frame
 
 def main(*, source: str, drop_frames: bool):
