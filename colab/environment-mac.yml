@@ -1,0 +1,33 @@
+name: thesis
+channels:
+ - defaults
+ - conda-forge
+ - fastai
+ - pytorch
+dependencies:
+ - python>=3.7.0
+ - numpy>=1.18.5
+ - matplotlib>=3.2.2
+ - pillow>=7.1.2
+ - pyyaml>=5.3.1
+ - requests>=2.23.0
+ - scipy>=1.4.1
+ - pytorch::torchvision>=0.12.0
+ - tqdm>=4.41.0
+ - pandas>=1.1.4
+ - seaborn>=0.11.0
+ - tensorboard>=2.4.1
+ - pytorch>=1.7.0
+ # above dependencies are for yolov5
+ # other ai libraries
+ - tensorflow
+ - fastai
+ # utilities
+ - ffmpeg
+ - jupyterlab
+ # h264
+ - openh264=1.8.0
+ # pip
+ - pip
+ - pip:
+   - opencv-python>=4.1.2

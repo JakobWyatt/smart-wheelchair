@@ -1,6 +1,7 @@
 import cv2
 import argparse
 import time
+import platform
 
 def main():
     parser = argparse.ArgumentParser()
@@ -12,8 +13,13 @@ def main():
         return
     fps, width, height = vid.get(cv2.CAP_PROP_FPS), int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
     print(f"Video Properties:\nfps {fps} resolution {width},{height}")
-    fourcc = cv2.VideoWriter_fourcc(*'H264')
-    output = cv2.VideoWriter('test.mp4', fourcc, fps, (width,  height))
+    if platform.system() == "Darwin":
+        fourcc = cv2.VideoWriter_fourcc(*'X264')
+        extension = 'mkv'
+    else:
+        fourcc = cv2.VideoWriter_fourcc(*'H264')
+        extension = 'mp4'
+    output = cv2.VideoWriter(f'test.{extension}', fourcc, fps, (width,  height))
     while True:
         success, frame = vid.read()
         # press q to exit
