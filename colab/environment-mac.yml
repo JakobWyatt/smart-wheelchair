@@ -5,7 +5,7 @@ channels:
  - fastai
  - pytorch
 dependencies:
- - python>=3.7.0
+ - python>=3.9.0
  - numpy>=1.18.5
  - matplotlib>=3.2.2
  - pillow>=7.1.2
