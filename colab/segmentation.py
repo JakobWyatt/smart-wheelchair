@@ -31,10 +31,11 @@ def GenerateFrame(path):
 
 def PushFrame(p):
     print(f"Video Properties:\nfps {p.fps} resolution {p.width},{p.height}")
-    fourcc = cv2.VideoWriter_fourcc(*'avc1') # unpatented h264
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     if platform.system() == "Darwin":
         print("No GPU")
     output = cv2.VideoWriter(f'test.mp4', fourcc, p.fps, (p.width,  p.height))
+    cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
     def push_frame(frame):
         if frame is None:
             output.release()
@@ -77,7 +78,7 @@ def ProcessFrame(p):
         with torch.no_grad():
             output = model(model_input)
         output_predictions = output['out'][0].argmax(0).byte().cpu().numpy()
-        return postprocess_frame(output_predictions)
+        return np.vstack((frame, postprocess_frame(output_predictions)))
     return process_frame
 
 def main(*, source: str, drop_frames: bool):
