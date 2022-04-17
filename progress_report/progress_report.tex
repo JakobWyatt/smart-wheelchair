@@ -134,12 +134,15 @@ Image classification is a core problem within this field, and involves identifyi
 subject of an image (such as an animal or object).
 AlexNet \cite{krizhevskyImageNetClassificationDeep2012}, based on the earlier digit-recognition CNN LeNet-5
 \cite{lecunGradientbasedLearningApplied1998}, was one of the first deep CNNs
-applied to this problem. Alexnet was trained on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009}
-and achieved an error of only 15.3\%. The underlying architecture uses a series of 5 convolutional
+applied to this problem. Alexnet was trained on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009},
+which consists of 15M images and 22K categories,
+and achieved an error of only 15.3\% on a 1000 class subset. The underlying architecture uses a series of 5 convolutional
 layers and 3 fully connected layers.
+
 Neural network architectures have become deeper and more accurate over time, enabled by both
-growth in computational power and dataset size. GoogLeNet \cite{szegedyGoingDeeperConvolutions2014}
-and VGG-16 \cite{simonyanVeryDeepConvolutional2014} are 22 and 16 layers deep respectively, and approached
+growth in computational power and dataset size. VGG-16 \cite{simonyanVeryDeepConvolutional2014}
+and GoogLeNet \cite{szegedyGoingDeeperConvolutions2014}
+are 16 and 22 layers deep respectively, and approached
 human performance on the ImageNet dataset. ResNet \cite{heDeepResidualLearning2016} is up to 156 layers deep,
 and exceeds human performance at image classification with an error of 3.57\%.
 ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies on
@@ -147,12 +150,25 @@ the input of a previous layer.
 
 Object localization is another core problem within this field, and involves identifying the location of objects within an image,
 as well as classifying them. This is important for our wheelchair, as we want to be able to identify the location of
-a pedestrian or obstacle within the environment. % RCNN and YOLO
+a pedestrian or obstacle within the environment. R-CNN \cite{girshickRichFeatureHierarchies2013} was one of the
+first object classification models which utilized convolutional networks, by identifying potential bounding boxes
+and running an image classifier on these bounding boxes. Fast and Faster R-CNN \cite{girshickFastRCNN2015}\cite{renFasterRCNNRealTime2015}
+improved the speed of this model by running an image classifier backbone once on the entire image, and using a CNN to improve
+identification of bounding boxes. Pascal VOC \cite{everinghamPascalVisualObject2009} and MS COCO \cite{linMicrosoftCOCOCommon2014}
+are datasets which are commonly used to evaluate object classification models.
 
-Some 
+YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000BetterFaster2016}\cite{redmonYOLOv3IncrementalImprovement2018}\cite{bochkovskiyYOLOv4OptimalSpeed2020}
+is another object classification model which focuses on improving performance. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
+reaches over 60 fps on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
+YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
+image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
+%YOLOv4 uses a backbone-neck-head architecture
+
+
+% U-net, deepnet
 
 % classification, localization, segmentation, video, datasets
-% SLAM, mapping
+% SLAM, mapping, hybridnet, etc.
 
 \subsection{Assistive Control}
 
@@ -183,6 +199,8 @@ To train and evaluate machine learning models, a dataset was collected.
 
 \section{Current Work}
 % 34 minute dataset
+% algorithm:
+% object detection, find out more about VSLAM, path planning
 The first stages of smart wheelchair development involved:
 \begin{enumerate}
     \item Identifying desired sensors and hardware for the wheelchair.

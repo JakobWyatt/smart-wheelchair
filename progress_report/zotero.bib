@@ -27,6 +27,14 @@
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/bochkovskiyYOLOv4OptimalSpeed2020.pdf}
 }
 
+@software{bradskiOpenCVLibrary2000,
+  title = {The {{OpenCV Library}}},
+  author = {Bradski, Gary},
+  date = {2000},
+  url = {https://opencv.org/},
+  keywords = {Framework}
+}
+
 @inproceedings{dawoodDistanceMeasurementSelfDriving2017,
   title = {Distance {{Measurement}} for {{Self-Driving Cars Using Stereo Camera}}},
   booktitle = {Proceedings of the 6th {{International Conference}} of {{Computing}} \& {{Informatics}}},
@@ -71,6 +79,24 @@
   abstract = {Thanks to advances in electric wheelchair design, persons with motor impairments due to diseases, such as amyotrophic lateral sclerosis (ALS), have tools to become more independent and mobile. However, an electric wheelchair generally requires considerable skill to learn how to use and operate. Moreover, some persons with motor disabilities cannot drive an electric wheelchair manually (even with a joystick), because they lack the physical ability to control their hand movement (such is the case with people with ALS). In this paper, we propose a novel system that enables a person with motor disability to control a wheelchair via eye-gaze and to provide a continuous, real-time navigation in unknown environments. The system comprises a Permobile M400 wheelchair, eye tracking glasses, a depth camera to capture the geometry of the ambient space, a set of ultrasound and infrared sensors to detect obstacles with low proximity that are out of the field of view for the depth camera, a laptop placed on a flexible mount for maximized comfort, and a safety off switch to turn off the system whenever needed. First, a novel algorithm is proposed to support continuous, real-time target identification, path planning, and navigation in unknown environments. Second, the system utilizes a novel N-cell grid-based graphical user interface that adapts to input/output interfaces specifications. Third, a calibration method for the eye tracking system is implemented to minimize the calibration overheads. A case study with a person with ALS is presented, and interesting findings are discussed. The participant showed improved performance in terms of calibration time, task completion time, and navigation speed for a navigation trips between office, dining room, and bedroom. Furthermore, debriefing the caregiver has also shown promising results: the participant enjoyed higher level of confidence driving the wheelchair and experienced no collisions through all the experiment.},
   keywords = {Wheelchairs},
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/eidNovelEyeGazeControlledWheelchair2016.pdf}
+}
+
+@article{everinghamPascalVisualObject2009,
+  title = {The {{Pascal Visual Object Classes}} ({{VOC}}) {{Challenge}}},
+  author = {Everingham, Mark and Van Gool, Luc and Williams, Christopher K. I and Winn, John and Zisserman, Andrew},
+  date = {2009},
+  journaltitle = {International Journal of Computer Vision},
+  shortjournal = {Int J Comput Vis},
+  volume = {88},
+  number = {2},
+  pages = {303--338},
+  publisher = {{Boston: Springer US}},
+  location = {{Boston}},
+  issn = {0920-5691},
+  doi = {10.1007/s11263-009-0275-4},
+  abstract = {The Pascal Visual Object Classes (VOC) challenge is a benchmark in visual object category recognition and detection, providing the vision and machine learning communities with a standard dataset of images and annotation, and standard evaluation procedures. Organised annually from 2005 to present, the challenge and its associated dataset has become accepted as the benchmark for object detection. This paper describes the dataset and evaluation procedure. We review the state-of-the-art in evaluated methods for both classification and detection, analyse whether the methods are statistically different, what they are learning from the images (e.g. the object or its context), and what the methods find easy or confuse. The paper concludes with lessons learnt in the three year history of the challenge, and proposes directions for future improvement and extension.},
+  keywords = {Dataset,Machine Learning},
+  file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/everinghamPascalVisualObject2009.pdf}
 }
 
 @inproceedings{girshickFastRCNN2015,
@@ -300,6 +326,36 @@
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/lugaresiMediaPipeFrameworkBuilding2019.pdf}
 }
 
+@article{mur-artalORBSLAM2OpenSourceSLAM2017,
+  title = {{{ORB-SLAM2}}: {{An Open-Source SLAM System}} for {{Monocular}}, {{Stereo}}, and {{RGB-D Cameras}}},
+  author = {Mur-Artal, Raul and Tardos, Juan D},
+  date = {2017},
+  journaltitle = {IEEE Transactions on Robotics},
+  shortjournal = {TRO},
+  volume = {33},
+  number = {5},
+  pages = {1255--1262},
+  publisher = {{PISCATAWAY: IEEE}},
+  location = {{PISCATAWAY}},
+  issn = {1552-3098},
+  doi = {10.1109/TRO.2017.2705103},
+  abstract = {We present ORB-SLAM2, a complete simultaneous localization and mapping (SLAM) system for monocular, stereo and RGB-D cameras, including map reuse, loop closing, and relocalization capabilities. The system works in real time on standard central processing units in a wide variety of environments from small hand-held indoors sequences, to drones flying in industrial environments and cars driving around a city. Our back-end, based on bundle adjustment with monocular and stereo observations, allows for accurate trajectory estimation with metric scale. Our system includes a lightweight localization mode that leverages visual odometry tracks for unmapped regions and matches with map points that allow for zero-drift localization. The evaluation on 29 popular public sequences shows that our method achieves state-of-the-art accuracy, being in most cases the most accurate SLAM solution. We publish the source code, not only for the benefit of the SLAM community, but with the aim of being an out-of-the-box SLAM solution for researchers in other fields.},
+  keywords = {Model,SLAM},
+  file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/mur-artalORBSLAM2OpenSourceSLAM2017.pdf}
+}
+
+@article{paszkePyTorchImperativeStyle2019,
+  title = {{{PyTorch}}: {{An Imperative Style}}, {{High-Performance Deep Learning Library}}},
+  author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Köpf, Andreas and Yang, Edward and DeVito, Zach and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  date = {2019},
+  journaltitle = {Advances in Neural Information Processing Systems},
+  volume = {32},
+  pages = {8024--8035},
+  abstract = {Deep learning frameworks have often focused on either usability or speed, but not both. PyTorch is a machine learning library that shows that these two goals are in fact compatible: it provides an imperative and Pythonic programming style that supports code as a model, makes debugging easy and is consistent with other popular scientific computing libraries, while remaining efficient and supporting hardware accelerators such as GPUs. In this paper, we detail the principles that drove the implementation of PyTorch and how they are reflected in its architecture. We emphasize that every aspect of PyTorch is a regular Python program under the full control of its user. We also explain how the careful and pragmatic implementation of the key components of its runtime enables them to work together to achieve compelling performance. We demonstrate the efficiency of individual subsystems, as well as the overall speed of PyTorch on several common benchmarks.},
+  keywords = {Framework,Machine Learning},
+  file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/paszkePyTorchImperativeStyle2019.pdf}
+}
+
 @article{redmonYOLO9000BetterFaster2016,
   title = {{{YOLO9000}}: {{Better}}, {{Faster}}, {{Stronger}}},
   author = {Redmon, Joseph and Farhadi, Ali},
@@ -453,6 +509,13 @@
   isbn = {978-981-4585-42-2},
   keywords = {From Survey,Wheelchairs},
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/tomariEnhancingWheelchairControl2014.pdf}
+}
+
+@software{ultralyticsYOLOv5,
+  title = {{{YOLOv5}}},
+  author = {{Ultralytics}},
+  url = {https://github.com/ultralytics/yolov5},
+  keywords = {Machine Learning,Model}
 }
 
 @inproceedings{vanderpoortenPoweredWheelchairNavigation2012,
