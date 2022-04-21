@@ -15,7 +15,7 @@
 \usepackage{amsmath} \usepackage{graphicx} \usepackage{microtype} \usepackage{float}
 \usepackage[hidelinks]{hyperref} \usepackage{cleveref}
 \usepackage{siunitx} \usepackage{gensymb}
-\usepackage{tabularx} \usepackage{booktabs}
+\usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox}
 \usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
 
 \begin{document}
@@ -86,43 +86,83 @@ on the wheelchair.
 \pagebreak
 
 \section{Literature Review}
-%Smart wheelchairs are wheelchairs with additional sensors and computers,
-%enabling greater usability and safety. This can come in the form of alternative input methods,
-%such as eye-gaze tracking \cite{eidNovelEyeGazeControlledWheelchair2016} or using a brain-computer
-%interface \cite{kaufmannBraincomputerInterfaceBased2014} to control the wheelchair. For people with vision impairment,
-%haptic feedback \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}
-%has been used to improve awareness of the surrounding environment and make indoor navigation safer.
+Smart wheelchairs are wheelchairs with additional sensors and computers,
+enabling greater usability and safety. This can come in the form of alternative input methods,
+such as eye-gaze tracking \cite{eidNovelEyeGazeControlledWheelchair2016} or using a brain-computer
+interface \cite{kaufmannBraincomputerInterfaceBased2014} to control the wheelchair. For people with vision impairment,
+haptic feedback \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}
+has been used to improve awareness of the surrounding environment and make indoor navigation safer.
 
-Initial research on semi-autonomous wheelchairs 
+There has been greater interest in 
 
 \subsection{Sensors and Hardware}
 To percieve the environment, the wheelchair should be fitted with various sensors and
-a compute element to process the sensors output. 
+a compute element to process the sensors output.
 
-\Cref{table:sensor_options} shows some sensors that were considered for use in the smart wheelchair.
+Other approaches to smart wheelchairs
+in the past have utilized RGB-D stereo cameras \cite{jainAutomatedPerceptionSafe2014},
+2d Lidar \cite{scudellariSelfdrivingWheelchairsDebut2017}, and ultrasonic sensors \cite{levineNavChairAssistiveWheelchair1999}
+to percieve the surrounding environment. Self-driving cars built by companies such as Tesla and Waymo
+use cameras, mmWave Radar, and 3d Lidar to avoid traffic and pedestrians.
+
+Various sensor options are compared in \Cref{table:sensor_options}.
 Selecting a sensor to use is not necessarily an either-or decision. Sensor fusion algorithms such as
 the Extended Kalman Filter (EKF) or Unscented Kalman Filter (UKF) \cite{wanUnscentedKalmanFilter2000} allow
 outputs from multiple sensors to be used together to improve their accuracy. Additionally, some sensors may
-be used for different applications on the smart wheelchair.
+be used for different applications on the smart wheelchair - an inertial measurement unit (IMU) would help improve
+wheelchair odometry, but was not listed below.
 
-\begin{table}
+\begin{table}[H]
     \centering
+\begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c}
     \toprule
     Sensor & Advantages & Disadvantages \\
     \midrule
-    Stereo Camera & High Resolution & \\
-    MMWave Radar & & \\
-    3D Lidar & & High Cost \\
-    2D Lidar & & \\
-    Ultrasonic Radar & & \\
-    Inertial Measurement Unit (IMU) & & \\
-    Servo Motor Encoder & & \\
+    RGB-D Stereo Camera & Very high resolution & Low field of view (FOV) \\
+    mmWave Radar & High accuracy & Low resolution \\
+    3D Lidar & High resolution and accuracy & Very high cost \\
+    2D Lidar & High FOV and accuracy & Only detects obstacles within the same plane \\
+    Ultrasonic sensor & Low cost & One-dimensional \\
     \bottomrule
     \end{tabular}
+\end{adjustbox}
     \caption{Sensor Comparisons}
     \label{table:sensor_options}
 \end{table}
+
+% Description of different sensor types?
+
+Several commercial options for an RGB-D camera are compared in \Cref{table:stereo_camera}.
+Factors such as package size, field of view, and accuracy are important to consider due to the available
+mounting points on the wheelchair. All of the below units come with an integrated IMU, and do not have a compute
+element on board.
+Costs are taken at the exchange rate of 1 AUD = 0.74 USD.
+
+The Microsoft Azure Kinect DK has multiple operating modes which tradeoff between FOV, operating range,
+and resolution. The configuration listed in the table below is the \texttt{NFOV unbinned} mode, which
+provides good tradeoff between operating range and resolution.
+
+\begin{table}
+    \centering
+\begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{c c c c c c}
+    \toprule
+    Name & Type & Cost (AUD) & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
+    \midrule
+    Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & Passive & \$595 & $124.5\times 30.5\times 26.5$ & $90\degree\times 60\degree\times 100\degree$ & 0.1-15\\
+    Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & Passive & \$670 & $175\times 30\times 33$ & $110\degree\times 70\degree\times 120\degree$ & 0.3-20 \\
+    Intel RealSense D455 \cite{intelIntelRealSenseProduct2022} & Active IR (Stereo) & \$595 & $124\times 26\times 29$ & $90\degree\times 65\degree\times 87\degree$ & 0.6-6 \\
+    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (ToF) & \$595 & $103\times 39\times 126$ & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
+    \bottomrule
+    \end{tabular}
+\end{adjustbox}
+    \caption{Stereo Camera Options}
+    \label{table:stereo_camera}
+\end{table}
+
+% Compute element
+The compute element  Note that the Stereolabs Zed products require an Nvidia GPU with CUDA capability to operate.
 
 \subsection{Scene Understanding}
 Scene understanding is a broad field, and involves using computer vision methods
