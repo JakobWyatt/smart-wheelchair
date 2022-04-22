@@ -35,6 +35,11 @@
 \pagebreak
 
 \pagenumbering{arabic}
+
+
+
+
+
 \section{Introduction}
 Many people with motor disabilities rely on wheelchairs for movement, and
 powered wheelchairs have enabled greater independance for people with disability.
@@ -43,6 +48,7 @@ the use of this technology can be inaccessible or unsafe for people
 with amyotrophic lateral sclerosis (ALS) or vision impairment,
 who may be unable to use a joystick or see their environment clearly.
 
+
 \subsection{Aims}
 The aim of this research is to develop a semi-autonomous smart wheelchair system.
 This research is done in collaboration with Glide, a WA wheelchair manufacturer,
@@ -50,6 +56,14 @@ who have provided an existing powered wheelchair (CentroGlide) to use as a base
 for this functionality. By developing assistive technology for the wheelchair,
 the user is granted greater mobility, confidence, and independence.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/wheelchair_reclined.jpeg}
+    \caption{CentroGlide in Reclined Configuration}
+    \label{fig:wheelchair_reclined}
+\end{figure}
+
+\pagebreak
 \subsection{Problem Definition}
 There are multiple engineering research project students who are part of this team,
 working on elements such as controller design, navigation assistance, and object detection.
@@ -77,40 +91,39 @@ for the system to operate either - the round trip time required to communicate w
 would compromise the safety of a user. Because of this, all processing is performed locally
 on the wheelchair.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/wheelchair_reclined.jpeg}
-    \caption{CentroGlide in Reclined Configuration}
-    \label{fig:wheelchair_reclined}
-\end{figure}
 \pagebreak
 
-\section{Literature Review}
-Smart wheelchairs are wheelchairs with additional sensors and computers,
-enabling greater usability and safety. This can come in the form of alternative input methods,
-such as eye-gaze tracking \cite{eidNovelEyeGazeControlledWheelchair2016} or using a brain-computer
-interface \cite{kaufmannBraincomputerInterfaceBased2014} to control the wheelchair. For people with vision impairment,
-haptic feedback \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}
-has been used to improve awareness of the surrounding environment and make indoor navigation safer.
 
-There has been greater interest in 
+
+
+
+\section{Literature Review}
+%Smart wheelchairs are wheelchairs with additional sensors and computers,
+%enabling greater usability and safety. This can come in the form of alternative input methods,
+%such as eye-gaze tracking \cite{eidNovelEyeGazeControlledWheelchair2016} or using a brain-computer
+%interface \cite{kaufmannBraincomputerInterfaceBased2014} to control the wheelchair. For people with vision impairment,
+%haptic feedback \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}
+%has been used to improve awareness of the surrounding environment and make indoor navigation safer.
+
 
 \subsection{Sensors and Hardware}
-To percieve the environment, the wheelchair should be fitted with various sensors and
-a compute element to process the sensors output.
+%To percieve the environment, the wheelchair should be fitted with various sensors and
+%a compute element to process the sensors output.
 
-Other approaches to smart wheelchairs
-in the past have utilized RGB-D stereo cameras \cite{jainAutomatedPerceptionSafe2014},
-2d Lidar \cite{scudellariSelfdrivingWheelchairsDebut2017}, and ultrasonic sensors \cite{levineNavChairAssistiveWheelchair1999}
-to percieve the surrounding environment. Self-driving cars built by companies such as Tesla and Waymo
+\subsubsection{Sensor Types}
+Smart wheelchairs have used a varied range of sensor types to percieve the surrounding environment.
+RGB-D stereo cameras have been widely used in the field \cite{wangS2P2SelfSupervisedGoalDirected2021}\cite{wangSelfSupervisedDrivableArea2019}\cite{jainAutomatedPerceptionSafe2014},
+alongside 2d Lidar \cite{scudellariSelfdrivingWheelchairsDebut2017} and ultrasonic sensors \cite{levineNavChairAssistiveWheelchair1999}.
+Self-driving cars built by companies such as Tesla and Waymo
 use cameras, mmWave Radar, and 3d Lidar to avoid traffic and pedestrians.
 
-Various sensor options are compared in \Cref{table:sensor_options}.
 Selecting a sensor to use is not necessarily an either-or decision. Sensor fusion algorithms such as
 the Extended Kalman Filter (EKF) or Unscented Kalman Filter (UKF) \cite{wanUnscentedKalmanFilter2000} allow
-outputs from multiple sensors to be used together to improve their accuracy. Additionally, some sensors may
-be used for different applications on the smart wheelchair - an inertial measurement unit (IMU) would help improve
-wheelchair odometry, but was not listed below.
+outputs from multiple sensors to be used together to improve their accuracy. Additionally, sensors can
+be used for different applications on the smart wheelchair - a stereo camera could be used to sense the surrounding environment
+while an inertial measurement unit (IMU) could be used for wheelchair odometry.
+\Cref{table:sensor_options} gives a comparison of several available sensor types,
+taking into account factors such as resolution, cost, and accuracy.
 
 \begin{table}[H]
     \centering
@@ -133,27 +146,28 @@ wheelchair odometry, but was not listed below.
 
 % Description of different sensor types?
 
-Several commercial options for an RGB-D camera are compared in \Cref{table:stereo_camera}.
-Factors such as package size, field of view, and accuracy are important to consider due to the available
-mounting points on the wheelchair. All of the below units come with an integrated IMU, and do not have a compute
-element on board.
-Costs are taken at the exchange rate of 1 AUD = 0.74 USD.
+\subsubsection{RGB-D Cameras}
+One advantage RGB-D cameras have over alternative sensors is high RGB resolution,
+allowing them to utilize recent advantages in machine learning and computer vision.
+Sensors such as LIDAR may fail at path detection, as features such as drawn lines must
+be distinguished visually from the surroundings.
 
-The Microsoft Azure Kinect DK has multiple operating modes which tradeoff between FOV, operating range,
-and resolution. The configuration listed in the table below is the \texttt{NFOV unbinned} mode, which
-provides good tradeoff between operating range and resolution.
+When comparing these cameras, factors such as package size,
+field of view, and depth accuracy are important to consider due to the available
+mounting points on the wheelchair. Several commercial options are compared in \Cref{table:stereo_camera}
+- all of the listed units come with an integrated IMU.
 
-\begin{table}
+\begin{table}[H]
     \centering
 \begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
     \toprule
-    Name & Type & Cost (AUD) & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
+    Name & Type & Cost (AUD)\footnote{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD} & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
     \midrule
     Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & Passive & \$595 & $124.5\times 30.5\times 26.5$ & $90\degree\times 60\degree\times 100\degree$ & 0.1-15\\
     Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & Passive & \$670 & $175\times 30\times 33$ & $110\degree\times 70\degree\times 120\degree$ & 0.3-20 \\
     Intel RealSense D455 \cite{intelIntelRealSenseProduct2022} & Active IR (Stereo) & \$595 & $124\times 26\times 29$ & $90\degree\times 65\degree\times 87\degree$ & 0.6-6 \\
-    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (ToF) & \$595 & $103\times 39\times 126$ & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
+    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (Time of Flight)\footnote{The Microsoft Azure Kinect DK has multiple operating modes which tradeoff between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good tradeoff between operating range and resolution.} & \$595 & $103\times 39\times 126$ & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
     \bottomrule
     \end{tabular}
 \end{adjustbox}
@@ -161,15 +175,49 @@ provides good tradeoff between operating range and resolution.
     \label{table:stereo_camera}
 \end{table}
 
-% Compute element
-The compute element  Note that the Stereolabs Zed products require an Nvidia GPU with CUDA capability to operate.
+A caveat of the Stereolabs products is that they require a seperate CUDA enabled GPU (Nvidia) to generate the point-cloud
+and RGB-D image. The Kinect DK requires a CPU for processing, while the Intel RealSense performs processing onboard
+and only requires a USB-C 3.1 interface to communicate.
 
+\subsubection{Compute Element}
+The compute element consists of several components - a microcontroller to process user inputs and
+send signals to the motors, a general purpose computer to run pathfinding algorithms and log information,
+and an AI accelerator to improve performance of on-board ML algorithms.
+
+AI accelerators use specialized hardware to perform operations common in ML algorithms (such as matrix multiplication
+and convolution) more efficiently than a CPU can. GPUs have been used widely for this application, however their high
+power usage is infeasible for some applications. Embedded AI accelerators aim to provide greater power efficiency
+at the cost of specialization.
+
+The Nvidia Jetson and Google Coral products are both popular options for embedded AI acceleration. These accelerators are compared
+in \Cref{table:compute_element}, alongside a GPU. Speed is difficult to compare across different products - originally, 
+
+\begin{table}[H]
+    \centering
+\begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{c c c c c c}
+    \toprule
+    Name & Cost (AUD) & Speed & Power (W) & Notes \\
+    \midrule
+    Nvidia Jetson Nano \cite{stereolabsZEDMiniCamera2018} & \\
+    Nvidia Jetson Xavier NX \cite{stereolabsZEDCameraSDK2019} & \\
+    Nvidia GTX 1080 \cite{intelIntelRealSenseProduct2022} & \\
+    Google Coral Edge TPU \cite{} & \\
+    \bottomrule
+    \end{tabular}
+\end{adjustbox}
+    \caption{AI Accelerator Options}
+    \label{table:compute_element}
+\end{table}
+
+\pagebreak
 \subsection{Scene Understanding}
 Scene understanding is a broad field, and involves using computer vision methods
 on visual or spatial data to gain better knowledge about the surrounding environment.
 Convolutional Neural Networks (CNNs) are commonly used for this application, as they
 are able to exploit the local nature of image features to reduce the number of required computations.
 
+\subsubsection{Image Classification}
 Image classification is a core problem within this field, and involves identifying the
 subject of an image (such as an animal or object).
 AlexNet \cite{krizhevskyImageNetClassificationDeep2012}, based on the earlier digit-recognition CNN LeNet-5
@@ -185,9 +233,10 @@ and GoogLeNet \cite{szegedyGoingDeeperConvolutions2014}
 are 16 and 22 layers deep respectively, and approached
 human performance on the ImageNet dataset. ResNet \cite{heDeepResidualLearning2016} is up to 156 layers deep,
 and exceeds human performance at image classification with an error of 3.57\%.
-ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies on
+ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies directly on
 the input of a previous layer.
 
+\subsubsection{Object Localization}
 Object localization is another core problem within this field, and involves identifying the location of objects within an image,
 as well as classifying them. This is important for our wheelchair, as we want to be able to identify the location of
 a pedestrian or obstacle within the environment. R-CNN \cite{girshickRichFeatureHierarchies2013} was one of the
@@ -204,11 +253,13 @@ YOLO divides an image into an $S\times S$ grid, and uses a single convolutional 
 image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
 
+\subsubsection{Semantic Segmentation}
 
 % U-net, deepnet
 
 % classification, localization, segmentation, video, datasets
 % SLAM, mapping, hybridnet, etc.
+
 
 \subsection{Assistive Control}
 
@@ -222,7 +273,12 @@ image classification for each grid square. Low-probability and overlapping bound
 %\cite{tomariEnhancingWheelchairControl2014}
 \pagebreak
 
+
+
+
+
 \section{Methodology}
+
 \subsection{Hardware}
 The smart wheelchair should have the ability to sense, process, and manouver within the surrounding environment.
 To do this requires some necessary hardware, including a sensor system, compute element, and motor controller.
@@ -235,9 +291,15 @@ frameworks and low power usage.
 
 \subsection{Dataset Collection}
 To train and evaluate machine learning models, a dataset was collected.
+
 \pagebreak
 
+
+
+
+
 \section{Current Work}
+
 % 34 minute dataset
 % algorithm:
 % object detection, find out more about VSLAM, path planning
@@ -250,9 +312,6 @@ The first stages of smart wheelchair development involved:
 \end{enumerate}
 
 \subsection{Hardware}
-
-
-
 
 After consideration of the available options, it was decided to use a stereo camera as the main
 forward facing sensor, with 2D LIDAR used for the side and rear of the wheelchair.
@@ -282,8 +341,17 @@ navigation and docking, due to the low field of view (FOV).
 
 \pagebreak
 
+
+
+
+
 \section{Future Work}
+
 \pagebreak
+
+
+
+
 
 \printbibliography[heading=bibnumbered]
 
