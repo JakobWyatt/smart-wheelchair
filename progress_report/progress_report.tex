@@ -15,7 +15,7 @@
 \usepackage{amsmath} \usepackage{graphicx} \usepackage{microtype} \usepackage{float}
 \usepackage[hidelinks]{hyperref} \usepackage{cleveref}
 \usepackage{siunitx} \usepackage{gensymb}
-\usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox}
+\usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox} \usepackage{makecell}
 \usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
 
 \begin{document}
@@ -148,7 +148,7 @@ taking into account factors such as resolution, cost, and accuracy.
 
 \subsubsection{RGB-D Cameras}
 One advantage RGB-D cameras have over alternative sensors is high RGB resolution,
-allowing them to utilize recent advantages in machine learning and computer vision.
+allowing them to utilize advances in machine learning and computer vision.
 Sensors such as LIDAR may fail at path detection, as features such as drawn lines must
 be distinguished visually from the surroundings.
 
@@ -162,7 +162,7 @@ mounting points on the wheelchair. Several commercial options are compared in \C
 \begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
     \toprule
-    Name & Type & Cost (AUD)\footnote{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD} & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
+    Name & Type & Cost (AUD)\footnote[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD} & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
     \midrule
     Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & Passive & \$595 & $124.5\times 30.5\times 26.5$ & $90\degree\times 60\degree\times 100\degree$ & 0.1-15\\
     Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & Passive & \$670 & $175\times 30\times 33$ & $110\degree\times 70\degree\times 120\degree$ & 0.3-20 \\
@@ -179,8 +179,9 @@ A caveat of the Stereolabs products is that they require a seperate CUDA enabled
 and RGB-D image. The Kinect DK requires a CPU for processing, while the Intel RealSense performs processing onboard
 and only requires a USB-C 3.1 interface to communicate.
 
-\subsubection{Compute Element}
-The compute element consists of several components - a microcontroller to process user inputs and
+\subsubsection{Compute Element}
+A compute element inside a semi-autonomous driving system generally consists of several components -
+a microcontroller to process user inputs and
 send signals to the motors, a general purpose computer to run pathfinding algorithms and log information,
 and an AI accelerator to improve performance of on-board ML algorithms.
 
@@ -189,20 +190,29 @@ and convolution) more efficiently than a CPU can. GPUs have been used widely for
 power usage is infeasible for some applications. Embedded AI accelerators aim to provide greater power efficiency
 at the cost of specialization.
 
+ML models often use mixed-precision (FP16) datatypes to store weights while training. This helps improve the accuracy
+of the model, however can have a negative impact on speed during inference. One technique used to improve the speed
+of the model is quantization \cite{jacobQuantizationTrainingNeural2017}, where the FP16 datatype is replaced with an
+INT8 datatype (using a scaling factor and bias). This gives a large speed improvement, while only losing a small amount
+of model accuracy.
+For this reason, modern AI accelerators focus on the performance of INT8 operations (TOPS, $10^9$ operations per second),
+whereas earlier accelerators state the performance of FP16 operations (TFLOPS, $10^9$ floating-point
+operations per second).
+
 The Nvidia Jetson and Google Coral products are both popular options for embedded AI acceleration. These accelerators are compared
-in \Cref{table:compute_element}, alongside a GPU. Speed is difficult to compare across different products - originally, 
+in \Cref{table:compute_element} alongside a gaming GPU. 
 
 \begin{table}[H]
     \centering
 \begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
     \toprule
-    Name & Cost (AUD) & Speed & Power (W) & Notes \\
+    Name & Cost (AUD)\footnotemark[1] & Release Year & Speed & Power & Notes \\
     \midrule
-    Nvidia Jetson Nano \cite{stereolabsZEDMiniCamera2018} & \\
-    Nvidia Jetson Xavier NX \cite{stereolabsZEDCameraSDK2019} & \\
-    Nvidia GTX 1080 \cite{intelIntelRealSenseProduct2022} & \\
-    Google Coral Edge TPU \cite{} & \\
+    Nvidia Jetson Nano \cite{nvidiaJetsonNanoSystemonModule2019} & \$150 & Early 2019 & 0.5 TFLOPS (FP16) & 10 W & - \\
+    Nvidia Jetson Xavier NX \cite{nvidiaJetsonXavierNX2019} & \$595 & Late 2019 & 21 TOPS (INT8) & 20 W & - \\
+    Nvidia RTX 2080 \cite{nvidiaTuringGPUArchitecture2018} & \$1040 & 2018 & \makecell{80.5 TFLOPS (FP16)\\161.1 TOPS (INT8)} & 215 W & Doesn't include single-board computer \\
+    Google Coral Edge TPU \cite{googlecoralCoralDevBoard2020} & \$190 & 2020 & 4 TOPS (INT8) & 2 W & Only supports TensorFlow Lite \\
     \bottomrule
     \end{tabular}
 \end{adjustbox}
@@ -247,7 +257,7 @@ identification of bounding boxes. Pascal VOC \cite{everinghamPascalVisualObject2
 are datasets which are commonly used to evaluate object classification models.
 
 YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000BetterFaster2016}\cite{redmonYOLOv3IncrementalImprovement2018}\cite{bochkovskiyYOLOv4OptimalSpeed2020}
-is another object classification model which focuses on improving performance. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
+is another object classification model which focuses on improving speed. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
 reaches over 60 fps on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
 image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
