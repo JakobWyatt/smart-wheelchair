@@ -295,36 +295,9 @@ To do this requires some necessary hardware, including a sensor system, compute 
 Due to the 2021-2022 chip shortage, hardware selection was identified as a process that should occur relatively quickly.
 
 The literature review provides a comparison between different sensor types and models. For outdoor navigation assistance,
-a forward facing stereo camera was selected as the best option for this project - specifically, the Zed 2 Mini.
-For the compute element, a Nvidia Jetson Xavier NX will be used, due to compatability with existing deep learning
-frameworks and low power usage.
-
-\subsection{Dataset Collection}
-To train and evaluate machine learning models, a dataset was collected.
-
-\pagebreak
-
-
-
-
-
-\section{Current Work}
-
-% 34 minute dataset
-% algorithm:
-% object detection, find out more about VSLAM, path planning
-The first stages of smart wheelchair development involved:
-\begin{enumerate}
-    \item Identifying desired sensors and hardware for the wheelchair.
-    \item Choosing an appropriate mounting point for these sensors.
-    \item Researching the field of machine perception and computer vision (both applied to wheelchairs and more generally).
-    \item Collecting an initial video dataset, enabling work to begin on labelling and algorithm evaluation.
-\end{enumerate}
-
-\subsection{Hardware}
-
-After consideration of the available options, it was decided to use a stereo camera as the main
-forward facing sensor, with 2D LIDAR used for the side and rear of the wheelchair.
+a forward facing RGB-D camera was selected as the best option for this project - specifically, the Zed 2 Mini.
+This was chosen due to the high resolution provided by RGB-D cameras, and the long distance range of the Zed cameras due to 
+their passive operation (does not use an IR emitter).
 
 The front of the joystick control unit was selected as the best mounting point for the
 stereo camera, due to several reasons:
@@ -340,14 +313,37 @@ However, there are some challenges faced when using this mounting point, which m
     \item Close to the front of the wheelchair, which reduces visibility of the sides of the wheelchair.
     \item Maximum camera width of \SI{150}{\milli\metre} before doorway manouverability is affected.
 \end{enumerate}
+Due to the size constraints, the Mini form factor was chosen.
 
-To evaluate the effectiveness of this mounting point, a GoPro (Hero 4) was attached
-using a temporary mount and a 34 minute driving dataset was collected around Curtin University.
-% Images here
-It was found that camera shakiness could be reduced by using a stiffer mounting solution,
-however some shakiness would always remain due to the unstable mounting surface.
-It was also found that alternative sensors, such as 2D LIDAR, would be required for features such as doorway
-navigation and docking, due to the low field of view (FOV).
+An additional sensor with a wider field of view will be needed for doorway navigation
+and wheelchair docking, due to the limitations of this mounting point. The sensor selected for this purpose
+was a 2D Lidar unit attached to the base of the wheelchair. However, this sensor will not be used for
+our specific application (pathway assistance).
+
+For the compute element, a Nvidia Jetson Xavier NX will be used, due to compatability with the Zed API
+and a wide range of ML frameworks, as well as low power use.
+The motor controller is being designed by a different thesis student, however will connect with the compute element in a standard way.
+
+\subsection{Dataset Collection}
+To train and evaluate machine learning models, a 34 minute driving dataset was collected around Curtin University.
+The camera used to collect this dataset was a GoPro Hero 4. Although this camera does lack a depth component,
+having a basic dataset for model evaluation is valuable prior to procurement of the RGB-D camera.
+% Other datasets
+
+\subsection{Software}
+Our software system requires several components. Interaction with the Zed 2 Mini will be done
+via the proprietry Stereolabs API, which will provide RGB-D imaging to the computer.
+PyTorch \cite{paszkePyTorchImperativeStyle2019} will be used for training and evaluation of machine learning models, as it
+provides good compatability with existing models such as YOLOv5 \cite{ultralyticsYOLOv5}
+and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. OpenCV \cite{bradskiOpenCVLibrary2000} will be used to encode and decode video.
+% System diagram
+\pagebreak
+
+
+
+
+
+\section{Current Work}
 
 \pagebreak
 
