@@ -272,7 +272,47 @@ image classification for each grid square. Low-probability and overlapping bound
 
 
 \subsection{Assistive Control}
-Once an understanding of the 3d scene has been built, 
+Once an understanding of the 3d scene has been built, the user can be navigated through the environment.
+As the wheelchair moves in a 2d plane, the surrounding environment can be represented as an occupancy grid \cite{elfesUsingOccupancyGrids1989}.
+This is a top-down view of the surrounding environment where each grid cell includes the probability that it is occupied
+by an obstacle. This representation is widely used in the literature - it is possible to include more information about
+paths and obstacles by adding more information to the occupancy grid.
+
+Semi-autonomous control means that the user decides the desired speed and direction of the wheelchair, with any intervention only
+occuring before a collision takes place. This is in contrast to full autonomy, where the user specifies the
+desired end goal and the wheelchair navigates the way there \cite{wangS2P2SelfSupervisedGoalDirected2021}.
+In full autonomous control, SLAM is required to build a global map of the surroundings - this is not necessary
+for semi-autonomous control, as only a local map is needed for navigation assistance.
+
+\subsubsection{Path-Based Algorithms}
+Path-based algorithms take an occupancy grid as an input, and output a path between the start point and a goal point.
+A* is an example of this, and uses a heuristic to efficiently find the shortest path between the start and end point.
+Other algorithms such as RRT* \cite{karamanSamplingbasedAlgorithmsOptimal2011} (rapidly-exploring random tree) build a tree from randomly sampled points
+to find a path to the goal node. RRT* may not find the shortest path initially, however can find an efficient path with much less
+computation required.
+
+One potential issue with these two algorithms is that they fail to take into account the smoothness of the resulting path.
+Although the path may be short, sharp changes in the trajectory could be uncomfortable to the user.
+Trajectory planning algorithms aim to solve this - one such algorithm is optimal-control in a Fren\'et-Frame \cite{werlingOptimalTrajectoryGeneration2010},
+which can be used in autonomous vehicle control.
+This algorithm takes a reference path as an input, and outputs a local path which avoids collisions and minimizes jerk (rate of change of acceleration).
+This is done by generating sample trajectories (represented with quintic polynomials), removing those which cause collisions, and choosing
+the remaining trajectory with the lowest change in acceleration. It should be noted that this algorithm still requires a reference path, which could be generated
+with one of the path finding algorithms mentioned above.
+
+\subsubsection{Local Algorithms}
+Local algorithms only consider obstacles currently in the proximity of the wheelchair,
+and use this information to set the current speed and direction of the wheelchair.
+VFH+ \cite{ulrichVFHReliableObstacle1998} (Vector Field Histogram) is one example, and has
+been used 
+
+%\subsubsection{Path and Trajectory Planning}
+%Path planning involves finding a path from the current location to the goal location.
+
+%\subsubsection{Feedback and Control Blending}
+%Alternative methods which can be used to provide assistance to the user are haptic feedback and control blending.
+
+
 % Inputs
 % Semi-autonomy
 % Full autonomy
@@ -348,7 +388,7 @@ and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. OpenCV \cite{bradskiOp
 
 
 \section{Current Work}
-Part of the current work this semester has included sensor and compute element selection, as well as dataset collection.
+Part of the current work this semester has included selection of the sensor and compute element, as well as dataset collection.
 
 \pagebreak
 
