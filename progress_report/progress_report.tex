@@ -37,7 +37,12 @@
 \pagenumbering{arabic}
 
 
-
+% Figures to add:
+% Frenet planning
+% VFH+
+% Image classification network
+% Unet network
+% Atrous convolution
 
 
 \section{Introduction}
@@ -162,18 +167,21 @@ mounting points on the wheelchair. Several commercial options are compared in \C
 \begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
     \toprule
-    Name & Type & Cost (AUD)\footnote[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD} & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
+    Name & Type & Cost (AUD)\footnotemark[1] & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
     \midrule
     Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & Passive & \$595 & $124.5\times 30.5\times 26.5$ & $90\degree\times 60\degree\times 100\degree$ & 0.1-15\\
     Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & Passive & \$670 & $175\times 30\times 33$ & $110\degree\times 70\degree\times 120\degree$ & 0.3-20 \\
     Intel RealSense D455 \cite{intelIntelRealSenseProduct2022} & Active IR (Stereo) & \$595 & $124\times 26\times 29$ & $90\degree\times 65\degree\times 87\degree$ & 0.6-6 \\
-    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (Time of Flight)\footnote{The Microsoft Azure Kinect DK has multiple operating modes which tradeoff between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good tradeoff between operating range and resolution.} & \$595 & $103\times 39\times 126$ & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
+    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (Time of Flight)\footnotemark[2] & \$595 & $103\times 39\times 126$ & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
     \bottomrule
     \end{tabular}
 \end{adjustbox}
     \caption{Stereo Camera Options}
     \label{table:stereo_camera}
 \end{table}
+
+\footnotetext[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD}
+\footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes which tradeoff between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good tradeoff between operating range and resolution.}
 
 A caveat of the Stereolabs products is that they require a seperate CUDA enabled GPU (Nvidia) to generate the point-cloud
 and RGB-D image. The Kinect DK requires a CPU for processing, while the Intel RealSense performs processing onboard
@@ -246,6 +254,13 @@ and exceeds human performance at image classification with an error of 3.57\%.
 ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies directly on
 the input of a previous layer.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/classification_types.png}
+    \caption{Types of Classification in Machine Vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014})}
+    \label{fig:classification_types}
+\end{figure}
+
 \subsubsection{Object Localization}
 Object localization is another core problem within this field, and involves identifying the location of objects within an image,
 as well as classifying them. This is important for our wheelchair, as we want to be able to identify the location of
@@ -264,13 +279,30 @@ image classification for each grid square. Low-probability and overlapping bound
 %YOLOv4 uses a backbone-neck-head architecture
 
 \subsubsection{Semantic Segmentation}
+Semantic segmentation involves labelling each pixel of an object, rather than drawing a bounding box around the entire object.
+This technique is often used in medical applications, where different components of a scan need to be labelled.
+Another application semantic segmentation can be used for is drivable area detection, where a bounding box would not be able to cleanly
+identify a road or kerb. \Cref{fig:classification_types} compares the output of semantic segmentation to image classification and object localization.
 
+Most semantic segmentation algorithms use an encoder-decoder architecture, where information about the image is encoded into a small feature space.
+This feature space is then decoded back to the size of the original image using deconvolutional layers to obtain the segmented output.
+An issue with this architecture is that the resulting image can be low quality, as the image encoding is low resolution.
+U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation network which helps to rectify this issue,
+by combining higher resolution features with the output during deconvolution.
+This makes the segmented output sharper and more accurate.
+
+Another semantic segmentation algorithm is DeepLab \cite{chenSemanticImageSegmentation2014}\cite{chenDeepLabSemanticImage2016}\cite{chenRethinkingAtrousConvolution2017}.
+DeepLab uses atrous convolution (otherwise known as dilated convolution), which is a type of convolution which widens the FOV of a convolutional layer.
+It does this by leaving gaps in the convolutional layer. This allows the features to be encoded in a much higher resolution feature space.
+To obtain the segmented output, a technique called atrous spatial pyramid pooling is used. This technique samples the feature space at different
+scales.
+These techniques improve both the accuracy and speed of the network - DeepLabv3 obtained 86.9\% accuracy on the PASCAL VOC 2012 test set.
 % U-net, deepnet
 
 % classification, localization, segmentation, video, datasets
 % SLAM, mapping, hybridnet, etc.
 
-
+\pagebreak
 \subsection{Assistive Control}
 Once an understanding of the 3d scene has been built, the user can be navigated through the environment.
 As the wheelchair moves in a 2d plane, the surrounding environment can be represented as an occupancy grid \cite{elfesUsingOccupancyGrids1989}.
@@ -303,8 +335,23 @@ with one of the path finding algorithms mentioned above.
 \subsubsection{Local Algorithms}
 Local algorithms only consider obstacles currently in the proximity of the wheelchair,
 and use this information to set the current speed and direction of the wheelchair.
-VFH+ \cite{ulrichVFHReliableObstacle1998} (Vector Field Histogram) is one example, and has
-been used 
+VFH+ \cite{ulrichVFHReliableObstacle1998} (Vector Field Histogram) is one example, which
+has been applied to wheelchair control algorithms in the past \cite{tomariEnhancingWheelchairControl2014}.
+VFH+ works by calculating a polar obstacle density histogram around the robot based on the occupancy grid.
+The histogram is then binarized, to classify sectors around the robot as either occupied or not occupied.
+Next, a masked polar histogram is generated, which excludes paths that are not possible given the robots
+turning radius and kinematics. Finally, a safe direction is chosen which is nearest to the users desired direction.
+
+An advantage to this algorithm is that it gives the user more fine-grained control over their speed and direction,
+rather than planning a path to their assumed goal.
+However an issue with VFH+ is that it does not control the wheelchairs speed, and instead only finds a safe direction.
+Ideally the wheelchair should slow down if an obstacle is present.
+
+Another approach to assistive control with local algorithms is haptic feedback. Rather than
+blending inputs from the autonomous software and the user, the joystick itself is actuated
+to make it more difficult to move in the direction of obstacles \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}.
+An advantage of this approach is that it gives the user total control over which direction of movement they choose,
+however the additional force required to actuate the joystick may fatigue the user.
 
 %\subsubsection{Path and Trajectory Planning}
 %Path planning involves finding a path from the current location to the goal location.
@@ -346,6 +393,7 @@ their passive operation (does not use an IR emitter).
 The front of the joystick control unit was selected as the best mounting point for the
 stereo camera, due to several reasons:
 \begin{enumerate}
+    \itemsep=0em
     \item Clear view of the environment in front of the wheelchair.
     \item Not obstructed by the user in any wheelchair configuration.
     \item When needed, the user can move the joystick control unit out of the way,
@@ -353,6 +401,7 @@ stereo camera, due to several reasons:
 \end{enumerate}
 However, there are some challenges faced when using this mounting point, which must be addressed.
 \begin{enumerate}
+    \itemsep=0em
     \item Shaky video footage due to low rigidity in joystick mount.
     \item Close to the front of the wheelchair, which reduces visibility of the sides of the wheelchair.
     \item Maximum camera width of \SI{150}{\milli\metre} before doorway manouverability is affected.
