@@ -58,7 +58,7 @@ who may be unable to use a joystick or see their environment clearly.
 The aim of this research is to develop a semi-autonomous smart wheelchair system.
 This research is done in collaboration with Glide, a WA wheelchair manufacturer,
 who have provided an existing powered wheelchair (CentroGlide) to use as a base
-for this functionality. By developing assistive technology for the wheelchair,
+for this functionality (\cref{fig:wheelchair_reclined}). By developing assistive technology for the wheelchair,
 the user is granted greater mobility, confidence, and independence.
 
 \begin{figure}[H]
@@ -79,8 +79,8 @@ By guiding the user along a path, these safety issues can be mitigated.
 
 Emphasis is placed on the 'semi-autonomous' aspect of the wheelchair.
 An important requirement of this project is that the user still
-has control over their wheelchair, and can override any semi-autonomous functionality
-if required. When false positives occur within the smart wheelchair system,
+has control over their wheelchair, and can override any autonomous functionality
+if required. If the smart wheelchair system mistakenly detects an obstacle,
 the users mobility should not be compromised.
 
 Another requirement of the system is that any sensors mounted to the wheelchair
@@ -120,7 +120,7 @@ Smart wheelchairs have used a varied range of sensor types to percieve the surro
 RGB-D stereo cameras have been widely used in the field \cite{wangS2P2SelfSupervisedGoalDirected2021}\cite{wangSelfSupervisedDrivableArea2019}\cite{jainAutomatedPerceptionSafe2014},
 alongside 2d Lidar \cite{scudellariSelfdrivingWheelchairsDebut2017} and ultrasonic sensors \cite{levineNavChairAssistiveWheelchair1999}.
 Self-driving cars built by companies such as Tesla and Waymo
-use cameras, mmWave Radar, and 3d Lidar to avoid traffic and pedestrians.
+use cameras, mmWave Radar, and 3d Lidar to avoid traffic and pedestrians \cite{karpathyTeslaAIDay2021}.
 
 Selecting a sensor to use is not necessarily an either-or decision. Sensor fusion algorithms such as
 the Extended Kalman Filter (EKF) or Unscented Kalman Filter (UKF) \cite{wanUnscentedKalmanFilter2000} allow
@@ -154,15 +154,15 @@ taking into account factors such as resolution, cost, and accuracy.
 \subsubsection{RGB-D Cameras}
 One advantage RGB-D cameras have over alternative sensors is high RGB resolution,
 allowing them to utilize advances in machine learning and computer vision.
-Sensors such as LIDAR may fail at path detection, as features such as drawn lines must
-be distinguished visually from the surroundings.
+Sensors such as LIDAR may fail at path detection, as path markings
+cannot be detected.
 
 When comparing these cameras, factors such as package size,
 field of view, and depth accuracy are important to consider due to the available
 mounting points on the wheelchair. Several commercial options are compared in \Cref{table:stereo_camera}
 - all of the listed units come with an integrated IMU.
 
-\begin{table}[H]
+\begin{table}
     \centering
 \begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
@@ -183,25 +183,25 @@ mounting points on the wheelchair. Several commercial options are compared in \C
 \footnotetext[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD}
 \footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes which tradeoff between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good tradeoff between operating range and resolution.}
 
-A caveat of the Stereolabs products is that they require a seperate CUDA enabled GPU (Nvidia) to generate the point-cloud
-and RGB-D image. The Kinect DK requires a CPU for processing, while the Intel RealSense performs processing onboard
-and only requires a USB-C 3.1 interface to communicate.
+A caveat of the Stereolabs products is that they require a seperate CUDA enabled GPU (manufactured by Nvidia) to generate the point-cloud
+and RGB-D image. In contrast, the Kinect DK only requires a CPU for processing, while the Intel RealSense performs processing onboard
+and requires a USB-C 3.1 interface to communicate.
 
 \subsubsection{Compute Element}
 A compute element inside a semi-autonomous driving system generally consists of several components -
 a microcontroller to process user inputs and
 send signals to the motors, a general purpose computer to run pathfinding algorithms and log information,
-and an AI accelerator to improve performance of on-board ML algorithms.
+and an AI accelerator to improve performance of on-board machine learning (ML) algorithms.
 
 AI accelerators use specialized hardware to perform operations common in ML algorithms (such as matrix multiplication
 and convolution) more efficiently than a CPU can. GPUs have been used widely for this application, however their high
 power usage is infeasible for some applications. Embedded AI accelerators aim to provide greater power efficiency
 at the cost of specialization.
 
-ML models often use mixed-precision (FP16) datatypes to store weights while training. This helps improve the accuracy
-of the model, however can have a negative impact on speed during inference. One technique used to improve the speed
-of the model is quantization \cite{jacobQuantizationTrainingNeural2017}, where the FP16 datatype is replaced with an
-INT8 datatype (using a scaling factor and bias). This gives a large speed improvement, while only losing a small amount
+Machine learning models often use mixed-precision (FP16) datatypes to store weights while training. Although improving the accuracy
+of the model, FP16 datatypes are slow to manipulate during inference. Model quantization \cite{jacobQuantizationTrainingNeural2017} is a process where this FP16 datatype is replaced with an
+INT8 datatype (using a scaling factor and bias) after training.
+This gives a large speed improvement, while only losing a small amount
 of model accuracy.
 For this reason, modern AI accelerators focus on the performance of INT8 operations (TOPS, $10^9$ operations per second),
 whereas earlier accelerators state the performance of FP16 operations (TFLOPS, $10^9$ floating-point
@@ -269,8 +269,8 @@ the input of a previous layer.
 \end{figure}
 
 \subsubsection{Object Localization}
-Object localization is another core problem within this field, and involves identifying the location of objects within an image,
-as well as classifying them. This is important for our wheelchair, as we want to be able to identify the location of
+Object localization is another core problem within this field, and involves identifying the location of objects within an image
+as well as classifying them. Object localization can be used on a semi-autonomous wheelchair to identify
 a pedestrian or obstacle within the environment. R-CNN \cite{girshickRichFeatureHierarchies2013} was one of the
 first object classification models which utilized convolutional networks, by identifying potential bounding boxes
 and running an image classifier on these bounding boxes. Fast and Faster R-CNN \cite{girshickFastRCNN2015}\cite{renFasterRCNNRealTime2015}
@@ -279,7 +279,7 @@ identification of bounding boxes. Pascal VOC \cite{everinghamPascalVisualObject2
 are datasets which are commonly used to evaluate object classification models.
 
 YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000BetterFaster2016}\cite{redmonYOLOv3IncrementalImprovement2018}\cite{bochkovskiyYOLOv4OptimalSpeed2020}
-is another object classification model which focuses on improving speed. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
+is another object classification model which focuses on improving the speed of the model. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
 reaches over 60 fps on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
 image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
@@ -288,14 +288,14 @@ image classification for each grid square. Low-probability and overlapping bound
 \subsubsection{Semantic Segmentation}
 Semantic segmentation involves labelling each pixel of an object, rather than drawing a bounding box around the entire object.
 This technique is often used in medical applications, where different components of a scan need to be labelled.
-Another application semantic segmentation can be used for is drivable area detection, where a bounding box would not be able to cleanly
+Another application semantic segmentation can be used for is drivable area detection, as a bounding box would not be able to cleanly
 identify a road or kerb. \Cref{fig:classification_types} compares the output of semantic segmentation to image classification and object localization.
 
 Most semantic segmentation algorithms use an encoder-decoder architecture, where information about the image is encoded into a small feature space.
 This feature space is then decoded back to the size of the original image using deconvolutional layers to obtain the segmented output.
 An issue with this architecture is that the resulting image can be low quality, as the image encoding is low resolution.
 U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation network which helps to rectify this issue,
-by combining higher resolution features with the output during deconvolution.
+by using higher resolution features during deconvolution.
 This makes the segmented output sharper and more accurate.
 
 Another semantic segmentation algorithm is DeepLab \cite{chenSemanticImageSegmentation2014}\cite{chenDeepLabSemanticImage2016}\cite{chenRethinkingAtrousConvolution2017}.
@@ -303,8 +303,8 @@ DeepLab uses atrous convolution (otherwise known as dilated convolution), which 
 It does this by leaving gaps in the convolutional layer, as illustrated in \cref{fig:atrous_convolution}.
 By widening the FOV of each convolution, less downscaling is required during encoding. By encoding the image in a much higher resolution feature space,
 the segmented output is more accurate.
-To obtain the segmented output, a technique called atrous spatial pyramid pooling is used. This technique samples the feature space at different
-scales using atrous convolution.
+To obtain the segmented output, a technique called atrous spatial pyramid pooling (ASPP) is used. ASPP samples the feature space at different
+scales using atrous convolution to classify each pixel in the image.
 These techniques improve both the accuracy and speed of the network - DeepLabv3 obtained 86.9\% accuracy on the PASCAL VOC 2012 test set.
 
 \begin{figure}[bp]
@@ -321,21 +321,21 @@ These techniques improve both the accuracy and speed of the network - DeepLabv3 
 \pagebreak
 \subsection{Assistive Control}
 Once an understanding of the 3d scene has been built, the user can be navigated through the environment.
-As the wheelchair moves in a 2d plane, the surrounding environment can be represented as an occupancy grid \cite{elfesUsingOccupancyGrids1989}.
-This is a top-down view of the surrounding environment where each grid cell includes the probability that it is occupied
-by an obstacle. This representation is widely used in the literature - it is possible to include more information about
+The surrounding environment is generally represented as an occupancy grid \cite{elfesUsingOccupancyGrids1989},
+which is a top-down view of the area where each grid cell indicates the probability that it is occupied
+by an obstacle. It is possible to include more detailed information about
 paths and obstacles by adding more information to the occupancy grid.
 
-Semi-autonomous control means that the user decides the desired speed and direction of the wheelchair, with any intervention only
+In semi-autonomous control, the user decides the desired speed and direction of the wheelchair, with any intervention only
 occuring before a collision takes place. This is in contrast to full autonomy, where the user specifies the
-desired end goal and the wheelchair navigates the way there \cite{wangS2P2SelfSupervisedGoalDirected2021}.
-In full autonomous control, SLAM is required to build a global map of the surroundings - this is not necessary
-for semi-autonomous control, as only a local map is needed for navigation assistance.
+desired end goal and the wheelchair navigates to that goal \cite{wangS2P2SelfSupervisedGoalDirected2021}.
+%In full autonomous control, SLAM is required to build a global map of the surroundings - this is not necessary
+%for semi-autonomous control, as only a local map is needed for navigation assistance.
 
 \subsubsection{Path-Based Algorithms}
 Path-based algorithms take an occupancy grid as an input, and output a path between the start point and a goal point.
 A* is an example of this, and uses a heuristic to efficiently find the shortest path between the start and end point.
-Other algorithms such as RRT* \cite{karamanSamplingbasedAlgorithmsOptimal2011} (rapidly-exploring random tree) build a tree from randomly sampled points
+Other algorithms such as RRT* (rapidly-exploring random tree) \cite{karamanSamplingbasedAlgorithmsOptimal2011} build a tree from randomly sampled points
 to find a path to the goal node. RRT* may not find the shortest path initially, however can find an efficient path with much less
 computation required.
 
@@ -360,9 +360,9 @@ with one of the path finding algorithms mentioned above.
 \subsubsection{Local Algorithms}
 Local algorithms only consider obstacles currently in the proximity of the wheelchair,
 and use this information to set the current speed and direction of the wheelchair.
-VFH+ \cite{ulrichVFHReliableObstacle1998} (Vector Field Histogram) is one example, which
-has been applied to wheelchair control algorithms in the past \cite{tomariEnhancingWheelchairControl2014}.
-VFH+ works by calculating a polar obstacle density histogram around the robot based on the occupancy grid.
+VFH+ (vector field histogram) \cite{ulrichVFHReliableObstacle1998} is one example, which
+has been applied to wheelchair control algorithms in prior work \cite{tomariEnhancingWheelchairControl2014}.
+VFH+ calculates a polar obstacle density histogram around the robot based on the occupancy grid.
 The histogram is then binarized, to classify sectors around the robot as either occupied or not occupied.
 Next, a masked polar histogram is generated, which excludes paths that are not possible given the robots
 turning radius and kinematics. Finally, a safe direction is chosen which is nearest to the users desired direction.
