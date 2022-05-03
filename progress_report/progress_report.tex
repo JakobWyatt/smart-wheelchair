@@ -14,9 +14,12 @@
 
 \usepackage{amsmath} \usepackage{graphicx} \usepackage{microtype} \usepackage{float}
 \usepackage[hidelinks]{hyperref} \usepackage{cleveref}
-\usepackage{siunitx} \usepackage{gensymb}
+\usepackage{siunitx} \usepackage{gensymb} \usepackage{enumitem}
 \usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox} \usepackage{makecell}
 \usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
+
+\setcounter{bottomnumber}{1}
+\renewcommand\bottomfraction{10.0}
 
 \begin{document}
 \includepdf{title.pdf}
@@ -30,6 +33,7 @@
 
 \renewcommand{\contentsname}{Table of Contents}
 \tableofcontents
+\pagebreak
 \listoffigures
 \listoftables
 \pagebreak
@@ -38,11 +42,7 @@
 
 
 % Figures to add:
-% Frenet planning
-% VFH+
-% Image classification network
 % Unet network
-% Atrous convolution
 
 
 \section{Introduction}
@@ -63,7 +63,7 @@ the user is granted greater mobility, confidence, and independence.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{images/wheelchair_reclined.jpeg}
+    \includegraphics[width=0.6\linewidth]{images/wheelchair_reclined.jpg}
     \caption{CentroGlide in Reclined Configuration}
     \label{fig:wheelchair_reclined}
 \end{figure}
@@ -240,10 +240,17 @@ Image classification is a core problem within this field, and involves identifyi
 subject of an image (such as an animal or object).
 AlexNet \cite{krizhevskyImageNetClassificationDeep2012}, based on the earlier digit-recognition CNN LeNet-5
 \cite{lecunGradientbasedLearningApplied1998}, was one of the first deep CNNs
-applied to this problem. Alexnet was trained on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009},
+applied to this problem. AlexNet was trained on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009},
 which consists of 15M images and 22K categories,
 and achieved an error of only 15.3\% on a 1000 class subset. The underlying architecture uses a series of 5 convolutional
-layers and 3 fully connected layers.
+layers and 3 fully connected layers, which can be seen in \cref{fig:alexnet_architecture}.
+
+\begin{figure}[bp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/alexnet_architecture.png}
+    \caption{Architecture of the AlexNet image classification network. Reproduced from Krizhevsky et al. \cite{krizhevskyImageNetClassificationDeep2012})}
+    \label{fig:alexnet_architecture}
+\end{figure}
 
 Neural network architectures have become deeper and more accurate over time, enabled by both
 growth in computational power and dataset size. VGG-16 \cite{simonyanVeryDeepConvolutional2014}
@@ -254,7 +261,7 @@ and exceeds human performance at image classification with an error of 3.57\%.
 ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies directly on
 the input of a previous layer.
 
-\begin{figure}
+\begin{figure}[bp]
     \centering
     \includegraphics[width=0.6\linewidth]{images/classification_types.png}
     \caption{Types of Classification in Machine Vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014})}
@@ -293,10 +300,19 @@ This makes the segmented output sharper and more accurate.
 
 Another semantic segmentation algorithm is DeepLab \cite{chenSemanticImageSegmentation2014}\cite{chenDeepLabSemanticImage2016}\cite{chenRethinkingAtrousConvolution2017}.
 DeepLab uses atrous convolution (otherwise known as dilated convolution), which is a type of convolution which widens the FOV of a convolutional layer.
-It does this by leaving gaps in the convolutional layer. This allows the features to be encoded in a much higher resolution feature space.
+It does this by leaving gaps in the convolutional layer, as illustrated in \cref{fig:atrous_convolution}.
+By widening the FOV of each convolution, less downscaling is required during encoding. By encoding the image in a much higher resolution feature space,
+the segmented output is more accurate.
 To obtain the segmented output, a technique called atrous spatial pyramid pooling is used. This technique samples the feature space at different
-scales.
+scales using atrous convolution.
 These techniques improve both the accuracy and speed of the network - DeepLabv3 obtained 86.9\% accuracy on the PASCAL VOC 2012 test set.
+
+\begin{figure}[bp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/atrous_convolution.png}
+    \caption{Atrous convolution with a 3x3 kernel, showing increasing FOV. Reproduced from Chen et al. \cite{chenRethinkingAtrousConvolution2017})}
+    \label{fig:atrous_convolution}
+\end{figure}
 % U-net, deepnet
 
 % classification, localization, segmentation, video, datasets
@@ -329,8 +345,17 @@ Trajectory planning algorithms aim to solve this - one such algorithm is optimal
 which can be used in autonomous vehicle control.
 This algorithm takes a reference path as an input, and outputs a local path which avoids collisions and minimizes jerk (rate of change of acceleration).
 This is done by generating sample trajectories (represented with quintic polynomials), removing those which cause collisions, and choosing
-the remaining trajectory with the lowest change in acceleration. It should be noted that this algorithm still requires a reference path, which could be generated
+the remaining trajectory with the lowest change in acceleration. \Cref{fig:frenet_frame_local_path} illustrates the reference path, obstacles, and generated
+local path in an example scenario.
+It should be noted that this algorithm still requires a reference path, which could be generated
 with one of the path finding algorithms mentioned above.
+
+\begin{figure}[bp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
+    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018})}
+    \label{fig:frenet_frame_local_path}
+\end{figure}
 
 \subsubsection{Local Algorithms}
 Local algorithms only consider obstacles currently in the proximity of the wheelchair,
@@ -341,11 +366,20 @@ VFH+ works by calculating a polar obstacle density histogram around the robot ba
 The histogram is then binarized, to classify sectors around the robot as either occupied or not occupied.
 Next, a masked polar histogram is generated, which excludes paths that are not possible given the robots
 turning radius and kinematics. Finally, a safe direction is chosen which is nearest to the users desired direction.
+An example binary histogram is shown in \cref{fig:binary_histogram_vfh}; the chosen direction avoids the obstacle in the
+desired direction.
 
 An advantage to this algorithm is that it gives the user more fine-grained control over their speed and direction,
 rather than planning a path to their assumed goal.
 However an issue with VFH+ is that it does not control the wheelchairs speed, and instead only finds a safe direction.
 Ideally the wheelchair should slow down if an obstacle is present.
+
+\begin{figure}[bp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/binary_histogram_vfh.png}
+    \caption{VFH+ binary histogram, representing direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022})}
+    \label{fig:binary_histogram_vfh}
+\end{figure}
 
 Another approach to assistive control with local algorithms is haptic feedback. Rather than
 blending inputs from the autonomous software and the user, the joystick itself is actuated
@@ -392,16 +426,14 @@ their passive operation (does not use an IR emitter).
 % Should this be in the methodology?
 The front of the joystick control unit was selected as the best mounting point for the
 stereo camera, due to several reasons:
-\begin{enumerate}
-    \itemsep=0em
+\begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
     \item Clear view of the environment in front of the wheelchair.
     \item Not obstructed by the user in any wheelchair configuration.
     \item When needed, the user can move the joystick control unit out of the way,
             which also moves the camera out of the way.
 \end{enumerate}
 However, there are some challenges faced when using this mounting point, which must be addressed.
-\begin{enumerate}
-    \itemsep=0em
+\begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
     \item Shaky video footage due to low rigidity in joystick mount.
     \item Close to the front of the wheelchair, which reduces visibility of the sides of the wheelchair.
     \item Maximum camera width of \SI{150}{\milli\metre} before doorway manouverability is affected.
