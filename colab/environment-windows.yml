@@ -6,18 +6,14 @@ channels:
  - pytorch
 dependencies:
  - python>=3.9.0
- - numpy>=1.18.5
+ - numpy>=1.21.2
  - matplotlib>=3.2.2
+ - opencv>=4.5.1
  - pillow>=7.1.2
- - pyyaml>=5.3.1
- - requests>=2.23.0
- - scipy>=1.4.1
  - pytorch::torchvision>=0.12.0
- - tqdm>=4.41.0
  - pandas>=1.1.4
- - seaborn>=0.11.0
- - tensorboard>=2.4.1
- - pytorch>=1.7.0
+ - seaborn>=0.11.2
+ - pytorch>=1.10.0
  # above dependencies are for yolov5
  # other ai libraries
  - tensorflow-gpu
@@ -25,8 +21,9 @@ dependencies:
  # utilities
  - ffmpeg
  - jupyterlab
- # h264 must be downloaded directly
- # pip
- - pip
- - pip:
-   - opencv-python>=4.1.2
+ # yolov5
+ - pyyaml>=5.3.1
+ - requests>=2.23.0
+ - scipy>=1.4.1
+ - tqdm>=4.61.2
+ - tensorboard>=2.4.1
