@@ -8,7 +8,6 @@ dependencies:
  - python>=3.9.0
  - numpy>=1.21.2
  - matplotlib>=3.2.2
- - opencv>=4.5.1
  - pillow>=7.1.2
  - pytorch::torchvision>=0.12.0
  - pandas>=1.1.4
@@ -36,3 +35,4 @@ dependencies:
  - pip
  - pip:
    - prefetch_generator>=1.0.1
+   - opencv-python>=4.5.1

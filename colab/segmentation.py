@@ -46,7 +46,36 @@ def PushFrame(p):
             output.write(frame)
     return push_frame
 
-def ProcessFrame(p):
+def ProcessFrameHybrid(p):
+    hybridnet = torch.hub.load('datvuthanh/hybridnets', 'hybridnets', pretrained=True, device='cuda:0')
+    hybridnet.eval()
+
+    preprocess_tensor = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    def preprocess_frame(frame):
+        frame = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (640, 384), interpolation=cv2.INTER_AREA)
+        frame = preprocess_tensor(frame).unsqueeze(0)
+        if torch.cuda.is_available():
+            return frame.to('cuda')
+        return frame
+
+    def process_frame(frame):
+        # opencv: 2d array, linear pixels, bgr, 0-255
+        model_input = preprocess_frame(frame)
+        with torch.no_grad():
+            features, regression, classification, anchors, segmentation = hybridnet(model_input)
+            print(features)
+            print(regression)
+            print(classification)
+            print(anchors)
+            print(segmentation)
+        return frame
+    return process_frame
+
+def ProcessFrameYoloDeeplab(p):
     # resnet50 resnet101 mobilenet_v3_large
     seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
     seg_model.eval()
@@ -96,7 +125,7 @@ def main(*, source: str, drop_frames: bool):
     generate_frame, p = GenerateFrame(source)
     if generate_frame is not None:
         push_frame = PushFrame(p)
-        process_frame = ProcessFrame(p)
+        process_frame = ProcessFrameHybrid(p)
         frames_drop = 0
         for frame in generate_frame():
             if frames_drop == 0:
