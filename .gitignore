@@ -17,4 +17,5 @@ colab/test.mp4
 colab/test.mkv
 *.pt
 *.synctex.gz
-
+*.slxc
+slprj/
