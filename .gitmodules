@@ -1,3 +1,6 @@
 [submodule "colab/yolov5"]
 	path = colab/yolov5
 	url = https://github.com/ultralytics/yolov5
+[submodule "colab/PythonRobotics"]
+	path = colab/PythonRobotics
+	url = https://github.com/AtsushiSakai/PythonRobotics

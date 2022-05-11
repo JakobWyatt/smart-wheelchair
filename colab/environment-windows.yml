@@ -13,6 +13,7 @@ dependencies:
  - pandas>=1.1.4
  - seaborn>=0.11.2
  - pytorch::pytorch>=1.10.0
+ - cvxpy
  # above dependencies are for yolov5
  # other ai libraries
  - tensorflow-gpu
