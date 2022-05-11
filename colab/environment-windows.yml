@@ -13,17 +13,26 @@ dependencies:
  - pytorch::torchvision>=0.12.0
  - pandas>=1.1.4
  - seaborn>=0.11.2
- - pytorch>=1.10.0
+ - pytorch::pytorch>=1.10.0
  # above dependencies are for yolov5
  # other ai libraries
  - tensorflow-gpu
- - fastai
+ - fastai::fastai
  # utilities
  - ffmpeg
  - jupyterlab
- # yolov5
+ # Yolov5
  - pyyaml>=5.3.1
  - requests>=2.23.0
  - scipy>=1.4.1
  - tqdm>=4.61.2
  - tensorboard>=2.4.1
+ # HybridNets
+ - fastai::albumentations>=1.1.0
+ - efficientnet-pytorch>=0.7.1
+ - pretrainedmodels>=0.7.4
+ - fastai::timm>=0.5.4
+ - webcolors>=1.11.1
+ - pip
+ - pip:
+   - prefetch_generator>=1.0.1
