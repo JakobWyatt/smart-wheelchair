@@ -35,7 +35,7 @@ def PushFrame(p):
     if platform.system() == "Darwin":
         print("No GPU")
     # This is a hack
-    output = cv2.VideoWriter(f'test.mp4', fourcc, p.fps, (p.width,  p.height * 2))
+    output = cv2.VideoWriter(f'test.mp4', fourcc, p.fps, (p.width,  p.height))
     cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
     def push_frame(frame):
         if frame is None:
