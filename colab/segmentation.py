@@ -62,17 +62,34 @@ def ProcessFrameHybrid(p):
             return frame.to('cuda')
         return frame
 
+    # taken from HybridNets/hybridnets_test.py
+    def postprocess_frame(frame, seg):
+        seg = seg[:, :, 12:372, :]
+        da_seg_mask = torch.nn.functional.interpolate(seg, size=[p.height, p.width], mode='nearest')
+        _, da_seg_mask = torch.max(da_seg_mask, 1)
+        for i in range(da_seg_mask.size(0)):
+            #   print(i)
+            da_seg_mask_ = da_seg_mask[i].squeeze().cpu().numpy().round()
+            color_area = np.zeros((da_seg_mask_.shape[0], da_seg_mask_.shape[1], 3), dtype=np.uint8)
+            color_area[da_seg_mask_ == 1] = [0, 255, 0]
+            color_area[da_seg_mask_ == 2] = [0, 0, 255]
+            color_seg = color_area[..., ::-1]
+            # cv2.imwrite('seg_only_{}.jpg'.format(i), color_seg)
+
+            color_mask = np.mean(color_seg, 2)
+            # prepare to show det on 2 different imgs
+            # (with and without seg) -> (full and det_only)
+            seg_img = frame
+            seg_img[color_mask != 0] = seg_img[color_mask != 0] * 0.5 + color_seg[color_mask != 0] * 0.5
+            return seg_img.astype(np.uint8)
+
     def process_frame(frame):
         # opencv: 2d array, linear pixels, bgr, 0-255
         model_input = preprocess_frame(frame)
         with torch.no_grad():
             features, regression, classification, anchors, segmentation = hybridnet(model_input)
-            print(features)
-            print(regression)
-            print(classification)
-            print(anchors)
-            print(segmentation)
-        return frame
+            # focus on segmentation for now
+        return postprocess_frame(frame, segmentation)
     return process_frame
 
 def ProcessFrameYoloDeeplab(p):
