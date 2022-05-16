@@ -20,6 +20,8 @@
 \usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox} \usepackage{makecell}
 \usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
 
+\usepackage{listings}
+
 \setcounter{bottomnumber}{1}
 \renewcommand\bottomfraction{10.0}
 
@@ -282,7 +284,7 @@ are datasets which are commonly used to evaluate object classification models.
 
 YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000BetterFaster2016}\cite{redmonYOLOv3IncrementalImprovement2018}\cite{bochkovskiyYOLOv4OptimalSpeed2020}
 is another object classification model which focuses on improving the speed of the model. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
-reaches over 60 fps on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
+reaches over 60 FPS (frames per second) on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
 image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
@@ -295,6 +297,8 @@ identify a road or kerb. \Cref{fig:classification_types} compares the output of 
 
 Most semantic segmentation algorithms use an encoder-decoder architecture, where information about the image is encoded into a small feature space.
 This feature space is then decoded back to the size of the original image using deconvolutional layers to obtain the segmented output.
+Encoding is typically done using a pretrained model backbone, such as ResNet. By avoiding model retraining and making use of
+existing classifier backbones, the computational power required to evaluate a model is reduced significantly.
 An issue with this architecture is that the resulting image can be low quality, as the image encoding is low resolution.
 U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation network which helps to rectify this issue,
 by using higher resolution features during deconvolution.
@@ -471,7 +475,73 @@ and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. OpenCV \cite{bradskiOp
 
 
 \section{Current Work}
-Part of the current work this semester has included selection of the sensor and compute element, as well as dataset collection.
+Part of the current work this semester has included selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
+which has been described in the methodology.
+Early identification of viable sensor mounting points on the wheelchair (also described in the methodology) has enabled dataset collection
+and algorithm evaluation to progress from an early stage, despite not having access to an RGB-D stereo camera.
+Most technical progress this semester has focused on evaluation of various algorithms for scene understanding
+and assistive control, as well as writing the software required to evaluate these algorithms.
+
+YOLOv5 \cite{ultralyticsYOLOv5} was one of the first algorithms evaluated for object detection.
+The implementation of YOLOv5 includes an inbuilt video encoder and decoder, which simplified
+the evaluation process significantly. However, some preprocessing of our video dataset with ffmpeg was required.
+YOLOv5 has 5 model sizes (nano, small, medium, large, extra large),
+which allow the user to choose between speed and accuracy.
+Due to the low latency requirements of a fast moving wheelchair, this algorithm was evaluated using the small model size.
+
+YOLOv5 was evaluated on our Curtin video dataset. As seen in \cref{fig:yolov5s}, this algorithm can identify pedestrians and vehicles with high accuracy.
+The confidence of the algorithm decreases when objects are further away, as can be seen with the cars in the background.
+YOLOv5 ran in realtime (using a GTX 1080) on the 24 FPS Curtin video dataset.
+
+\begin{figure}[bp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/yolov5s.png}
+    \caption{YOLOv5s evaluated on the Curtin dataset}
+    \label{fig:yolov5s}
+\end{figure}
+
+The next algorithm evaluated was DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. This is a segmentation algorithm,
+which classifies individual pixels within the image rather than drawing bounding boxes around the entire object.
+Segmentation algorithms can be more suitable when environment features such as pathways and stairs need to be identified,
+as these features do not have well defined bounding boxes.
+
+To evaluate this algorithm, a video encoder and decoder needed to be created. This was done using a Python generator,
+so that frames in the video could simply be iterated over within a for loop and only decoded when required.
+OpenCV \cite{bradskiOpenCVLibrary2000} was the underlying library used to decode each video frame into a BGR pixel array.
+After evaluation of the algorithm, each processed frame was displayed on the screen and encoded into a video file using OpenCV.
+
+Some scene processing algorithms do not run in realtime due to hardware limitations or performance issues.
+When this occurs, some frames must be dropped during model evaluation to keep the scene model up to date and minimize latency.
+The code used to do this is shown below. By measuring the amount of time taken to process and encode a frame, the current FPS
+and number of frames to drop can be calculated.
+
+\begin{lstlisting}[language=Python]
+for frame in generate_frame():
+    if frames_drop == 0:
+        start_time = time.time()
+        new_frame = process_frame(frame)
+        push_frame(new_frame)
+        elapsed = time.time() - start_time
+        print(f"Current FPS: {1 / elapsed}")
+        frames_drop = math.ceil(elapsed * p.fps) - 1
+    else:
+        frames_drop -= 1
+\end{lstlisting}
+
+To avoid training the model from scratch, a pretrained model is loaded from Pytorch Hub using the code below.
+As mentioned in the literature review, image segmentation algorithms can accept different image classifiers as a backbone.
+In this case, MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone due to its fast performance.
+
+\begin{lstlisting}[language=Python]
+seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
+\end{lstlisting}
+
+Another model evaluated was Hybridnet.
+
+The viability of VFH+ was evaluated as an assistive control algorithm. This algorithm was evaluated
+in MATLAB using the Navigation toolbox and Lidar toolbox.
+First, a virtual 2D environment and occupancy grid were created in MATLAB.
+Next, a Lidar 
 
 \pagebreak
 
