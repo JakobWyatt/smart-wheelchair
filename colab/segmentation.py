@@ -136,7 +136,7 @@ def main(*, source: str, drop_frames: bool):
     generate_frame, p = GenerateFrame(source)
     if generate_frame is not None:
         push_frame = PushFrame(p)
-        process_frame = ProcessFrameHybrid(p)
+        process_frame = ProcessFrameDeeplab(p)
         frames_drop = 0
         for frame in generate_frame():
             if frames_drop == 0:
