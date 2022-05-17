@@ -92,14 +92,12 @@ def ProcessFrameHybrid(p):
         return postprocess_frame(frame, segmentation)
     return process_frame
 
-def ProcessFrameYoloDeeplab(p):
+def ProcessFrameDeeplab(p):
     # resnet50 resnet101 mobilenet_v3_large
     seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
     seg_model.eval()
     if torch.cuda.is_available():
         seg_model.to('cuda')
-    # nsmlx
-    yolo = torch.hub.load('ultralytics/yolov5', 'yolov5s')
     
     colors = np.random.randint(256, size=(21, 3), dtype=np.uint8)
     colors[0] = [0, 0, 0]
@@ -109,19 +107,21 @@ def ProcessFrameYoloDeeplab(p):
         torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
     def preprocess_frame(frame):
-        factor = 0.3
+        factor = 0.5
         frame = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (0, 0), fx=factor, fy=factor)
         frame = preprocess_tensor(frame).unsqueeze(0)
         if torch.cuda.is_available():
             return frame.to('cuda')
         return frame
 
-    def postprocess_frame(frame):
-        frame = PIL.Image.fromarray(frame)
-        frame.putpalette(colors)
-        frame = frame.resize((p.width, p.height)).convert("RGB")
-        return np.array(frame)
-    
+    def postprocess_frame(frame, pred):
+        pred = PIL.Image.fromarray(pred)
+        pred.putpalette(colors)
+        pred = pred.resize((p.width, p.height)).convert("RGB")
+        pred = np.array(pred)
+        cv2.addWeighted(frame, 1, pred, 0.8, 0, frame)
+        return frame
+
     def process_frame(frame):
         # segmentation
         # opencv: 2d array, linear pixels, bgr, 0-255
@@ -129,20 +129,23 @@ def ProcessFrameYoloDeeplab(p):
         with torch.no_grad():
             output = seg_model(model_input)
         output_predictions = output['out'][0].argmax(0).byte().cpu().numpy()
-        # yolo
-        detected = yolo(frame)
-        detected.render()
-        detected = detected.imgs[0]
-
-        stacked = np.vstack((detected, postprocess_frame(output_predictions)))
-        return stacked
+        #stacked = np.vstack((detected, postprocess_frame(output_predictions)))
+        return postprocess_frame(frame, output_predictions)
     return process_frame
+
+def ProcessFrameYolo(p):
+    # nsmlx
+    yolo = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+    def process_frame(frame):
+        output = yolo(frame)
+        output.render()
+        return output.imgs[0]
 
 def main(*, source: str, drop_frames: bool):
     generate_frame, p = GenerateFrame(source)
     if generate_frame is not None:
         push_frame = PushFrame(p)
-        process_frame = ProcessFrameHybrid(p)
+        process_frame = ProcessFrameDeeplab(p)
         frames_drop = 0
         for frame in generate_frame():
             if frames_drop == 0:

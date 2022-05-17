@@ -531,12 +531,14 @@ for frame in generate_frame():
 To avoid training the model from scratch, a pretrained model is loaded from Pytorch Hub using the code below.
 As mentioned in the literature review, image segmentation algorithms can accept different image classifiers as a backbone.
 In this case, MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone due to its fast performance.
+% 15 fps
 
 \begin{lstlisting}[language=Python]
 seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
 \end{lstlisting}
 
 Another model evaluated was Hybridnet.
+% 6 fps
 
 The viability of VFH+ was evaluated as an assistive control algorithm. This algorithm was evaluated
 in MATLAB using the Navigation toolbox and Lidar toolbox.
