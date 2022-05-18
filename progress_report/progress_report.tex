@@ -20,7 +20,7 @@
 \usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox} \usepackage{makecell}
 \usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
 
-\usepackage{listings}
+\usepackage{minted}\usepackage{lmodern}
 
 \setcounter{bottomnumber}{1}
 \renewcommand\bottomfraction{10.0}
@@ -456,12 +456,13 @@ and a wide range of ML frameworks, as well as low power use.
 The motor controller is being designed by a different thesis student, however will connect with the compute element in a standard way.
 
 \subsection{Dataset Collection}
-To train and evaluate machine learning models, a 34 minute driving dataset was collected around Curtin University.
-The camera used to collect this dataset was a GoPro Hero 4. Although this camera does lack a depth component,
-having a basic dataset for model evaluation is valuable prior to procurement of the RGB-D camera.
-% Other datasets
+To train and evaluate machine learning models, a stereo camera dataset will be collected by driving the wheelchair
+around Curtin University. This dataset will provide valuable RGB and depth information, as well as movement data
+from an inbuilt IMU. A preliminary video dataset will also be collected before the stereo camera is purchased,
+to enable initial evaluation of scene recognition algorithms.
 
 \subsection{Software}
+% Fix this 
 Our software system requires several components. Interaction with the Zed 2 Mini will be done
 via the proprietry Stereolabs API, which will provide RGB-D imaging to the computer.
 PyTorch \cite{paszkePyTorchImperativeStyle2019} will be used for training and evaluation of machine learning models, as it
@@ -476,10 +477,19 @@ and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. OpenCV \cite{bradskiOp
 
 \section{Current Work}
 Part of the current work this semester has included selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
-which has been described in the methodology.
-Early identification of viable sensor mounting points on the wheelchair (also described in the methodology) has enabled dataset collection
-and algorithm evaluation to progress from an early stage, despite not having access to an RGB-D stereo camera.
-Most technical progress this semester has focused on evaluation of various algorithms for scene understanding
+as well as identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
+A preliminary 34 minute driving dataset (1920x1080 @ 24 FPS) has been collected around Curtin University using a GoPro Hero 4.
+The experimental setup to collect this dataset can be seen in \cref{fig:gopro_dataset_collection}, including the identified
+sensor mounting point.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/gopro_dataset_collection.jpg}
+    \caption{Experimental setup of preliminary dataset collection}
+    \label{fig:gopro_dataset_collection}
+\end{figure}
+
+The remaining technical progress this semester has focused on evaluation of various algorithms for scene understanding
 and assistive control, as well as writing the software required to evaluate these algorithms.
 
 YOLOv5 \cite{ultralyticsYOLOv5} was one of the first algorithms evaluated for object detection.
@@ -515,27 +525,26 @@ When this occurs, some frames must be dropped during model evaluation to keep th
 The code used to do this is shown below. By measuring the amount of time taken to process and encode a frame, the current FPS
 and number of frames to drop can be calculated.
 
-\begin{lstlisting}[language=Python]
+\begin{minted}{python}
 for frame in generate_frame():
     if frames_drop == 0:
         start_time = time.time()
         new_frame = process_frame(frame)
         push_frame(new_frame)
         elapsed = time.time() - start_time
-        print(f"Current FPS: {1 / elapsed}")
         frames_drop = math.ceil(elapsed * p.fps) - 1
     else:
         frames_drop -= 1
-\end{lstlisting}
+\end{minted}
 
 To avoid training the model from scratch, a pretrained model is loaded from Pytorch Hub using the code below.
 As mentioned in the literature review, image segmentation algorithms can accept different image classifiers as a backbone.
 In this case, MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone due to its fast performance.
 % 15 fps
 
-\begin{lstlisting}[language=Python]
+\begin{minted}[breaklines]{python}
 seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
-\end{lstlisting}
+\end{minted}
 
 Another model evaluated was Hybridnet.
 % 8 fps

@@ -19,3 +19,4 @@ colab/test.mkv
 *.synctex.gz
 *.slxc
 slprj/
+_minted*
