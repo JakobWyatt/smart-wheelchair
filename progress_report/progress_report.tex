@@ -62,14 +62,14 @@ who may be unable to use a joystick or see their environment clearly.
 The aim of this research is to develop a semi-autonomous smart wheelchair system.
 This research is done in collaboration with Glide, a WA wheelchair manufacturer,
 who have provided an existing powered wheelchair (CentroGlide) to use as a base
-for this functionality (\cref{fig:wheelchair_reclined}). By developing assistive technology for the wheelchair,
+for this functionality (\cref{fig:wheelchair}). By developing assistive technology for the wheelchair,
 the user is granted greater mobility, confidence, and independence.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{images/wheelchair_reclined.jpg}
-    \caption{CentroGlide in Reclined Configuration}
-    \label{fig:wheelchair_reclined}
+    \includegraphics[width=0.35\linewidth,angle=270,origin=c]{images/wheelchair.jpg}
+    \caption{The CentroGlide Wheelchair}
+    \label{fig:wheelchair}
 \end{figure}
 
 \pagebreak
@@ -99,6 +99,13 @@ components and sensors are infeasible. Internet connectivity should not be a req
 for the system to operate either - the round trip time required to communicate with a server
 would compromise the safety of a user. Because of this, all processing is performed locally
 on the wheelchair.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\linewidth]{images/wheelchair_reclined.jpg}
+    \caption{CentroGlide Wheelchair in Reclined Position}
+    \label{fig:wheelchair_reclined}
+\end{figure}
 
 \pagebreak
 
@@ -166,7 +173,7 @@ field of view, and depth accuracy are important to consider due to the available
 mounting points on the wheelchair. Several commercial options are compared in \Cref{table:stereo_camera}
 - all of the listed units come with an integrated IMU.
 
-\begin{table}
+\begin{table}[H]
     \centering
 \begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
@@ -249,7 +256,7 @@ which consists of 15M images and 22K categories,
 and achieved an error of only 15.3\% on a 1000 class subset. The underlying architecture uses a series of 5 convolutional
 layers and 3 fully connected layers, which can be seen in \cref{fig:alexnet_architecture}.
 
-\begin{figure}[bp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/alexnet_architecture.png}
     \caption{Architecture of the AlexNet image classification network. Reproduced from Krizhevsky et al. \cite{krizhevskyImageNetClassificationDeep2012})}
@@ -265,7 +272,7 @@ and exceeds human performance at image classification with an error of 3.57\%.
 ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies directly on
 the input of a previous layer.
 
-\begin{figure}[bp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{images/classification_types.png}
     \caption{Types of Classification in Machine Vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014})}
@@ -313,7 +320,7 @@ To obtain the segmented output, a technique called atrous spatial pyramid poolin
 scales using atrous convolution to classify each pixel in the image.
 These techniques improve both the accuracy and speed of the network - DeepLabv3 obtained 86.9\% accuracy on the PASCAL VOC 2012 test set.
 
-\begin{figure}[bp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{images/atrous_convolution.png}
     \caption{Atrous convolution with a 3x3 kernel, showing increasing FOV. Reproduced from Chen et al. \cite{chenRethinkingAtrousConvolution2017})}
@@ -356,7 +363,7 @@ local path in an example scenario.
 It should be noted that this algorithm still requires a reference path, which could be generated
 with one of the path finding algorithms mentioned above.
 
-\begin{figure}[bp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
     \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018})}
@@ -380,9 +387,9 @@ rather than planning a path to their assumed goal.
 However an issue with VFH+ is that it does not control the wheelchairs speed, and instead only finds a safe direction.
 Ideally the wheelchair should slow down if an obstacle is present.
 
-\begin{figure}[bp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\linewidth]{images/binary_histogram_vfh.png}
+    \includegraphics[width=0.35\linewidth]{images/binary_histogram_vfh.png}
     \caption{VFH+ binary histogram, representing direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022})}
     \label{fig:binary_histogram_vfh}
 \end{figure}
@@ -453,7 +460,8 @@ our specific application (pathway assistance).
 
 For the compute element, a Nvidia Jetson Xavier NX will be used, due to compatability with the Zed API
 and a wide range of ML frameworks, as well as low power use.
-The motor controller is being designed by a different thesis student, however will connect with the compute element in a standard way.
+The motor controller is being designed by a different thesis student; \cref{fig:block_diagram} shows
+how it integrates with other hardware on the wheelchair.
 
 \subsection{Dataset Collection}
 To train and evaluate machine learning models, a stereo camera dataset will be collected by driving the wheelchair
@@ -462,13 +470,44 @@ from an inbuilt IMU. A preliminary video dataset will also be collected before t
 to enable initial evaluation of scene recognition algorithms.
 
 \subsection{Software}
-% Fix this 
 Our software system requires several components. Interaction with the Zed 2 Mini will be done
 via the proprietry Stereolabs API, which will provide RGB-D imaging to the computer.
 PyTorch \cite{paszkePyTorchImperativeStyle2019} will be used for training and evaluation of machine learning models, as it
-provides good compatability with existing models such as YOLOv5 \cite{ultralyticsYOLOv5}
-and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. OpenCV \cite{bradskiOpenCVLibrary2000} will be used to encode and decode video.
+provides good compatability with existing machine learning models.
+The software system will involve a series of scene recognition algorithms to build and update an occupancy map of the surrounding area.
+Assistive control algorithms will then be used to choose the direction and speed of the wheelchair, based on the occupancy map and the users desired direction.
+Evaluation of several machine learning and assistive control algorithms based on their
+speed and accuracy will also be required, to choose which is suitable for the final software implementation.
+
+An embedded microcontroller system and motor controller is being designed by other thesis students,
+which will allow the software system to communicate with the underlying wheelchair hardware in a standard way.
+The embedded microcontroller will validate the chosen direction and speed of the wheelchair, to ensure
+that in the case of a software failure the user is still able to use the wheelchair. \Cref{fig:block_diagram}
+shows a block diagram of the final semi-autonomous wheelchair design.
+
+As the timeline of the embedded microcontroller system is uncertain, a basic simulation environment for the software system will be created.
+This allows the performance of the system to be validated without reliance on other thesis projects.
 % System diagram
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/block_diagram.png}
+    \caption{Block Diagram of System}
+    \label{fig:block_diagram}
+\end{figure}
+
+\subsection{Time Planning}
+Time should be allocated to thesis writing and review as well as technical progress.
+A Gantt chart displaying the expected progress over the course of the two semesters
+is shown in \cref{fig:gantt_chart}. Note that a significant portion of time at the beginning was allocated
+to initial research and project scope. Due to the large number of students working on this team,
+a clear project scope was important so that students did not unnecessarily duplicate work.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/gantt_chart.png}
+    \caption{Gantt Chart of Thesis Progress}
+    \label{fig:gantt_chart}
+\end{figure}
 \pagebreak
 
 
@@ -484,7 +523,7 @@ sensor mounting point.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/gopro_dataset_collection.jpg}
+    \includegraphics[width=0.5\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
     \caption{Experimental setup of preliminary dataset collection}
     \label{fig:gopro_dataset_collection}
 \end{figure}
@@ -503,7 +542,7 @@ YOLOv5 was evaluated on our Curtin video dataset. As seen in \cref{fig:yolov5s},
 The confidence of the algorithm decreases when objects are further away, as can be seen with the cars in the background.
 YOLOv5 ran in realtime (using a GTX 1080) on the 24 FPS Curtin video dataset.
 
-\begin{figure}[bp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{images/yolov5s.png}
     \caption{YOLOv5s evaluated on the Curtin dataset}
