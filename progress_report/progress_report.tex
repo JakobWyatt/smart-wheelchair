@@ -576,7 +576,7 @@ for frame in generate_frame():
         frames_drop -= 1
 \end{minted}
 
-To avoid training the model from scratch, a pretrained model is loaded from Pytorch Hub using the code below.
+To avoid training the model from scratch, a pretrained model is loaded from PyTorch Hub using the code below.
 As mentioned in the literature review, image segmentation algorithms can accept different image classifiers as a backbone.
 In this case, MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone due to its fast performance.
 This model was trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset, and runs at 15 fps on a GTX 1080.
@@ -598,17 +598,82 @@ features such as vehicles are not accurately segmented due to these objects not 
     \label{fig:deeplab}
 \end{figure}
 
-Another model evaluated was Hybridnet.
+Another model evaluated was Hybridnet \cite{vuHybridNetsEndtoEndPerception2022}, which performs drivable area segmentation.
+A lot of code used to implement DeepLabv3 could be shared for this model, as both models were segmentation models
+and loaded from PyTorch Hub. The sample code used to overlay the model output over the original image had some
+performance issues, and was replaced with the code below (which was also used for our implementation of DeepLabv3).
+This improved the models performance from 5 fps to 8 fps on a GTX 1080.
 % 8 fps
+\begin{minted}[breaklines]{python}
+output = PIL.Image.fromarray(prediction)
+output.putpalette(colors)
+output = np.array(output.resize((width, height)).convert("RGB"))
+cv2.addWeighted(frame, 1, output, 0.8, 0, frame)
+\end{minted}
 
-The viability of VFH+ was evaluated as an assistive control algorithm. This algorithm was evaluated
+\Cref{fig:hybridnets_outdoor} shows Hybridnet evaluated on the Curtin dataset, with the identified drivable area highlighted.
+This model performs well on uniform surfaces, however has more difficulty identifying the drivable area on surfaces such as paved bricks.
+This could be due to domain adaptation problems, as this model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018}
+which consists of bitumen roads.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/hybridnets_outdoor.png}
+    \caption{Hybridnet drivable area segmentation evaluated on the Curtin dataset}
+    \label{fig:hybridnets_outdoor}
+\end{figure}
+
+Assistive control is required to navigate the wheelchair after a map of the surroundings has been built.
+The VFH+ (vector field histogram) \cite{ulrichVFHReliableObstacle1998} algorithm was evaluated
 in MATLAB using the Navigation toolbox and Lidar toolbox.
-First, a virtual 2D environment and occupancy grid were created in MATLAB.
-Next, a Lidar 
+A simulated 2D environment and occupancy grid were created in MATLAB,
+with a Lidar sensor simulated at the wheelchairs position. The code for this is shown below,
+with the occupancy grid and Lidar scan visualized in \cref{fig:simulated_lidar}.
+
+\begin{minted}[breaklines]{matlab}
+load('occupancy-warehouse.mat')
+show(map)
+pose = [4 4 0];
+helperPlotRobot(ax, pose);
+lidar = rangeSensor;
+[ranges, angles] = lidar(pose, map);
+scan = lidarScan(ranges, angles);
+plot(scan)
+\end{minted}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/simulated_lidar.png}
+    \caption{Simulated occupancy grid and Lidar sensor}
+    \label{fig:simulated_lidar}
+\end{figure}
+
+Next, the simulated Lidar scan is input into the VFH+ controller, along with
+the users desired direction. The algorithm calculates the closest direction to the desired direction which
+avoids nearby obstacles, taking into consideration the turning radius of the wheelchair.
+\Cref{fig:vfh_controller} shows a visualization of the VFH+ controller successfully avoiding nearby
+obstacles, with code listed below.
+
+One disadvantage of VFH+ is that it is not able to modify the speed of the wheelchair.
+If presented with an obstacle, VFH+ will attempt to steer around the obstacle at the current velocity rather than
+slowing down, which may be unsafe in some scenarios.
+
+\begin{minted}[breaklines]{matlab}
+vfh = controllerVFH('UseLidarScan', true);
+targetDirection = -pi / 2;
+steerDir = vfh(scan, targetDirection);
+show(vfh)
+\end{minted}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/vfh_controller.png}
+    \caption{VFH+ obstacle density and target and steering direction}
+    \label{fig:vfh_controller}
+\end{figure}
 
 %The current work this semester has successfully identified and evaluated several algorithms for scene recognition and control.
 %The desired hardware for the wheelchair has been selected
-%This 
 
 \pagebreak
 
@@ -617,6 +682,16 @@ Next, a Lidar
 
 
 \section{Future Work}
+Future work of this project involves remaining technical progress detailed in the methodology,
+and the final thesis writeup.
+Once the desired RGB-D and Lidar sensors have been procured, they will be mounted to the wheelchair
+in a secure manner and used to collect a second driving dataset around Curtin university.
+
+% Training algorithms on datasets
+% Performance improvement - MMDetection or multithreaded encoder/decoder?
+% Simulation environment
+% Final hardware integration
+% Measure kinematics
 
 \pagebreak
 
