@@ -291,7 +291,7 @@ are datasets which are commonly used to evaluate object classification models.
 
 YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000BetterFaster2016}\cite{redmonYOLOv3IncrementalImprovement2018}\cite{bochkovskiyYOLOv4OptimalSpeed2020}
 is another object classification model which focuses on improving the speed of the model. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
-reaches over 60 FPS (frames per second) on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
+reaches over 60 fps (frames per second) on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
 image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
@@ -517,7 +517,7 @@ a clear project scope was important so that students did not unnecessarily dupli
 \section{Current Work}
 Part of the current work this semester has included selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
 as well as identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
-A preliminary 34 minute driving dataset (1920x1080 @ 24 FPS) has been collected around Curtin University using a GoPro Hero 4.
+A preliminary 34 minute driving dataset (1920x1080 @ 24 fps) has been collected around Curtin University using a GoPro Hero 4.
 The experimental setup to collect this dataset can be seen in \cref{fig:gopro_dataset_collection}, including the identified
 sensor mounting point.
 
@@ -540,7 +540,7 @@ Due to the low latency requirements of a fast moving wheelchair, this algorithm 
 
 YOLOv5 was evaluated on our Curtin video dataset. As seen in \cref{fig:yolov5s}, this algorithm can identify pedestrians and vehicles with high accuracy.
 The confidence of the algorithm decreases when objects are further away, as can be seen with the cars in the background.
-YOLOv5 ran in realtime (using a GTX 1080) on the 24 FPS Curtin video dataset.
+YOLOv5 ran in realtime (using a GTX 1080) on the 24 fps Curtin video dataset.
 
 \begin{figure}[H]
     \centering
@@ -561,7 +561,7 @@ After evaluation of the algorithm, each processed frame was displayed on the scr
 
 Some scene processing algorithms do not run in realtime due to hardware limitations or performance issues.
 When this occurs, some frames must be dropped during model evaluation to keep the scene model up to date and minimize latency.
-The code used to do this is shown below. By measuring the amount of time taken to process and encode a frame, the current FPS
+The code used to do this is shown below. By measuring the amount of time taken to process and encode a frame, the current fps
 and number of frames to drop can be calculated.
 
 \begin{minted}{python}
@@ -579,11 +579,24 @@ for frame in generate_frame():
 To avoid training the model from scratch, a pretrained model is loaded from Pytorch Hub using the code below.
 As mentioned in the literature review, image segmentation algorithms can accept different image classifiers as a backbone.
 In this case, MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone due to its fast performance.
+This model was trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset, and runs at 15 fps on a GTX 1080.
 % 15 fps
 
 \begin{minted}[breaklines]{python}
 seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
 \end{minted}
+
+Pillow (a Python image library) was used to overlay the output on top of the original image.
+An example of model output can be seen in \cref{fig:deeplab}; the poor segmentation resolution is due to the
+lower model resolution of 960x540. DeepLabv3 identifies pedestrians with a high degree of accuracy, however
+features such as vehicles are not accurately segmented due to these objects not existing in the MS COCO dataset.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/deeplab.png}
+    \caption{DeepLabv3 evaluated on the Curtin dataset}
+    \label{fig:deeplab}
+\end{figure}
 
 Another model evaluated was Hybridnet.
 % 8 fps
@@ -592,6 +605,10 @@ The viability of VFH+ was evaluated as an assistive control algorithm. This algo
 in MATLAB using the Navigation toolbox and Lidar toolbox.
 First, a virtual 2D environment and occupancy grid were created in MATLAB.
 Next, a Lidar 
+
+%The current work this semester has successfully identified and evaluated several algorithms for scene recognition and control.
+%The desired hardware for the wheelchair has been selected
+%This 
 
 \pagebreak
 
