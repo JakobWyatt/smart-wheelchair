@@ -654,10 +654,6 @@ avoids nearby obstacles, taking into consideration the turning radius of the whe
 \Cref{fig:vfh_controller} shows a visualization of the VFH+ controller successfully avoiding nearby
 obstacles, with code listed below.
 
-One disadvantage of VFH+ is that it is not able to modify the speed of the wheelchair.
-If presented with an obstacle, VFH+ will attempt to steer around the obstacle at the current velocity rather than
-slowing down, which may be unsafe in some scenarios.
-
 \begin{minted}[breaklines]{matlab}
 vfh = controllerVFH('UseLidarScan', true);
 targetDirection = -pi / 2;
@@ -672,8 +668,14 @@ show(vfh)
     \label{fig:vfh_controller}
 \end{figure}
 
-%The current work this semester has successfully identified and evaluated several algorithms for scene recognition and control.
-%The desired hardware for the wheelchair has been selected
+One disadvantage of VFH+ is that it is not able to modify the speed of the wheelchair.
+If presented with an obstacle, VFH+ will attempt to steer around the obstacle at the current velocity rather than
+slowing down, which may be unsafe in some scenarios.
+
+The current work this semester has successfully identified and evaluated several algorithms for scene recognition and assistive control.
+The desired hardware for the wheelchair has been selected alongside the desired mounting points, and an initial dataset has
+been collected around Curtin university.
+The work done this semester enables progression towards further technical work and the end of the project.
 
 \pagebreak
 
@@ -686,6 +688,30 @@ Future work of this project involves remaining technical progress detailed in th
 and the final thesis writeup.
 Once the desired RGB-D and Lidar sensors have been procured, they will be mounted to the wheelchair
 in a secure manner and used to collect a second driving dataset around Curtin university.
+
+Scene recognition algorithms such as DeepLabv3 and Hybridnet
+had some difficulty identifying features of our dataset. This is likely a problem with domain adaptation,
+as the original datasets used to train these models did not include pedestrian walkways or vehicles.
+Transfer learning will be explored to improve the performance of these
+models, by training them on existing supervised driving datasets.
+Additionally, labelling of our driving dataset (using platforms such as Roboflow or V7 Labs)
+or generation of a simulated dataset will be considered.
+
+To improve the speed of these algorithms, GPU video encoding and postprocessing will be explored.
+Maximizing hardware acceleration is important for the final wheelchair hardware, as the embedded hardware will have fewer
+computational resources.
+
+Further evaluation and design of assistive control algorithms will ensure safe operation of the wheelchair.
+VFH+ showed promising results, however does not grant the user full control of the wheelchair
+in some scenarios and may require some modification. A basic 2D simulation environment will be created
+to model shared control between the autonomous system and the user, which will allow further tuning
+of the algorithm.
+
+Final integration of the autonomous system with the remaining wheelchair hardware
+will allow demonstration of the overall system, and enables direct user feedback about its performance.
+This integration will involve development of a protocol between the wheelchair microcontroller and the compute
+element, as well as delivery of the necessary power to all components of the wheelchair.
+However, it should be noted that this final integration will be reliant on the work of other thesis students.
 
 % Training algorithms on datasets
 % Performance improvement - MMDetection or multithreaded encoder/decoder?

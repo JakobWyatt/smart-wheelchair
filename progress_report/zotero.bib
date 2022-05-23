@@ -35,6 +35,35 @@
   keywords = {Framework}
 }
 
+@incollection{brostowSegmentationRecognitionUsing,
+  title = {Segmentation and {{Recognition Using Structure}} from {{Motion Point Clouds}}},
+  author = {Brostow, Gabriel J and Shotton, Jamie and Fauqueur, Julien and Cipolla, Roberto},
+  pages = {44--57},
+  publisher = {{Berlin, Heidelberg: Springer Berlin Heidelberg}},
+  location = {{Berlin, Heidelberg}},
+  doi = {10.1007/978-3-540-88682-2_5},
+  abstract = {We propose an algorithm for semantic segmentation based on 3D point clouds derived from ego-motion. We motivate five simple cues designed to model specific patterns of motion and 3D world structure that vary with object category. We introduce features that project the 3D cues back to the 2D image plane while modeling spatial layout and context. A randomized decision forest combines many such features to achieve a coherent 2D segmentation and recognize the object categories present. Our main contribution is to show how semantic segmentation is possible based solely on motion-derived 3D world structure. Our method works well on sparse, noisy point clouds, and unlike existing approaches, does not need appearance-based descriptors. Experiments were performed on a challenging new video database containing sequences filmed from a moving car in daylight and at dusk. The results confirm that indeed, accurate segmentation and recognition are possible using only motion and 3D world structure. Further, we show that the motion-derived information complements an existing state-of-the-art appearance-based method, improving both qualitative and quantitative performance.},
+  isbn = {0302-9743},
+  keywords = {Dataset,Machine Learning},
+  file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/brostowSegmentationRecognitionUsing.pdf}
+}
+
+@article{brostowSemanticObjectClasses2009,
+  title = {Semantic Object Classes in Video: {{A}} High-Definition Ground Truth Database},
+  author = {Brostow, Gabriel J and Fauqueur, Julien and Cipolla, Roberto},
+  date = {2009},
+  journaltitle = {Pattern Recognition Letters},
+  volume = {30},
+  number = {2},
+  pages = {88--97},
+  publisher = {{Elsevier B.V}},
+  issn = {0167-8655},
+  doi = {10.1016/j.patrec.2008.04.005},
+  abstract = {Visual object analysis researchers are increasingly experimenting with video, because it is expected that motion cues should help with detection, recognition, and other analysis tasks. This paper presents the Cambridge-driving Labeled Video Database (CamVid) as the first collection of videos with object class semantic labels, complete with metadata. The database provides ground truth labels that associate each pixel with one of 32 semantic classes. The database addresses the need for experimental data to quantitatively evaluate emerging algorithms. While most videos are filmed with fixed-position CCTV-style cameras, our data was captured from the perspective of a driving automobile. The driving scenario increases the number and heterogeneity of the observed object classes. Over 10 min of high quality 30 Hz footage is being provided, with corresponding semantically labeled images at 1 Hz and in part, 15 Hz. The CamVid Database offers four contributions that are relevant to object analysis researchers. First, the per-pixel semantic segmentation of over 700 images was specified manually, and was then inspected and confirmed by a second person for accuracy. Second, the high-quality and large resolution color video images in the database represent valuable extended duration digitized footage to those interested in driving scenarios or ego-motion. Third, we filmed calibration sequences for the camera color response and intrinsics, and computed a 3D camera pose for each frame in the sequences. Finally, in support of expanding this or other databases, we present custom-made labeling software for assisting users who wish to paint precise class-labels for other images and videos. We evaluate the relevance of the database by measuring the performance of an algorithm from each of three distinct domains: multi-class object recognition, pedestrian detection, and label propagation.},
+  keywords = {Dataset,Machine Learning},
+  file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/brostowSemanticObjectClasses2009.pdf}
+}
+
 @article{chenDeepLabSemanticImage2016,
   title = {{{DeepLab}}: {{Semantic Image Segmentation}} with {{Deep Convolutional Nets}}, {{Atrous Convolution}}, and {{Fully Connected CRFs}}},
   author = {Chen, Liang-Chieh and Papandreou, George and Kokkinos, Iasonas and Murphy, Kevin and Yuille, Alan L},
@@ -92,6 +121,18 @@
   abstract = {Self-driving cars reduce human error and can accomplish various missions to help people in different fields. They have become one of the main interests in automotive research and development, both in the industry and academia. However, many challenges are encountered in dealing with distance measurement and cost, both in equipment and technique. The use of stereo camera to measure the distance of an object is convenient and popular for obstacle avoidance and navigation of autonomous vehicles. The calculation of distance considers angular distance, distance between cameras, and the pixel of the image. This study proposes a method that measures object distance based on trigonometry, that is, facing the self-driving car using image processing and stereo vision with high accuracy, low cost, and computational speed. The method achieves a high distance measuring accuracy of up to 20 m. It can be implemented in real time computing systems and can determine the safe driving distance between obstacles.},
   keywords = {Recommended},
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/Distance measurement.pdf}
+}
+
+@article{dosovitskiyCARLAOpenUrban2017,
+  title = {{{CARLA}}: {{An Open Urban Driving Simulator}}},
+  author = {Dosovitskiy, Alexey and Ros, German and Codevilla, Felipe and Lopez, Antonio and Koltun, Vladlen},
+  date = {2017},
+  journaltitle = {arXiv},
+  doi = {10.48550/ARXIV.1711.03938},
+  url = {https://arxiv.org/abs/1711.03938},
+  abstract = {We introduce CARLA, an open-source simulator for autonomous driving research. CARLA has been developed from the ground up to support development, training, and validation of autonomous urban driving systems. In addition to open-source code and protocols, CARLA provides open digital assets (urban layouts, buildings, vehicles) that were created for this purpose and can be used freely. The simulation platform supports flexible specification of sensor suites and environmental conditions. We use CARLA to study the performance of three approaches to autonomous driving: a classic modular pipeline, an end-to-end model trained via imitation learning, and an end-to-end model trained via reinforcement learning. The approaches are evaluated in controlled scenarios of increasing difficulty, and their performance is examined via metrics provided by CARLA, illustrating the platform's utility for autonomous driving research. The supplementary video can be viewed at https://youtu.be/Hp8Dz-Zek2E},
+  keywords = {Dataset,Machine Learning},
+  file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/dosovitskiyCARLAOpenUrban2017.pdf}
 }
 
 @article{durrant-whyteSimultaneousLocalizationMapping2006,
@@ -244,17 +285,16 @@
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/heDeepResidualLearning2015.pdf}
 }
 
-@inproceedings{howardSearchingMobileNetV32019,
+@article{howardSearchingMobileNetV32019,
   title = {Searching for {{MobileNetV3}}},
-  booktitle = {{{IEEE}}/{{CVF International Conference}} on {{Computer Vision}}},
   author = {Howard, Andrew and Sandler, Mark and Chen, Bo and Wang, Weijun and Chen, Liang-Chieh and Tan, Mingxing and Chu, Grace and Vasudevan, Vijay and Zhu, Yukun and Pang, Ruoming and Adam, Hartwig and Le, Quoc},
   date = {2019},
+  journaltitle = {IEEE/CVF International Conference on Computer Vision},
+  shortjournal = {ICCV},
   volume = {2019},
   pages = {1314--1324},
-  publisher = {{IEEE}},
   doi = {10.1109/ICCV.2019.00140},
   abstract = {We present the next generation of MobileNets based on a combination of complementary search techniques as well as a novel architecture design. MobileNetV3 is tuned to mobile phone CPUs through a combination of hardware-aware network architecture search (NAS) complemented by the NetAdapt algorithm and then subsequently improved through novel architecture advances. This paper starts the exploration of how automated search algorithms and network design can work together to harness complementary approaches improving the overall state of the art. Through this process we create two new MobileNet models for release: MobileNetV3-Large and MobileNetV3-Small which are targeted for high and low resource use cases. These models are then adapted and applied to the tasks of object detection and semantic segmentation. For the task of semantic segmentation (or any dense pixel prediction), we propose a new efficient segmentation decoder Lite Reduced Atrous Spatial Pyramid Pooling (LR-ASPP). We achieve new state of the art results for mobile classification, detection and segmentation. MobileNetV3-Large is 3.2\% more accurate on ImageNet classification while reducing latency by 20\% compared to MobileNetV2. MobileNetV3-Small is 6.6\% more accurate compared to a MobileNetV2 model with comparable latency. MobileNetV3-Large detection is over 25\% faster at roughly the same accuracy as MobileNetV2 on COCO detection. MobileNetV3-Large LRASPP is 34\% faster than MobileNetV2 R-ASPP at similar accuracy for Cityscapes segmentation.},
-  isbn = {1550-5499},
   keywords = {Machine Learning,Model},
   file = {/Users/jakobwyatt/Library/CloudStorage/OneDrive-Personal/thesis/papers/howardSearchingMobileNetV32019.pdf}
 }
