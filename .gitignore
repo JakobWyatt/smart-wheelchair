@@ -20,3 +20,4 @@ colab/test.mkv
 *.slxc
 slprj/
 _minted*
+*.bak
