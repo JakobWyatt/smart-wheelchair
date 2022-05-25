@@ -47,7 +47,7 @@ A preliminary wheelchair driving video dataset has been collected around Curtin 
 This dataset has been used to evaluate algorithms such as YOLOv5, DeepLabv3, and Hybridnet on
 the problem of scene recognition, with promising results. VFH+ has been evaluated as an assistive
 control algorithm after being implemented in MATLAB. Additionally, sensors and hardware to be used
-alongside the wheelchair have been identified and ordered.
+alongside the wheelchair have been identified and evaluated.
 
 The methodology and technical roadmap of this project have been planned, and future work identified (to be completed
 next semester). This involves collection of a second dataset using the final sensors, retraining of
@@ -70,13 +70,10 @@ scene recognition models, and final integration of the semi-autonomous system wi
 
 
 \section{Introduction}
-Many people with motor disabilities rely on wheelchairs for movement, and
-powered wheelchairs have enabled greater independence for people with disability.
-Despite the huge benefit powered wheelchairs have granted,
-the use of this technology can be inaccessible or unsafe for people
+Powered wheelchairs have enabled greater independence for people with disability.
+However, the use of this technology can be inaccessible or unsafe for people
 with amyotrophic lateral sclerosis (ALS) or vision impairment,
 who may be unable to use a joystick or see their environment clearly.
-
 
 \subsection{Aims}
 The aim of this research is to develop a semi-autonomous smart wheelchair system.
@@ -87,8 +84,8 @@ the user is granted greater mobility, confidence, and independence.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\linewidth,angle=270,origin=c]{images/wheelchair.jpg}
-    \caption{The CentroGlide Wheelchair}
+    \includegraphics[width=0.55\linewidth,angle=270,origin=c]{images/wheelchair.jpg}
+    \caption{The CentroGlide wheelchair}
     \label{fig:wheelchair}
 \end{figure}
 
@@ -117,13 +114,13 @@ are infeasible.
 The smart wheelchair system should also be commercially viable - high-cost
 components and sensors are infeasible. Internet connectivity should not be a requirement
 for the system to operate either - the round trip time required to communicate with a server
-would compromise the safety of a user. Because of this, all processing is performed locally
+could compromise the safety of a user. Because of this, all processing is performed locally
 on the wheelchair.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.35\linewidth]{images/wheelchair_reclined.jpg}
-    \caption{CentroGlide Wheelchair in Reclined Position}
+    \includegraphics[width=0.4\linewidth]{images/wheelchair_reclined.jpg}
+    \caption{CentroGlide wheelchair in reclined position}
     \label{fig:wheelchair_reclined}
 \end{figure}
 
@@ -176,7 +173,7 @@ taking into account factors such as resolution, cost, and accuracy.
     \bottomrule
     \end{tabular}
 \end{adjustbox}
-    \caption{Sensor Comparisons}
+    \caption{Sensor comparisons}
     \label{table:sensor_options}
 \end{table}
 
@@ -185,12 +182,12 @@ taking into account factors such as resolution, cost, and accuracy.
 \subsubsection{RGB-D Cameras}
 One advantage RGB-D cameras have over alternative sensors is high RGB resolution,
 allowing them to utilise advances in machine learning and computer vision.
-Sensors such as LIDAR may fail at path detection, as path markings
+Technologies such as Lidar may fail at path detection, as path markings
 cannot be detected.
 
 When comparing these cameras, factors such as package size,
-field of view, and depth accuracy are important to consider due to the available
-mounting points on the wheelchair. Several commercial options are compared in \Cref{table:stereo_camera}
+field of view, and operating range are important to consider.
+Several commercial options are compared in \Cref{table:stereo_camera}
 - all of the listed units come with an integrated IMU.
 
 \begin{table}[H]
@@ -207,7 +204,7 @@ mounting points on the wheelchair. Several commercial options are compared in \C
     \bottomrule
     \end{tabular}
 \end{adjustbox}
-    \caption{Stereo Camera Options}
+    \caption{Stereo camera options}
     \label{table:stereo_camera}
 \end{table}
 
@@ -255,7 +252,7 @@ in \Cref{table:compute_element} alongside a gaming GPU.
     \bottomrule
     \end{tabular}
 \end{adjustbox}
-    \caption{AI Accelerator Options}
+    \caption{AI accelerator options}
     \label{table:compute_element}
 \end{table}
 
@@ -292,13 +289,6 @@ and exceeds human performance at image classification with an error of 3.57\%.
 ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies directly on
 the input of a previous layer.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\linewidth]{images/classification_types.png}
-    \caption{Types of Classification in Machine Vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014})}
-    \label{fig:classification_types}
-\end{figure}
-
 \subsubsection{Object Localisation}
 Object localisation is another core problem within this field, and involves identifying the location of objects within an image
 as well as classifying them. Object localisation can be used on a semi-autonomous wheelchair to identify
@@ -324,18 +314,25 @@ identify a road or kerb. \Cref{fig:classification_types} compares the output of 
 
 Most semantic segmentation algorithms use an encoder-decoder architecture, where information about the image is encoded into a small feature space.
 This feature space is then decoded back to the size of the original image using deconvolutional layers to obtain the segmented output.
-Encoding is typically done using a pretrained model backbone, such as ResNet. By avoiding model retraining and making use of
-existing classifier backbones, the computational power required to evaluate a model is reduced significantly.
+Encoding is typically done using a pretrained model backbone, such as ResNet, which reduces the computational power required to train
+the model.
 An issue with this architecture is that the resulting image can be low quality, as the image encoding is low resolution.
 U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation network which helps to rectify this issue,
 by using higher resolution features during deconvolution.
 This makes the segmented output sharper and more accurate.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/classification_types.png}
+    \caption{Types of classification in machine vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014})}
+    \label{fig:classification_types}
+\end{figure}
+
 Another semantic segmentation algorithm is DeepLab \cite{chenSemanticImageSegmentation2014}\cite{chenDeepLabSemanticImage2016}\cite{chenRethinkingAtrousConvolution2017}.
 DeepLab uses atrous convolution (otherwise known as dilated convolution), which is a type of convolution which widens the FOV of a convolutional layer.
 It does this by leaving gaps in the convolutional layer, as illustrated in \cref{fig:atrous_convolution}.
-By widening the FOV of each convolution, less downscaling is required during encoding. By encoding the image in a much higher resolution feature space,
-the segmented output is more accurate.
+By widening the FOV of each convolution, less downscaling is required during encoding. This allows the image to be encoded in a much higher resolution,
+leading to a more accurate output.
 To obtain the segmented output, a technique called atrous spatial pyramid pooling (ASPP) is used. ASPP samples the feature space at different
 scales using atrous convolution to classify each pixel in the image.
 These techniques improve both the accuracy and speed of the network - DeepLabv3 obtained 86.9\% accuracy on the PASCAL VOC 2012 test set.
@@ -384,13 +381,6 @@ local path in an example scenario.
 It should be noted that this algorithm still requires a reference path, which could be generated
 with one of the path finding algorithms mentioned above.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
-    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018})}
-    \label{fig:frenet_frame_local_path}
-\end{figure}
-
 \subsubsection{Local Algorithms}
 Local algorithms only consider obstacles currently in the proximity of the wheelchair,
 and use this information to set the current speed and direction of the wheelchair.
@@ -408,18 +398,25 @@ rather than planning a path to their assumed goal.
 However an issue with VFH+ is that it does not control the wheelchairs speed, and instead only finds a safe direction.
 Ideally the wheelchair should slow down if an obstacle is present.
 
+Another approach to assistive control with local algorithms is haptic feedback. Rather than
+blending inputs from the autonomous software and the user, the joystick itself is actuated
+to make it more difficult to move in the direction of obstacles \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}.
+An advantage of this approach is that it gives the user total control over which direction of movement they choose,
+however the additional force required to actuate the joystick may fatigue the user.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
+    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018})}
+    \label{fig:frenet_frame_local_path}
+\end{figure}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.35\linewidth]{images/binary_histogram_vfh.png}
     \caption{VFH+ binary histogram, representing direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022})}
     \label{fig:binary_histogram_vfh}
 \end{figure}
-
-Another approach to assistive control with local algorithms is haptic feedback. Rather than
-blending inputs from the autonomous software and the user, the joystick itself is actuated
-to make it more difficult to move in the direction of obstacles \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}.
-An advantage of this approach is that it gives the user total control over which direction of movement they choose,
-however the additional force required to actuate the joystick may fatigue the user.
 
 %\subsubsection{Path and Trajectory Planning}
 %Path planning involves finding a path from the current location to the goal location.
@@ -491,30 +488,33 @@ from an inbuilt IMU. A preliminary video dataset will also be collected before t
 to enable initial evaluation of scene recognition algorithms.
 
 \subsection{Software}
-Our software system requires several components. Interaction with the Zed 2 Mini will be done
-via the proprietary Stereolabs API, which will provide RGB-D imaging to the computer.
-PyTorch \cite{paszkePyTorchImperativeStyle2019} will be used for training and evaluation of machine learning models, as it
-provides good compatibility with existing machine learning models.
+%Our software system requires several components. Interaction with the Zed 2 Mini will be done
+%via the proprietary Stereolabs API, which will provide RGB-D imaging to the computer.
 The software system will involve a series of scene recognition algorithms to build and update an occupancy map of the surrounding area.
-Assistive control algorithms will then be used to choose the direction and speed of the wheelchair, based on the occupancy map and the users desired direction.
-Evaluation of several machine learning and assistive control algorithms based on their
-speed and accuracy will also be required, to choose which is suitable for the final software implementation.
+Interaction with the Zed 2 Mini will be done using the proprietary Stereolabs API, and
+PyTorch \cite{paszkePyTorchImperativeStyle2019} will be used for training and evaluation of machine learning models.
+PyTorch provides good compatibility with existing machine learning models such as YOLOv5 \cite{ultralyticsYOLOv5} and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}.
 
-An embedded microcontroller system and motor controller is being designed by other thesis students,
+Assistive control algorithms will then be used to choose the direction and speed of the wheelchair, based on the occupancy map and the users desired direction.
+Several machine learning and assistive control algorithms will be evaluated based on their
+speed and accuracy to choose which are suitable for the final software implementation.
+
+An embedded microcontroller system and motor controller are being designed by other thesis students,
 which will allow the software system to communicate with the underlying wheelchair hardware in a standard way.
 The embedded microcontroller will validate the chosen direction and speed of the wheelchair, to ensure
 that in the case of a software failure the user is still able to use the wheelchair. \Cref{fig:block_diagram}
 shows a block diagram of the final semi-autonomous wheelchair design.
 
 As the timeline of the embedded microcontroller system is uncertain, a basic simulation environment for the software system will be created.
-This allows the performance of the system to be validated without reliance on other thesis projects.
+This allows the performance of the autonomous system to be validated without reliance on other thesis projects.
 % System diagram
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{images/block_diagram.png}
-    \caption{Block Diagram of System}
+    \includegraphics[width=\linewidth]{images/block_diagram.png}
+    \caption{Block diagram of system}
     \label{fig:block_diagram}
 \end{figure}
+\pagebreak
 
 \subsection{Time Planning}
 Time should be allocated to thesis writing and review as well as technical progress.
@@ -525,8 +525,8 @@ a clear project scope was important so that students did not unnecessarily dupli
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/gantt_chart.png}
-    \caption{Gantt Chart of Thesis Progress}
+    \includegraphics[width=\linewidth]{images/gantt_chart.png}
+    \caption{Gantt chart of thesis progress}
     \label{fig:gantt_chart}
 \end{figure}
 \pagebreak
@@ -542,10 +542,10 @@ A preliminary 34 minute driving dataset (1920x1080 @ 24 fps) has been collected 
 The experimental setup to collect this dataset can be seen in \cref{fig:gopro_dataset_collection}, including the identified
 sensor mounting point.
 
-\begin{figure}[H]
+\begin{figure}[bp]
     \centering
     \includegraphics[width=0.5\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
-    \caption{Experimental setup of preliminary dataset collection}
+    \caption{Experimental setup for preliminary dataset collection}
     \label{fig:gopro_dataset_collection}
 \end{figure}
 
@@ -554,9 +554,9 @@ and assistive control, as well as writing the software required to evaluate thes
 
 YOLOv5 \cite{ultralyticsYOLOv5} was one of the first algorithms evaluated for object detection.
 The implementation of YOLOv5 includes an inbuilt video encoder and decoder, which simplified
-the evaluation process significantly. However, some preprocessing of our video dataset with ffmpeg was required.
+the evaluation process significantly; only some preprocessing of our video dataset was required (using ffmpeg).
 YOLOv5 has 5 model sizes (nano, small, medium, large, extra large),
-which allow the user to choose between speed and accuracy.
+with smaller models sacrificing accuracy for speed.
 Due to the low latency requirements of a fast moving wheelchair, this algorithm was evaluated using the small model size.
 
 YOLOv5 was evaluated on our Curtin video dataset. As seen in \cref{fig:yolov5s}, this algorithm can identify pedestrians and vehicles with high accuracy.
@@ -565,7 +565,7 @@ YOLOv5 ran in real-time (using a GTX 1080) on the 24 fps Curtin video dataset.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/yolov5s.png}
+    \includegraphics[width=0.7\linewidth]{images/yolov5s.png}
     \caption{YOLOv5s evaluated on the Curtin dataset}
     \label{fig:yolov5s}
 \end{figure}
@@ -607,14 +607,15 @@ This model was trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset,
 seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
 \end{minted}
 
-Pillow (a Python image library) was used to overlay the output on top of the original image.
-An example of model output can be seen in \cref{fig:deeplab}; the poor segmentation resolution is due to the
-lower model resolution of 960x540. DeepLabv3 identifies pedestrians with a high degree of accuracy, however
+Pillow (a Python image library) was used to overlay the output on top of the original image;
+an example of model output can be seen in \cref{fig:deeplab}. To improve the speed of the model, input frames are
+downscaled to 960x540, which causes the lower segmentation resolution.
+DeepLabv3 identifies pedestrians with a high degree of accuracy, however
 features such as vehicles are not accurately segmented due to these objects not existing in the MS COCO dataset.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/deeplab.png}
+    \includegraphics[width=0.7\linewidth]{images/deeplab.png}
     \caption{DeepLabv3 evaluated on the Curtin dataset}
     \label{fig:deeplab}
 \end{figure}
@@ -635,11 +636,11 @@ cv2.addWeighted(frame, 1, output, 0.8, 0, frame)
 \Cref{fig:hybridnets_outdoor} shows Hybridnet evaluated on the Curtin dataset, with the identified drivable area highlighted.
 This model performs well on uniform surfaces, however has more difficulty identifying the drivable area on surfaces such as paved bricks.
 This could be due to domain adaptation problems, as this model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018}
-which consists of bitumen roads.
+which primarily consists of bitumen roads.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/hybridnets_outdoor.png}
+    \includegraphics[width=0.65\linewidth]{images/hybridnets_outdoor.png}
     \caption{Hybridnet drivable area segmentation evaluated on the Curtin dataset}
     \label{fig:hybridnets_outdoor}
 \end{figure}
@@ -647,9 +648,10 @@ which consists of bitumen roads.
 Assistive control is required to navigate the wheelchair after a map of the surroundings has been built.
 The VFH+ (vector field histogram) \cite{ulrichVFHReliableObstacle1998} algorithm was evaluated
 in MATLAB using the Navigation toolbox and Lidar toolbox.
-A simulated 2D environment and occupancy grid were created in MATLAB,
-with a Lidar sensor simulated at the wheelchairs position. The code for this is shown below,
-with the occupancy grid and Lidar scan visualised in \cref{fig:simulated_lidar}.
+First, a simulated 2D environment and occupancy grid were loaded,
+and a Lidar sensor simulated at the wheelchairs position. This code is below;
+\Cref{fig:simulated_lidar} shows the occupancy grid on the left and simulated
+Lidar scan on the right.
 
 \begin{minted}[breaklines]{matlab}
 load('occupancy-warehouse.mat')
@@ -664,16 +666,16 @@ plot(scan)
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/simulated_lidar.png}
+    \includegraphics[width=0.6\linewidth]{images/simulated_lidar.png}
     \caption{Simulated occupancy grid and Lidar sensor}
     \label{fig:simulated_lidar}
 \end{figure}
 
-Next, the simulated Lidar scan is input into the VFH+ controller, along with
-the users desired direction. The algorithm calculates the closest direction to the desired direction which
-avoids nearby obstacles, taking into consideration the turning radius of the wheelchair.
-\Cref{fig:vfh_controller} shows a visualisation of the VFH+ controller successfully avoiding nearby
-obstacles, with code listed below.
+The VFH+ controller is configured with the wheelchair size,
+turning radius, and other parameters (emitted from the code below for brevity).
+The simulated Lidar scan is input into the VFH+ controller, along with
+the users desired direction, as seen below. \Cref{fig:vfh_controller} shows a visualisation
+of the obstacle polar histogram, as well as the target and steering direction.
 
 \begin{minted}[breaklines]{matlab}
 vfh = controllerVFH('UseLidarScan', true);
@@ -684,11 +686,14 @@ show(vfh)
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/vfh_controller.png}
-    \caption{VFH+ obstacle density and target and steering direction}
+    \includegraphics[width=0.8\linewidth]{images/vfh_controller.png}
+    \caption{VFH+ obstacle density and steering direction}
     \label{fig:vfh_controller}
 \end{figure}
 
+VFH+ successfully finds the nearest direction to the chosen direction which avoids obstacles.
+In this case, the target direction directly right of the wheelchair is
+occupied by the wall, with the chosen direction avoiding this obstacle.
 One disadvantage of VFH+ is that it is not able to modify the speed of the wheelchair.
 If presented with an obstacle, VFH+ will attempt to steer around the obstacle at the current velocity rather than
 slowing down, which may be unsafe in some scenarios.
