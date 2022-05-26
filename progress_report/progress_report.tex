@@ -23,7 +23,7 @@
 \usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox} \usepackage{makecell}
 \usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
 
-\usepackage{minted}\usepackage{lmodern}
+\usepackage[cache=false]{minted}\usepackage{lmodern}
 
 \setcounter{bottomnumber}{1}
 \renewcommand\bottomfraction{10.0}
@@ -37,11 +37,11 @@
 \section*{Abstract}
 %\addcontentsline{toc}{section}{Abstract}
 
-This progress report involves identification and definition of the core thesis problem;
-creating a semi-autonomous wheelchair which prioritises user safety and independence.
+This progress report involves the identification and definition of the core thesis problem;
+creating a semi-autonomous wheelchair that prioritises user safety and independence.
 A literature review details prior work in this field, and identifies potential algorithms
 for scene recognition and assistive control. Additionally, the literature review identifies and evaluates
-sensors which could be used to perceive the wheelchairs environment.
+sensors that could be used to perceive the wheelchairs environment.
 
 A preliminary wheelchair driving video dataset has been collected around Curtin university.
 This dataset has been used to evaluate algorithms such as YOLOv5, DeepLabv3, and Hybridnet on
@@ -50,7 +50,7 @@ control algorithm after being implemented in MATLAB. Additionally, sensors and h
 alongside the wheelchair have been identified and evaluated.
 
 The methodology and technical roadmap of this project have been planned, and future work identified (to be completed
-next semester). This involves collection of a second dataset using the final sensors, retraining of
+next semester). This involves the collection of a second dataset using the final sensors, retraining of
 scene recognition models, and final integration of the semi-autonomous system with the wheelchair.
 
 \pagebreak
@@ -76,7 +76,7 @@ with amyotrophic lateral sclerosis (ALS) or vision impairment,
 who may be unable to use a joystick or see their environment clearly.
 
 \subsection{Aims}
-The aim of this research is to develop a semi-autonomous smart wheelchair system.
+This research aims to develop a semi-autonomous smart wheelchair system.
 This research is done in collaboration with Glide, a WA wheelchair manufacturer,
 who have provided an existing powered wheelchair (CentroGlide) to use as a base
 for this functionality (\cref{fig:wheelchair}). By developing assistive technology for the wheelchair,
@@ -91,8 +91,8 @@ the user is granted greater mobility, confidence, and independence.
 
 \pagebreak
 \subsection{Problem Definition}
-There are multiple engineering research project students who are part of this team,
-working on elements such as controller design, navigation assistance, and object detection.
+Multiple engineering project students are part of this team
+and are working on elements such as controller design, navigation assistance, and object detection.
 This work specifically focuses on pathway assistance, which identifies suitable
 paths for the wheelchair to drive on. If a user unintentionally drives off their desired path,
 this can lead to uneven terrain and possibly falling from the wheelchair.
@@ -102,10 +102,10 @@ Emphasis is placed on the 'semi-autonomous' aspect of the wheelchair.
 An important requirement of this project is that the user still
 has control over their wheelchair, and can override any autonomous functionality
 if required. If the smart wheelchair system mistakenly detects an obstacle,
-the users mobility should not be compromised.
+the user's mobility should not be compromised.
 
 Another requirement of the system is that any sensors mounted to the wheelchair
-should not impede the users comfort or the wheelchairs manoeuvrability.
+should not impede the user's comfort or the wheelchair's manoeuvrability.
 Many wheelchair users have specific requirements for wheelchair seat adjustments,
 to avoid pressure sores and discomfort. \Cref{fig:wheelchair_reclined} shows the
 wheelchair configuration when fully reclined, demonstrating that some sensor mounting locations
@@ -140,7 +140,7 @@ on the wheelchair.
 
 
 \subsection{Sensors and Hardware}
-%To percieve the environment, the wheelchair should be fitted with various sensors and
+%To perceive the environment, the wheelchair should be fitted with various sensors and
 %a compute element to process the sensors output.
 
 \subsubsection{Sensor Types}
@@ -209,7 +209,7 @@ Several commercial options are compared in \Cref{table:stereo_camera}
 \end{table}
 
 \footnotetext[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD}
-\footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes which trade-off between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good trade-off between operating range and resolution.}
+\footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes that trade-off between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good trade-off between operating range and resolution.}
 
 A caveat of the Stereolabs products is that they require a separate CUDA enabled GPU (manufactured by Nvidia) to generate the point-cloud
 and RGB-D image. In contrast, the Kinect DK only requires a CPU for processing, while the Intel RealSense performs processing onboard
@@ -218,11 +218,11 @@ and requires a USB-C 3.1 interface to communicate.
 \subsubsection{Compute Element}
 A compute element inside a semi-autonomous driving system generally consists of several components -
 a microcontroller to process user inputs and
-send signals to the motors, a general purpose computer to run pathfinding algorithms and log information,
-and an AI accelerator to improve performance of on-board machine learning (ML) algorithms.
+send signals to the motors, a general-purpose computer to run pathfinding algorithms and log information,
+and an AI accelerator to improve the performance of on-board machine learning (ML) algorithms.
 
 AI accelerators use specialised hardware to perform operations common in ML algorithms (such as matrix multiplication
-and convolution) more efficiently than a CPU can. GPUs have been used widely for this application, however their high
+and convolution) more efficiently than a CPU can. GPUs have been used widely for this application; however, their high
 power usage is infeasible for some applications. Embedded AI accelerators aim to provide greater power efficiency
 at the cost of specialisation.
 
@@ -258,14 +258,13 @@ in \Cref{table:compute_element} alongside a gaming GPU.
 
 \pagebreak
 \subsection{Scene Understanding}
-Scene understanding is a broad field, and involves using computer vision methods
+Scene understanding is a broad field and involves using computer vision methods
 on visual or spatial data to gain better knowledge about the surrounding environment.
 Convolutional Neural Networks (CNNs) are commonly used for this application, as they
-are able to exploit the local nature of image features to reduce the number of required computations.
+can exploit the local nature of image features to reduce the number of required computations.
 
 \subsubsection{Image Classification}
-Image classification is a core problem within this field, and involves identifying the
-subject of an image (such as an animal or object).
+Image classification is a core problem within this field and involves identifying the subject of an image (such as an animal or object).
 AlexNet \cite{krizhevskyImageNetClassificationDeep2012}, based on the earlier digit-recognition CNN LeNet-5
 \cite{lecunGradientbasedLearningApplied1998}, was one of the first deep CNNs
 applied to this problem. AlexNet was trained on the large ImageNet dataset \cite{jiadengImageNetLargescaleHierarchical2009},
@@ -290,18 +289,18 @@ ResNet uses a 'skipping' architecture to improve network training, where the out
 the input of a previous layer.
 
 \subsubsection{Object Localisation}
-Object localisation is another core problem within this field, and involves identifying the location of objects within an image
-as well as classifying them. Object localisation can be used on a semi-autonomous wheelchair to identify
+Object localisation is another core problem within this field, and involves identifying the location of objects within an image as well as classifying them.
+Object localisation can be used on a semi-autonomous wheelchair to identify
 a pedestrian or obstacle within the environment. R-CNN \cite{girshickRichFeatureHierarchies2013} was one of the
 first object classification models which utilised convolutional networks, by identifying potential bounding boxes
 and running an image classifier on these bounding boxes. Fast and Faster R-CNN \cite{girshickFastRCNN2015}\cite{renFasterRCNNRealTime2015}
 improved the speed of this model by running an image classifier backbone once on the entire image, and using a CNN to improve
-identification of bounding boxes. Pascal VOC \cite{everinghamPascalVisualObject2009} and MS COCO \cite{linMicrosoftCOCOCommon2014}
-are datasets which are commonly used to evaluate object classification models.
+the identification of bounding boxes. Pascal VOC \cite{everinghamPascalVisualObject2009} and MS COCO \cite{linMicrosoftCOCOCommon2014}
+are datasets that are commonly used to evaluate object classification models.
 
 YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000BetterFaster2016}\cite{redmonYOLOv3IncrementalImprovement2018}\cite{bochkovskiyYOLOv4OptimalSpeed2020}
 is another object classification model which focuses on improving the speed of the model. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
-reaches over 60 fps (frames per second) on the Tesla V100, which enables its use in real time applications such as autonomous driving and security camera footage. % RCNN and YOLO
+reaches over 60 fps (frames per second) on the Tesla V100, which enables its use in real-time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
 image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
@@ -314,11 +313,11 @@ identify a road or kerb. \Cref{fig:classification_types} compares the output of 
 
 Most semantic segmentation algorithms use an encoder-decoder architecture, where information about the image is encoded into a small feature space.
 This feature space is then decoded back to the size of the original image using deconvolutional layers to obtain the segmented output.
-Encoding is typically done using a pretrained model backbone, such as ResNet, which reduces the computational power required to train
+Encoding is typically done using a pre-trained model backbone, such as ResNet, which reduces the computational power required to train
 the model.
-An issue with this architecture is that the resulting image can be low quality, as the image encoding is low resolution.
-U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation network which helps to rectify this issue,
-by using higher resolution features during deconvolution.
+An issue with this architecture is that the resulting segmentation can be low quality, as the image encoding is low resolution.
+U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation network that helps to rectify this issue,
+by using higher-resolution features during deconvolution.
 This makes the segmented output sharper and more accurate.
 
 \begin{figure}[H]
@@ -329,7 +328,7 @@ This makes the segmented output sharper and more accurate.
 \end{figure}
 
 Another semantic segmentation algorithm is DeepLab \cite{chenSemanticImageSegmentation2014}\cite{chenDeepLabSemanticImage2016}\cite{chenRethinkingAtrousConvolution2017}.
-DeepLab uses atrous convolution (otherwise known as dilated convolution), which is a type of convolution which widens the FOV of a convolutional layer.
+DeepLab uses atrous convolution (otherwise known as dilated convolution), which is a type of convolution that widens the FOV of a convolutional layer.
 It does this by leaving gaps in the convolutional layer, as illustrated in \cref{fig:atrous_convolution}.
 By widening the FOV of each convolution, less downscaling is required during encoding. This allows the image to be encoded in a much higher resolution,
 leading to a more accurate output.
@@ -364,22 +363,22 @@ desired end goal and the wheelchair navigates to that goal \cite{wangS2P2SelfSup
 %for semi-autonomous control, as only a local map is needed for navigation assistance.
 
 \subsubsection{Path-Based Algorithms}
-Path-based algorithms take an occupancy grid as an input, and output a path between the start point and a goal point.
-A* is an example of this, and uses a heuristic to efficiently find the shortest path between the start and end point.
+Path-based algorithms take an occupancy grid as an input and output a path between the start point and a goal point.
+A* is an example of this and uses a heuristic to efficiently find the shortest path between the start and end point.
 Other algorithms such as RRT* (rapidly-exploring random tree) \cite{karamanSamplingbasedAlgorithmsOptimal2011} build a tree from randomly sampled points
-to find a path to the goal node. RRT* may not find the shortest path initially, however can find an efficient path with much less
+to find a path to the goal node. RRT* may not find the shortest path initially, but can find an efficient path with much less
 computation required.
 
 One potential issue with these two algorithms is that they fail to take into account the smoothness of the resulting path.
-Although the path may be short, sharp changes in the trajectory could be uncomfortable to the user.
+Although the path may be short, sharp changes in the trajectory could be uncomfortable for the user.
 Trajectory planning algorithms aim to solve this - one such algorithm is optimal-control in a Fren\'et-Frame \cite{werlingOptimalTrajectoryGeneration2010},
 which can be used in autonomous vehicle control.
-This algorithm takes a reference path as an input, and outputs a local path which avoids collisions and minimises jerk (rate of change of acceleration).
+This algorithm takes a reference path as an input and outputs a local path that avoids collisions and minimises jerk (rate of change of acceleration).
 This is done by generating sample trajectories (represented with quintic polynomials), removing those which cause collisions, and choosing
 the remaining trajectory with the lowest change in acceleration. \Cref{fig:frenet_frame_local_path} illustrates the reference path, obstacles, and generated
 local path in an example scenario.
 It should be noted that this algorithm still requires a reference path, which could be generated
-with one of the path finding algorithms mentioned above.
+with one of the pathfinding algorithms mentioned above.
 
 \subsubsection{Local Algorithms}
 Local algorithms only consider obstacles currently in the proximity of the wheelchair,
@@ -389,20 +388,20 @@ has been applied to wheelchair control algorithms in prior work \cite{tomariEnha
 VFH+ calculates a polar obstacle density histogram around the robot based on the occupancy grid.
 The histogram is then binarized, to classify sectors around the robot as either occupied or not occupied.
 Next, a masked polar histogram is generated, which excludes paths that are not possible given the robots
-turning radius and kinematics. Finally, a safe direction is chosen which is nearest to the users desired direction.
+turning radius and kinematics. Finally, a safe direction is chosen which is nearest to the user's desired direction.
 An example binary histogram is shown in \cref{fig:binary_histogram_vfh}; the chosen direction avoids the obstacle in the
 desired direction.
 
 An advantage to this algorithm is that it gives the user more fine-grained control over their speed and direction,
 rather than planning a path to their assumed goal.
-However an issue with VFH+ is that it does not control the wheelchairs speed, and instead only finds a safe direction.
-Ideally the wheelchair should slow down if an obstacle is present.
+However an issue with VFH+ is that it does not control the wheelchair's speed, and instead only finds a safe direction.
+Ideally, the wheelchair should slow down if an obstacle is present.
 
 Another approach to assistive control with local algorithms is haptic feedback. Rather than
 blending inputs from the autonomous software and the user, the joystick itself is actuated
 to make it more difficult to move in the direction of obstacles \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}.
 An advantage of this approach is that it gives the user total control over which direction of movement they choose,
-however the additional force required to actuate the joystick may fatigue the user.
+however, the additional force required to actuate the joystick may fatigue the user.
 
 \begin{figure}[H]
     \centering
@@ -450,8 +449,8 @@ To do this requires some necessary hardware, including a sensor system, compute 
 Due to the 2021-2022 chip shortage, hardware selection was identified as a process that should occur relatively quickly.
 
 The literature review provides a comparison between different sensor types and models. For outdoor navigation assistance,
-a forward facing RGB-D camera was selected as the best option for this project - specifically, the Zed 2 Mini.
-This was chosen due to the high resolution provided by RGB-D cameras, and the long distance range of the Zed cameras due to 
+a forward-facing RGB-D camera was selected as the best option for this project - specifically, the Zed 2 Mini.
+This was chosen due to the high resolution provided by RGB-D cameras, and the long-distance range of the Zed cameras due to 
 their passive operation (does not use an IR emitter).
 
 % Should this be in the methodology?
@@ -466,7 +465,7 @@ stereo camera, due to several reasons:
 However, there are some challenges faced when using this mounting point, which must be addressed.
 \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
     \item Shaky video footage due to low rigidity in joystick mount.
-    \item Close to the front of the wheelchair, which reduces visibility of the sides of the wheelchair.
+    \item Close to the front of the wheelchair, which reduces the visibility of the sides of the wheelchair.
     \item Maximum camera width of \SI{150}{\milli\metre} before doorway manoeuvrability is affected.
 \end{enumerate}
 Due to the size constraints, the Mini form factor was chosen.
@@ -476,7 +475,7 @@ and wheelchair docking, due to the limitations of this mounting point. The senso
 was a 2D Lidar unit attached to the base of the wheelchair. However, this sensor will not be used for
 our specific application (pathway assistance).
 
-For the compute element, a Nvidia Jetson Xavier NX will be used, due to compatibility with the Zed API
+For the compute element, an Nvidia Jetson Xavier NX will be used, due to compatibility with the Zed API
 and a wide range of ML frameworks, as well as low power use.
 The motor controller is being designed by a different thesis student; \cref{fig:block_diagram} shows
 how it integrates with other hardware on the wheelchair.
@@ -485,7 +484,7 @@ how it integrates with other hardware on the wheelchair.
 To train and evaluate machine learning models, a stereo camera dataset will be collected by driving the wheelchair
 around Curtin University. This dataset will provide valuable RGB and depth information, as well as movement data
 from an inbuilt IMU. A preliminary video dataset will also be collected before the stereo camera is purchased,
-to enable initial evaluation of scene recognition algorithms.
+to enable the initial evaluation of scene recognition algorithms.
 
 \subsection{Software}
 %Our software system requires several components. Interaction with the Zed 2 Mini will be done
@@ -495,7 +494,7 @@ Interaction with the Zed 2 Mini will be done using the proprietary Stereolabs AP
 PyTorch \cite{paszkePyTorchImperativeStyle2019} will be used for training and evaluation of machine learning models.
 PyTorch provides good compatibility with existing machine learning models such as YOLOv5 \cite{ultralyticsYOLOv5} and DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}.
 
-Assistive control algorithms will then be used to choose the direction and speed of the wheelchair, based on the occupancy map and the users desired direction.
+Assistive control algorithms will then be used to choose the direction and speed of the wheelchair, based on the occupancy map and the user's desired direction.
 Several machine learning and assistive control algorithms will be evaluated based on their
 speed and accuracy to choose which are suitable for the final software implementation.
 
@@ -536,8 +535,8 @@ a clear project scope was important so that students did not unnecessarily dupli
 
 
 \section{Current Work}
-Part of the current work this semester has included selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
-as well as identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
+Part of the current work this semester has included the selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
+as well as the identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
 A preliminary 34 minute driving dataset (1920x1080 @ 24 fps) has been collected around Curtin University using a GoPro Hero 4.
 The experimental setup to collect this dataset can be seen in \cref{fig:gopro_dataset_collection}, including the identified
 sensor mounting point.
@@ -549,7 +548,7 @@ sensor mounting point.
     \label{fig:gopro_dataset_collection}
 \end{figure}
 
-The remaining technical progress this semester has focused on evaluation of various algorithms for scene understanding
+The remaining technical progress this semester has focused on the evaluation of various algorithms for scene understanding
 and assistive control, as well as writing the software required to evaluate these algorithms.
 
 YOLOv5 \cite{ultralyticsYOLOv5} was one of the first algorithms evaluated for object detection.
@@ -573,7 +572,7 @@ YOLOv5 ran in real-time (using a GTX 1080) on the 24 fps Curtin video dataset.
 The next algorithm evaluated was DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. This is a segmentation algorithm,
 which classifies individual pixels within the image rather than drawing bounding boxes around the entire object.
 Segmentation algorithms can be more suitable when environment features such as pathways and stairs need to be identified,
-as these features do not have well defined bounding boxes.
+as these features do not have well-defined bounding boxes.
 
 To evaluate this algorithm, a video encoder and decoder needed to be created. This was done using a Python generator,
 so that frames in the video could simply be iterated over within a for loop and only decoded when required.
@@ -583,7 +582,7 @@ After evaluation of the algorithm, each processed frame was displayed on the scr
 Some scene processing algorithms do not run in real-time due to hardware limitations or performance issues.
 When this occurs, some frames must be dropped during model evaluation to keep the scene model up to date and minimise latency.
 The code used to do this is shown below. By measuring the amount of time taken to process and encode a frame, the current fps
-and number of frames to drop can be calculated.
+and the number of frames to drop can be calculated.
 
 \begin{minted}{python}
 for frame in generate_frame():
@@ -600,7 +599,7 @@ for frame in generate_frame():
 To avoid training the model from scratch, a pretrained model is loaded from PyTorch Hub using the code below.
 As mentioned in the literature review, image segmentation algorithms can accept different image classifiers as a backbone.
 In this case, MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone due to its fast performance.
-This model was trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset, and runs at 15 fps on a GTX 1080.
+This model was trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset and runs at 15 fps on a GTX 1080.
 % 15 fps
 
 \begin{minted}[breaklines]{python}
@@ -608,8 +607,8 @@ seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_lar
 \end{minted}
 
 Pillow (a Python image library) was used to overlay the output on top of the original image;
-an example of model output can be seen in \cref{fig:deeplab}. To improve the speed of the model, input frames are
-downscaled to 960x540, which causes the lower segmentation resolution.
+an example of the model output can be seen in \cref{fig:deeplab}. To improve the speed of the model, input frames are
+downscaled to 960x540, which causes a lower segmentation resolution.
 DeepLabv3 identifies pedestrians with a high degree of accuracy, however
 features such as vehicles are not accurately segmented due to these objects not existing in the MS COCO dataset.
 
@@ -634,7 +633,7 @@ cv2.addWeighted(frame, 1, output, 0.8, 0, frame)
 \end{minted}
 
 \Cref{fig:hybridnets_outdoor} shows Hybridnet evaluated on the Curtin dataset, with the identified drivable area highlighted.
-This model performs well on uniform surfaces, however has more difficulty identifying the drivable area on surfaces such as paved bricks.
+This model performs well on uniform surfaces but has more difficulty identifying the drivable area on surfaces such as paved bricks.
 This could be due to domain adaptation problems, as this model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018}
 which primarily consists of bitumen roads.
 
@@ -649,7 +648,7 @@ Assistive control is required to navigate the wheelchair after a map of the surr
 The VFH+ (vector field histogram) \cite{ulrichVFHReliableObstacle1998} algorithm was evaluated
 in MATLAB using the Navigation toolbox and Lidar toolbox.
 First, a simulated 2D environment and occupancy grid were loaded,
-and a Lidar sensor simulated at the wheelchairs position. This code is below;
+and a Lidar sensor was simulated at the position of the wheelchair. This code is below;
 \Cref{fig:simulated_lidar} shows the occupancy grid on the left and simulated
 Lidar scan on the right.
 
@@ -674,7 +673,7 @@ plot(scan)
 The VFH+ controller is configured with the wheelchair size,
 turning radius, and other parameters (emitted from the code below for brevity).
 The simulated Lidar scan is input into the VFH+ controller, along with
-the users desired direction, as seen below. \Cref{fig:vfh_controller} shows a visualisation
+the user's desired direction, as seen below. \Cref{fig:vfh_controller} shows a visualisation
 of the obstacle polar histogram, as well as the target and steering direction.
 
 \begin{minted}[breaklines]{matlab}
@@ -734,8 +733,8 @@ to model shared control between the autonomous system and the user, which will a
 of the algorithm.
 
 Final integration of the autonomous system with the remaining wheelchair hardware
-will allow demonstration of the overall system, and enables direct user feedback about its performance.
-This integration will involve development of a protocol between the wheelchair microcontroller and the compute
+will allow the demonstration of the overall system and enable direct user feedback about its performance.
+This integration will involve the development of a protocol between the wheelchair microcontroller and the compute
 element, as well as delivery of the necessary power to all components of the wheelchair.
 However, it should be noted that this final integration will be reliant on the work of other thesis students.
 
