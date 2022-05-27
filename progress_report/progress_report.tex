@@ -275,7 +275,7 @@ layers and 3 fully connected layers, which can be seen in \cref{fig:alexnet_arch
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/alexnet_architecture.png}
-    \caption{Architecture of the AlexNet image classification network. Reproduced from Krizhevsky et al. \cite{krizhevskyImageNetClassificationDeep2012})}
+    \caption{Architecture of the AlexNet image classification network. Reproduced from Krizhevsky et al. \cite{krizhevskyImageNetClassificationDeep2012}}
     \label{fig:alexnet_architecture}
 \end{figure}
 
@@ -302,7 +302,7 @@ YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000Better
 is another object classification model which focuses on improving the speed of the model. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
 reaches over 60 fps (frames per second) on the Tesla V100, which enables its use in real-time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
-image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
+an image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
 
 \subsubsection{Semantic Segmentation}
@@ -323,7 +323,7 @@ This makes the segmented output sharper and more accurate.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{images/classification_types.png}
-    \caption{Types of classification in machine vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014})}
+    \caption{Types of classification in machine vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014}}
     \label{fig:classification_types}
 \end{figure}
 
@@ -339,9 +339,44 @@ These techniques improve both the accuracy and speed of the network - DeepLabv3 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{images/atrous_convolution.png}
-    \caption{Atrous convolution with a 3x3 kernel, showing increasing FOV. Reproduced from Chen et al. \cite{chenRethinkingAtrousConvolution2017})}
+    \caption{Atrous convolution with a 3x3 kernel, showing increasing FOV. Reproduced from Chen et al. \cite{chenRethinkingAtrousConvolution2017}}
     \label{fig:atrous_convolution}
 \end{figure}
+
+\subsubsection{Autonomous Driving}
+Autonomous driving and autonomous wheelchair control involve similar challenges,
+including drivable area segmentation and object detection. As described previously, many machine learning
+models utilise an image classification backbone to extract features from an image, with a `detection head'
+then used for the final prediction.
+
+Running multiple classification backbones for different models can be inefficient, as
+the work of feature extraction is duplicated many times over. One way to improve the performance
+of the autonomous system is to share a classification backbone between models, and use different detection
+heads for various tasks.
+
+An example of this architecture is HydraNets \cite{karpathyTeslaAIDay2021}, a machine learning model used by
+Tesla to perform tasks such as traffic light detection, lane prediction, and object detection efficiently.
+Other machine learning models that utilise this architecture include YOLOP \cite{wuYOLOPYouOnly2021} and
+Hybridnet \cite{vuHybridNetsEndtoEndPerception2022}, which focus on lane segmentation, drivable area segmentation,
+and object detection. The model architecture of YOLOP is shown in \cref{fig:yolop}.
+
+This approach is valuable in situations where compute hardware is limited. Real-time applications such as
+autonomous wheelchair control require fast inference times to react to obstacles in the surrounding environment.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/yolop.png}
+    \caption{YOLOP model architecture. Reproduced from Wu et al. \cite{wuYOLOPYouOnly2021}}
+    \label{fig:yolop}
+\end{figure}
+
+To train these ML models, a pre-trained model backbone (on a dataset such as ImageNet \cite{jiadengImageNetLargescaleHierarchical2009})
+is retrained on a driving dataset. This technique is known as transfer learning, and can vastly reduce the amount of time required
+to train a new model.
+Driving datasets such as Cityscapes \cite{cordtsCityscapesDatasetSemantic2016} and Berkeley DeepDrive \cite{yuBDD100KDiverseDriving2018}
+can be used for this purpose. Additionally, game-engine based driving simulators such as CARLA \cite{dosovitskiyCARLAOpenUrban2017} can be used to generate a
+synthetic dataset for training.
+
 % U-net, deepnet
 
 % classification, localization, segmentation, video, datasets
@@ -406,14 +441,14 @@ however, the additional force required to actuate the joystick may fatigue the u
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
-    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018})}
+    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018}}
     \label{fig:frenet_frame_local_path}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.35\linewidth]{images/binary_histogram_vfh.png}
-    \caption{VFH+ binary histogram, representing direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022})}
+    \caption{VFH+ binary histogram, representing direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022}}
     \label{fig:binary_histogram_vfh}
 \end{figure}
 
@@ -543,7 +578,7 @@ sensor mounting point.
 
 \begin{figure}[bp]
     \centering
-    \includegraphics[width=0.5\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
+    \includegraphics[width=0.45\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
     \caption{Experimental setup for preliminary dataset collection}
     \label{fig:gopro_dataset_collection}
 \end{figure}
@@ -564,13 +599,13 @@ YOLOv5 ran in real-time (using a GTX 1080) on the 24 fps Curtin video dataset.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{images/yolov5s.png}
+    \includegraphics[width=0.65\linewidth]{images/yolov5s.png}
     \caption{YOLOv5s evaluated on the Curtin dataset}
     \label{fig:yolov5s}
 \end{figure}
 
-The next algorithm evaluated was DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. This is a segmentation algorithm,
-which classifies individual pixels within the image rather than drawing bounding boxes around the entire object.
+The next algorithm evaluated was DeepLabv3 \cite{chenRethinkingAtrousConvolution2017}. This is a segmentation algorithm
+which classifies individual pixels within the image rather than drawing bounding boxes around an object.
 Segmentation algorithms can be more suitable when environment features such as pathways and stairs need to be identified,
 as these features do not have well-defined bounding boxes.
 
@@ -610,17 +645,18 @@ Pillow (a Python image library) was used to overlay the output on top of the ori
 an example of the model output can be seen in \cref{fig:deeplab}. To improve the speed of the model, input frames are
 downscaled to 960x540, which causes a lower segmentation resolution.
 DeepLabv3 identifies pedestrians with a high degree of accuracy, however
-features such as vehicles are not accurately segmented due to these objects not existing in the MS COCO dataset.
+features such as vehicles are not accurately segmented due to their lower occurrence in the MS COCO dataset.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{images/deeplab.png}
+    \includegraphics[width=0.65\linewidth]{images/deeplab.png}
     \caption{DeepLabv3 evaluated on the Curtin dataset}
     \label{fig:deeplab}
 \end{figure}
 
-Another model evaluated was Hybridnet \cite{vuHybridNetsEndtoEndPerception2022}, which performs drivable area segmentation.
-A lot of code used to implement DeepLabv3 could be shared for this model, as both models were segmentation models
+Another model evaluated was Hybridnet \cite{vuHybridNetsEndtoEndPerception2022}, which performs drivable area segmentation
+and object detection on the same backbone. In our case, drivable area segmentation was the primary focus when evaluating this model.
+Code used to implement DeepLabv3 could be shared for this model, as both models were segmentation models
 and loaded from PyTorch Hub. The sample code used to overlay the model output over the original image had some
 performance issues, and was replaced with the code below (which was also used for our implementation of DeepLabv3).
 This improved the models performance from 5 fps to 8 fps on a GTX 1080.
@@ -637,9 +673,14 @@ This model performs well on uniform surfaces but has more difficulty identifying
 This could be due to domain adaptation problems, as this model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018}
 which primarily consists of bitumen roads.
 
+Selection of a final drivable area segmentation model is unable to be made at this stage, as further experimentation and model training
+will be required. The Future Work section of this progress report details the next steps for model evaluation.
+As Hybridnet also performs object detection on the same backbone, it could remove the need for a second object detection model,
+which could improve the performance of the autonomous system.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\linewidth]{images/hybridnets_outdoor.png}
+    \includegraphics[width=0.6\linewidth]{images/hybridnets_outdoor.png}
     \caption{Hybridnet drivable area segmentation evaluated on the Curtin dataset}
     \label{fig:hybridnets_outdoor}
 \end{figure}
@@ -665,7 +706,7 @@ plot(scan)
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{images/simulated_lidar.png}
+    \includegraphics[width=0.5\linewidth]{images/simulated_lidar.png}
     \caption{Simulated occupancy grid and Lidar sensor}
     \label{fig:simulated_lidar}
 \end{figure}
@@ -685,7 +726,7 @@ show(vfh)
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/vfh_controller.png}
+    \includegraphics[width=0.65\linewidth]{images/vfh_controller.png}
     \caption{VFH+ obstacle density and steering direction}
     \label{fig:vfh_controller}
 \end{figure}
