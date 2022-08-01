@@ -1,0 +1,74 @@
+%%%%%%%%%%%%%%%%%
+%    PACKAGES
+%%%%%%%%%%%%%%%%%
+
+% Formatting
+\usepackage{setspace} \onehalfspacing % line spacing
+\usepackage[top=2.5cm,bottom=2.5cm,inner=4cm,outer=2.5cm]{geometry} % margin sizes
+\usepackage[nottoc,notlof,notlot,numbib]{tocbibind} % remove toc from table of contents
+\usepackage[none]{hyphenat} % dont hyphenate words
+\usepackage{fontspec} \setmainfont{Times New Roman} % set font
+\usepackage{enumitem} % reduce spacing for enumerate and itemize
+\usepackage{microtype} % fix typing
+\usepackage{lmodern} % font for minted
+
+% Functionality
+\usepackage{pdfpages} % include pdf
+\usepackage{amsmath} % equations
+\usepackage{graphicx} % images
+\usepackage{float} % figure positioning
+\usepackage[hidelinks]{hyperref} % dont highlight links
+\usepackage{cleveref} % easy to reference figures
+\usepackage{siunitx} % format si units
+\usepackage{gensymb} % degree
+\usepackage[cache=false]{minted} % include code
+\usepackage[style=ieee]{biblatex} \addbibresource{../zotero.bib} % referencing
+
+% Tables
+\usepackage{tabularx} % table environment
+\usepackage{booktabs} % rules in table
+\usepackage{adjustbox} % expand table
+\usepackage{makecell} % multi-line cell
+
+%%%%%%%%%%%%%%%%%
+%    COMMANDS
+%%%%%%%%%%%%%%%%%
+
+\raggedbottom % allow pages to end early
+\pdfvariable minorversion 7 % updated pdf version
+\setlength\parindent{5mm} % change indent size
+
+% change section/subsection title font size to 12
+\usepackage{sectsty}
+\sectionfont{\fontsize{12}{10}\selectfont}
+\subsectionfont{\fontsize{12}{10}\selectfont}
+\subsubsectionfont{\fontsize{12}{10}\selectfont}
+
+% change spacing before & after headings
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{24pt}{12pt} % left, before, after
+\titlespacing*{\subsection}{0pt}{24pt}{12pt}
+\titlespacing*{\subsubsection}{0pt}{24pt}{12pt}
+
+% change spacing around captions and equations
+\setlength{\abovecaptionskip}{12pt}
+\setlength{\abovedisplayskip}{18pt}
+\setlength{\belowdisplayskip}{18pt}
+\setlength{\abovedisplayshortskip}{18pt}
+\setlength{\belowdisplayshortskip}{18pt}
+
+% "this page left blank"
+\newcommand*{\blankpage}{%
+\vspace*{\fill}
+{\centering \textbf{THIS PAGE INTENTIONALLY LEFT BLANK} \par}
+\vspace{\fill}}
+\makeatletter
+\renewcommand*{\cleardoublepage}{\clearpage\if@twoside \ifodd\c@page\else
+\blankpage
+\newpage
+\if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother
+
+% improve float placement
+\setcounter{bottomnumber}{1}
+\renewcommand\bottomfraction{10.0}

@@ -1,0 +1,77 @@
+\documentclass[12pt,twoside]{article}
+\input{chapters/preamble.tex}
+
+\begin{document}
+
+\includepdf{ThesisTitle.pdf}
+\thispagestyle{empty}\null\clearpage
+
+\includepdf{ThesisLetter.pdf}
+\thispagestyle{empty}\null\clearpage
+
+\pagenumbering{roman}
+\section*{ACKNOWLEDGEMENTS}
+The author wishes to thank Glide for providing a powered wheelchair to the research team.
+\cleardoublepage
+
+\section*{ABSTRACT}
+This progress report involves the identification and definition of the core thesis problem;
+creating a semi-autonomous wheelchair that prioritises user safety and independence.
+A literature review details prior work in this field, and identifies potential algorithms
+for scene recognition and assistive control. Additionally, the literature review identifies and evaluates
+sensors that could be used to perceive the wheelchairs environment.
+
+A preliminary wheelchair driving video dataset has been collected around Curtin university.
+This dataset has been used to evaluate algorithms such as YOLOv5, DeepLabv3, and Hybridnet on
+the problem of scene recognition, with promising results. VFH+ has been evaluated as an assistive
+control algorithm after being implemented in MATLAB. Additionally, sensors and hardware to be used
+alongside the wheelchair have been identified and evaluated.
+
+The methodology and technical roadmap of this project have been planned, and future work identified (to be completed
+next semester). This involves the collection of a second dataset using the final sensors, retraining of
+scene recognition models, and final integration of the semi-autonomous system with the wheelchair.
+
+The literature review of this thesis was previously submitted as part of the Progress Report assessment for MXEN4000.
+\cleardoublepage
+
+\renewcommand{\contentsname}{TABLE OF CONTENTS}
+\tableofcontents
+\pagebreak
+\listoffigures
+\listoftables
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{INTRODUCTION}
+\input{chapters/introduction.tex}
+\cleardoublepage
+
+\section{LITERATURE REVIEW}
+\input{chapters/literature_review.tex}
+\cleardoublepage
+
+\section{METHODOLOGY}
+\input{chapters/methodology.tex}
+\cleardoublepage
+
+\section{RESULTS AND DISCUSSION}
+\input{chapters/results.tex}
+\cleardoublepage
+
+\section{CONCLUSIONS}
+\cleardoublepage
+
+\section{FUTURE WORK}
+\input{chapters/future_work.tex}
+\cleardoublepage
+
+\printbibliography[title={REFERENCES},heading=bibnumbered]
+\cleardoublepage
+
+\appendix
+\section*{APPENDIX A - Thesis Completion Form}
+\addcontentsline{toc}{section}{APPENDIX A - Thesis Completion Form}
+\cleardoublepage
+\includepdf{ThesisCompletionForm.pdf}
+
+\end{document}

@@ -1,0 +1,34 @@
+Future work of this project involves remaining technical progress detailed in the methodology,
+and the final thesis write-up.
+Once the desired RGB-D and Lidar sensors have been procured, they will be mounted to the wheelchair
+in a secure manner and used to collect a second driving dataset around Curtin university.
+
+Scene recognition algorithms such as DeepLabv3 and Hybridnet
+had some difficulty identifying features of our dataset. This is likely a problem with domain adaptation,
+as the original datasets used to train these models did not include pedestrian walkways or vehicles.
+Transfer learning will be explored to improve the performance of these
+models, by training them on existing supervised driving datasets.
+Additionally, labelling of our driving dataset (using platforms such as Roboflow or V7 Labs)
+or generation of a simulated dataset will be considered.
+
+To improve the speed of these algorithms, GPU video encoding and post-processing will be explored.
+Maximising hardware acceleration is important for the final wheelchair hardware, as the embedded hardware will have fewer
+computational resources.
+
+Further evaluation and design of assistive control algorithms will ensure safe operation of the wheelchair.
+VFH+ showed promising results, however does not grant the user full control of the wheelchair
+in some scenarios and may require some modification. A basic 2D simulation environment will be created
+to model shared control between the autonomous system and the user, which will allow further tuning
+of the algorithm.
+
+Final integration of the autonomous system with the remaining wheelchair hardware
+will allow the demonstration of the overall system and enable direct user feedback about its performance.
+This integration will involve the development of a protocol between the wheelchair microcontroller and the compute
+element, as well as delivery of the necessary power to all components of the wheelchair.
+However, it should be noted that this final integration will be reliant on the work of other thesis students.
+
+% Training algorithms on datasets
+% Performance improvement - MMDetection or multithreaded encoder/decoder?
+% Simulation environment
+% Final hardware integration
+% Measure kinematics
