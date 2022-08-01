@@ -4,9 +4,10 @@
 \pdfvariable minorversion 7
 
 % Specify document formatting.
-\renewcommand{\baselinestretch}{1.0} 
+%\renewcommand{\baselinestretch}{1.0}
+\usepackage{setspace} \singlespacing
 \usepackage[top=2.5cm,bottom=2.5cm,inner=4cm,outer=2.5cm]{geometry}%twoside
-\usepackage{fancyhdr} \usepackage{pdfpages} \usepackage[nottoc,notlof,notlot,numbib]{tocbibind}
+\usepackage{pdfpages} \usepackage[nottoc,notlof,notlot,numbib]{tocbibind}
 
 % Change section title font size to 12.
 \usepackage[none]{hyphenat} \usepackage{sectsty}
@@ -14,24 +15,46 @@
 \subsectionfont{\fontsize{12}{10}\selectfont}
 \subsubsectionfont{\fontsize{12}{10}\selectfont}
 
+% Change spacing before/after headings
+% Spacing before heading is flexible (except for extended abstract).
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{24pt}{12pt} % Left, Before, After
+\titlespacing*{\subsection}{0pt}{24pt}{12pt}
+\titlespacing*{\subsubsection}{0pt}{24pt}{12pt}
+
+% Change spacing between caption and figure
+\setlength{\abovecaptionskip}{12pt}
+\setlength{\abovedisplayskip}{18pt}
+\setlength{\belowdisplayskip}{18pt}
+\setlength{\abovedisplayshortskip}{18pt}
+\setlength{\belowdisplayshortskip}{18pt}
+
+% Change indent size
+\setlength\parindent{5mm}
+
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 
 \usepackage{amsmath} \usepackage{graphicx} \usepackage{microtype} \usepackage{float}
 \usepackage[hidelinks]{hyperref} \usepackage{cleveref}
-\usepackage{siunitx} \usepackage{gensymb} \usepackage{enumitem}
+\usepackage{siunitx} \usepackage{gensymb} \usepackage{enumitem} % enumerate format
 \usepackage{tabularx} \usepackage{booktabs} \usepackage{adjustbox} \usepackage{makecell}
-\usepackage[style=ieee]{biblatex} \addbibresource{zotero.bib}
+\usepackage[style=ieee]{biblatex} \addbibresource{../zotero.bib}
 
-\usepackage[cache=false]{minted}\usepackage{lmodern}
+\usepackage[cache=false]{minted}\usepackage{lmodern} % code font
 
 \setcounter{bottomnumber}{1}
-\renewcommand\bottomfraction{10.0}
+\renewcommand\bottomfraction{10.0} % encourage floats at bottom of page
 
 \begin{document}
 \includepdf{title.pdf}
 \thispagestyle{empty}
 \pagebreak
+
+
+
+
+
 
 \pagenumbering{roman}
 \section*{Abstract}
