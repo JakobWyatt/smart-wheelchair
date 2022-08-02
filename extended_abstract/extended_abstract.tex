@@ -1,0 +1,108 @@
+\documentclass[10pt,twoside]{article}
+
+\usepackage{setspace} \singlespacing % line spacing
+\usepackage[top=2.5cm,bottom=2.5cm,inner=4cm,outer=2.5cm]{geometry} % margin sizes
+\usepackage[none]{hyphenat} % dont hyphenate words
+\usepackage{fontspec} \setmainfont{Times New Roman} % set font
+\usepackage{microtype} % fix typing
+\usepackage{amsmath} % equations
+\usepackage{graphicx} % images
+\usepackage{float} % figure positioning
+\usepackage[hidelinks]{hyperref} % dont highlight links
+\usepackage{cleveref} % easy to reference figures
+\usepackage{siunitx} % format si units
+\usepackage{changepage} % for the adjustwidth environment
+\usepackage[authordate,backend=biber]{biblatex-chicago} \addbibresource{../zotero.bib} % referencing
+
+\raggedbottom % allow pages to end early
+\pdfvariable minorversion 7 % updated pdf version
+\setlength\parindent{5mm} % change indent size
+
+% change section/subsection title font size to 10
+\usepackage{sectsty}
+\sectionfont{\fontsize{10}{10}\selectfont}
+\subsectionfont{\fontsize{10}{10}\selectfont}
+\subsubsectionfont{\fontsize{10}{10}\selectfont}
+
+% change spacing before & after headings
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{20pt}{6pt} % left, before, after
+\titlespacing*{\subsection}{0pt}{20pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{20pt}{6pt}
+
+% change spacing around captions and equations
+% indent equations
+\setlength{\abovecaptionskip}{10pt}
+\setlength{\abovedisplayskip}{10pt}
+\setlength{\belowdisplayskip}{10pt}
+\setlength{\abovedisplayshortskip}{10pt}
+\setlength{\belowdisplayshortskip}{10pt}
+
+\begin{document}
+
+\begin{center}
+\fontsize{12}{14.4}\selectfont
+\textbf{Navigation assistance for a semi-autonomous smart wheelchair}
+\fontsize{11}{13.2}\selectfont
+
+\vspace{11pt}
+
+Jakob D. WYATT and S. Khaksar
+
+\vspace{11pt}
+
+Department of Mechanical Engineering, Curtin University, Perth, WA 6845, Australia
+
+\vspace{11pt}
+
+\end{center}
+\begin{flushright}
+\textit{siavash.khaksar@curtin.edu.au}
+\end{flushright}
+
+\begin{adjustwidth}{10mm}{10mm}
+\section*{\textbf{ABSTRACT}}
+This progress report involves the identification and definition of the core thesis problem;
+creating a semi-autonomous wheelchair that prioritises user safety and independence.
+A literature review details prior work in this field, and identifies potential algorithms
+for scene recognition and assistive control. Additionally, the literature review identifies and evaluates
+sensors that could be used to perceive the wheelchairs environment.
+
+A preliminary wheelchair driving video dataset has been collected around Curtin university.
+This dataset has been used to evaluate algorithms such as YOLOv5, DeepLabv3, and Hybridnet on
+the problem of scene recognition, with promising results. VFH+ has been evaluated as an assistive
+control algorithm after being implemented in MATLAB. Additionally, sensors and hardware to be used
+alongside the wheelchair have been identified and evaluated.
+
+The methodology and technical roadmap of this project have been planned, and future work identified (to be completed
+next semester). This involves the collection of a second dataset using the final sensors, retraining of
+scene recognition models, and final integration of the semi-autonomous system with the wheelchair.
+\end{adjustwidth}
+
+\section*{\textbf{INTRODUCTION}}
+Multiple engineering project students are part of this team
+and are working on elements such as controller design, navigation assistance, and object detection.
+This work specifically focuses on pathway assistance, which identifies suitable
+paths for the wheelchair to drive on. If a user unintentionally drives off their desired path,
+this can lead to uneven terrain and possibly falling from the wheelchair.
+By guiding the user along a path, these safety issues can be mitigated.
+
+\section*{\textbf{RESULTS AND DISCUSSION}}
+Part of the current work this semester has included the selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
+as well as the identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
+A preliminary 34 minute driving dataset (1920x1080 @ 24 fps) has been collected around Curtin University using a GoPro Hero 4.
+The experimental setup to collect this dataset can be seen here, including the identified
+sensor mounting point.
+
+\section*{\textbf{CONCLUSIONS}}
+To evaluate this algorithm, a video encoder and decoder needed to be created. This was done using a Python generator,
+so that frames in the video could simply be iterated over within a for loop and only decoded when required.
+OpenCV \autocite{vuHybridNetsEndtoEndPerception2022} was the underlying library used to decode each video frame into a BGR pixel array.
+After evaluation of the algorithm, each processed frame was displayed on the screen and encoded into a video file using OpenCV.
+
+\section*{\textbf{ACKNOWLEDGEMENTS}}
+The author wishes to thank Glide for providing a powered wheelchair to the research team.
+
+\printbibliography[title=\textbf{REFERENCES},heading=bibliography]
+
+\end{document}
