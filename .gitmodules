@@ -4,3 +4,6 @@
 [submodule "colab/PythonRobotics"]
 	path = colab/PythonRobotics
 	url = https://github.com/AtsushiSakai/PythonRobotics
+[submodule "colab/HybridNets"]
+	path = colab/HybridNets
+	url = https://github.com/datvuthanh/HybridNets
