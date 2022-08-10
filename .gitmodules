@@ -7,3 +7,6 @@
 [submodule "colab/HybridNets"]
 	path = colab/HybridNets
 	url = https://github.com/datvuthanh/HybridNets
+[submodule "colab/YOLOP"]
+	path = colab/YOLOP
+	url = https://github.com/hustvl/YOLOP
