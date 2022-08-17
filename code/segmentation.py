@@ -1,3 +1,4 @@
+from concurrent.futures import process
 import cv2
 import torch
 import torchvision
@@ -12,6 +13,7 @@ import time
 import math
 
 VideoProperties = namedtuple('VideoProperties', ['fps', 'width', 'height'])
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def GenerateFrame(path):
     print(f"Video source: {path}")
@@ -46,10 +48,30 @@ def PushFrame(p):
             output.write(frame)
     return push_frame
 
-def ProcessFrameHybrid(p):
-    hybridnet = torch.hub.load('datvuthanh/hybridnets', 'hybridnets', pretrained=True, device='cuda:0')
-    hybridnet.eval()
+def HybridnetLoader(p, path = None):
+    import sys
+    from pathlib import Path
+    hybridnetspath = Path("../repositories/HybridNets")
+    sys.path.insert(0, str(hybridnetspath))
+    from backbone import HybridNetsBackbone
+    from utils.utils import Params
+    from utils.constants import BINARY_MODE
+    params = Params(str(hybridnetspath / "projects" / "bdd100k.yml"))
 
+    if path is None:
+        model = torch.hub.load('datvuthanh/hybridnets', 'hybridnets', pretrained=True, device=device)
+    else:
+        # Create a model without lane detection
+        model = HybridNetsBackbone(num_classes=len(params.obj_list), compound_coef=3,
+                               ratios=eval(params.anchors_ratios), scales=eval(params.anchors_scales),
+                               seg_mode=BINARY_MODE, backbone_name=None)
+        model.load_state_dict(torch.load(path)['model'])
+        model = model.to(device)
+    model.eval()
+    process_frame = ProcessFrameHybrid(p, model, path is not None)
+    return process_frame
+
+def ProcessFrameHybrid(p, model, is_binary = False):
     # Using 128 here is a weird hack - signed vs unsigned??
     colors = np.array([[0, 0, 0], [0, 128, 0], [0, 0, 128]], dtype=np.uint8)
 
@@ -61,12 +83,13 @@ def ProcessFrameHybrid(p):
     def preprocess_frame(frame):
         frame = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (640, 384), interpolation=cv2.INTER_AREA)
         frame = preprocess_tensor(frame).unsqueeze(0)
-        if torch.cuda.is_available():
-            return frame.to('cuda')
-        return frame
+        return frame.to(device)
 
     def postprocess_frame(frame, seg):
-        seg_mask = seg[0].argmax(0).byte().cpu().numpy()
+        if is_binary:
+            seg_mask = seg[0].round().squeeze(0).byte().cpu().numpy()
+        else:
+            seg_mask = seg[0].argmax(0).byte().cpu().numpy()
         seg_mask = PIL.Image.fromarray(seg_mask)
         seg_mask.putpalette(colors)
         seg_mask = seg_mask.resize((p.width, p.height)).convert("RGB")
@@ -79,7 +102,7 @@ def ProcessFrameHybrid(p):
         model_input = preprocess_frame(frame)
         with torch.no_grad():
             # focus on segmentation for now
-            features, regression, classification, anchors, segmentation = hybridnet(model_input)
+            features, regression, classification, anchors, segmentation = model(model_input)
         return postprocess_frame(frame, segmentation)
     return process_frame
 
@@ -87,8 +110,7 @@ def ProcessFrameDeeplab(p):
     # resnet50 resnet101 mobilenet_v3_large
     seg_model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_mobilenet_v3_large', pretrained=True)
     seg_model.eval()
-    if torch.cuda.is_available():
-        seg_model.to('cuda')
+    seg_model.to(device)
     
     colors = np.random.randint(256, size=(21, 3), dtype=np.uint8)
     colors[0] = [0, 0, 0]
@@ -101,8 +123,7 @@ def ProcessFrameDeeplab(p):
         factor = 0.5
         frame = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), (0, 0), fx=factor, fy=factor)
         frame = preprocess_tensor(frame).unsqueeze(0)
-        if torch.cuda.is_available():
-            return frame.to('cuda')
+        frame.to(device)
         return frame
 
     def postprocess_frame(frame, pred):
@@ -132,11 +153,18 @@ def ProcessFrameYolo(p):
         output.render()
         return output.imgs[0]
 
-def main(*, source: str, drop_frames: bool):
+def main(*, source: str, drop_frames: bool, model: str, weights: str):
     generate_frame, p = GenerateFrame(source)
     if generate_frame is not None:
         push_frame = PushFrame(p)
-        process_frame = ProcessFrameDeeplab(p)
+        if model == 'hybridnets':
+            process_frame = HybridnetLoader(p, weights)
+        elif model == 'deeplab':
+            process_frame = ProcessFrameDeeplab(p)
+        elif model == 'yolo':
+            process_frame = ProcessFrameYolo(p)
+        else:
+            print("INVALID MODEL NAME")
         frames_drop = 0
         for frame in generate_frame():
             if frames_drop == 0:
@@ -152,8 +180,13 @@ def main(*, source: str, drop_frames: bool):
         push_frame(None) # cleanup
 
 if __name__ == '__main__':
+    print("Available GPUs:")
+    print(torch.cuda.get_device_properties(device))
+    print(torch.cuda.memory_summary())
     parser = argparse.ArgumentParser()
     parser.add_argument('--drop-frames', action=argparse.BooleanOptionalAction, help="drop frames for low latency")
     parser.add_argument('--source', type=str, help='video path')
+    parser.add_argument('--model', type=str, help='model to use')
+    parser.add_argument('--weights', type=str, help='path to model weights')
     args = parser.parse_args()
-    main(source=args.source, drop_frames=args.drop_frames)
+    main(source=args.source, drop_frames=args.drop_frames, model=args.model, weights=args.weights)
