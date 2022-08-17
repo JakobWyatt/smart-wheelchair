@@ -1,12 +1,12 @@
 [submodule "colab/yolov5"]
-	path = colab/yolov5
+	path = repositories/yolov5
 	url = https://github.com/ultralytics/yolov5
 [submodule "colab/PythonRobotics"]
-	path = colab/PythonRobotics
+	path = repositories/PythonRobotics
 	url = https://github.com/AtsushiSakai/PythonRobotics
 [submodule "colab/HybridNets"]
-	path = colab/HybridNets
+	path = repositories/HybridNets
 	url = https://github.com/datvuthanh/HybridNets
 [submodule "colab/YOLOP"]
-	path = colab/YOLOP
+	path = repositories/YOLOP
 	url = https://github.com/hustvl/YOLOP

@@ -1,7 +1,0 @@
-name: latex
-channels:
- - defaults
- - conda-forge
-dependencies:
- - python>=3.9.0
- - pygments>=2.11.2
