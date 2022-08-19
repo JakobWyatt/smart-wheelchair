@@ -24,3 +24,5 @@ _minted*
 *.pdf
 build/
 *.svo
+*.mp4
+__pycache__/

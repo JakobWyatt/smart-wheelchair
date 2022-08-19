@@ -15,7 +15,7 @@ import math
 VideoProperties = namedtuple('VideoProperties', ['fps', 'width', 'height'])
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def GenerateFrame(path):
+def GenerateFrameVideo(path):
     print(f"Video source: {path}")
     vid = cv2.VideoCapture(path)
     if not vid.isOpened():
@@ -31,21 +31,25 @@ def GenerateFrame(path):
     properties = VideoProperties(vid.get(cv2.CAP_PROP_FPS), int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     return generate_frame, properties
 
-def PushFrame(p):
-    print(f"Video Properties:\nfps {p.fps} resolution {p.width},{p.height}")
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    if platform.system() == "Darwin":
-        print("No GPU")
-    # This is a hack
-    output = cv2.VideoWriter(f'test.mp4', fourcc, p.fps, (p.width,  p.height))
+# If fn is None only display image
+# fn is a tuple of (video properties, file name)
+def PushFrame(fn: str = None):
+    #if platform.system() == "Darwin":
+    if fn is not None:
+        p = fn[0]
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        print(f"Video Properties:\nfps {p.fps} resolution {p.width},{p.height}")
+        output = cv2.VideoWriter(fn[1], fourcc, p.fps, (p.width,  p.height))
     cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
     def push_frame(frame):
         if frame is None:
-            output.release()
             cv2.destroyAllWindows()
+            if fn is not None:
+                output.release()
         else:
             cv2.imshow('frame', frame)
-            output.write(frame)
+            if fn is not None:
+                output.write(frame)
     return push_frame
 
 def HybridnetLoader(p, path = None):
@@ -154,9 +158,9 @@ def ProcessFrameYolo(p):
         return output.imgs[0]
 
 def main(*, source: str, drop_frames: bool, model: str, weights: str):
-    generate_frame, p = GenerateFrame(source)
+    generate_frame, p = GenerateFrameVideo(source)
     if generate_frame is not None:
-        push_frame = PushFrame(p)
+        push_frame = PushFrame((p, "test.mp4"))
         if model == 'hybridnets':
             process_frame = HybridnetLoader(p, weights)
         elif model == 'deeplab':
