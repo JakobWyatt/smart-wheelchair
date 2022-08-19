@@ -22,3 +22,5 @@ slprj/
 _minted*
 *.bak
 *.pdf
+build/
+*.svo
