@@ -1,0 +1,28 @@
+name: glide
+channels:
+ - defaults
+ - conda-forge
+ - pytorch
+ - fastai
+dependencies:
+ - python>=3.9.0
+ # Essentials
+ - pytorch::pytorch>=1.12.0
+ - pytorch::torchvision>=0.12.0
+ - pillow>=7.1.2
+ # seaborn
+ - seaborn>=0.11.2
+ - pandas>=1.1.4
+ - matplotlib>=3.2.2
+#- scipy>=1.4.1
+ # HybridNets
+ - fastai::albumentations>=1.1.0
+ - efficientnet-pytorch>=0.7.1
+ - pretrainedmodels>=0.7.4
+ - fastai::timm>=0.5.4
+ - webcolors>=1.11.1
+ - tqdm>=4.61.2
+ - pip
+ - pip:
+   - prefetch_generator>=1.0.1
+   - opencv-python>=4.5.1

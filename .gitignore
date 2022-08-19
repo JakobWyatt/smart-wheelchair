@@ -26,3 +26,4 @@ build/
 *.svo
 *.mp4
 __pycache__/
+*.whl
