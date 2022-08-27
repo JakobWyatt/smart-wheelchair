@@ -27,13 +27,17 @@ import sys
 import ogl_viewer.viewer as gl
 import pyzed.sl as sl
 
+sys.path.append('../../../../code')
+from zedm_stream import StreamInitParams
+
 if __name__ == "__main__":
     print("Running Depth Sensing sample ... Press 'Esc' to quit")
 
     init = sl.InitParameters(camera_resolution=sl.RESOLUTION.HD720,
-                                 depth_mode=sl.DEPTH_MODE.NEURAL,
+                                 depth_mode=sl.DEPTH_MODE.ULTRA,
                                  coordinate_units=sl.UNIT.METER,
                                  coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP)
+    init = StreamInitParams(init) # enable SVO recording
     zed = sl.Camera()
     status = zed.open(init)
     if status != sl.ERROR_CODE.SUCCESS:
@@ -47,7 +51,7 @@ if __name__ == "__main__":
     camera_model = zed.get_camera_information().camera_model
     # Create OpenGL viewer
     viewer = gl.GLViewer()
-    viewer.init(len(sys.argv), sys.argv, camera_model, res)
+    viewer.init(1, sys.argv, camera_model, res)
 
     point_cloud = sl.Mat(res.width, res.height, sl.MAT_TYPE.F32_C4, sl.MEM.CPU)
 
