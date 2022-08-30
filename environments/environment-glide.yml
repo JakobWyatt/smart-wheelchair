@@ -1,5 +1,7 @@
 name: glide
 # conda config --set channel_priority flexible
+# After setting up environment:
+# pip uninstall opencv-python-headless
 channels:
  - conda-forge
  - pytorch

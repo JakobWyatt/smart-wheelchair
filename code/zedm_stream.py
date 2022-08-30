@@ -156,8 +156,8 @@ def main():
         push_frame_segmentation(floor_seg)
 
         # FLOOR POINT CLOUD PROCESSING
-        floor_cloud = find_floor(zed)
-        push_frame_floor_cloud(floor_cloud)
+        #floor_cloud = find_floor(zed)
+        #push_frame_floor_cloud(floor_cloud)
 
         push_frame(image)
     # Cleanup
