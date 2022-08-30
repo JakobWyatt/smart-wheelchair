@@ -1,28 +1,27 @@
 name: glide
+# conda config --set channel_priority flexible
 channels:
- - defaults
  - conda-forge
  - pytorch
  - fastai
+ - defaults
 dependencies:
- - python>=3.9.0
+ - python==3.10.6
  # Essentials
- - pytorch::pytorch>=1.12.0
- - pytorch::torchvision>=0.12.0
- - pillow>=7.1.2
- # seaborn
- - seaborn>=0.11.2
- - pandas>=1.1.4
- - matplotlib>=3.2.2
-#- scipy>=1.4.1
- # HybridNets
- - fastai::albumentations>=1.1.0
- - efficientnet-pytorch>=0.7.1
- - pretrainedmodels>=0.7.4
- - fastai::timm>=0.5.4
- - webcolors>=1.11.1
- - tqdm>=4.61.2
+ - pytorch::pytorch==1.12.1
+ - pytorch::torchvision==0.13.1
+ - fastai::timm==0.5.4
+ - fastai::albumentations==1.1.0
+ - pillow==9.2.0
+ - opencv==4.6.0
+ - scipy==1.9.1
  - pip
  - pip:
-   - prefetch_generator>=1.0.1
-   - opencv-python>=4.5.1
+   - prefetch_generator==1.0.1
+   - webcolors>=1.11.1
+   - tqdm>=4.61.2
+   - seaborn>=0.11.2
+   - pandas>=1.1.4
+   - matplotlib>=3.2.2
+   - efficientnet-pytorch>=0.7.1
+   - pretrainedmodels>=0.7.4
