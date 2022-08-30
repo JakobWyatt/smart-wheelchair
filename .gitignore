@@ -27,3 +27,4 @@ build/
 *.mp4
 __pycache__/
 *.whl
+.vscode/

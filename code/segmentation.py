@@ -89,14 +89,20 @@ def ProcessFrameHybrid(p, model, is_binary = False):
         frame = preprocess_tensor(frame).unsqueeze(0)
         return frame.to(device)
 
-    def postprocess_frame(frame, seg):
+    def postprocess_frame(seg):
         if is_binary:
             seg_mask = seg[0].round().squeeze(0).byte().cpu().numpy()
         else:
             seg_mask = seg[0].argmax(0).byte().cpu().numpy()
         seg_mask = PIL.Image.fromarray(seg_mask)
+        seg_mask = seg_mask.resize((p.width, p.height))
+        seg_mask = np.array(seg_mask, dtype=np.uint8)
+        return seg_mask
+
+    def draw_frame(frame, seg_mask):
+        seg_mask = PIL.Image.fromarray(seg_mask)
         seg_mask.putpalette(colors)
-        seg_mask = seg_mask.resize((p.width, p.height)).convert("RGB")
+        seg_mask = seg_mask.convert("RGB")
         seg_mask = np.array(seg_mask, dtype=np.uint8)
         cv2.addWeighted(frame, 1, seg_mask, 0.8, 0, frame)
         return frame
@@ -107,8 +113,8 @@ def ProcessFrameHybrid(p, model, is_binary = False):
         with torch.no_grad():
             # focus on segmentation for now
             features, regression, classification, anchors, segmentation = model(model_input)
-        return postprocess_frame(frame, segmentation)
-    return process_frame
+        return postprocess_frame(segmentation)
+    return process_frame, draw_frame
 
 def ProcessFrameDeeplab(p):
     # resnet50 resnet101 mobilenet_v3_large
@@ -162,7 +168,8 @@ def main(*, source: str, drop_frames: bool, model: str, weights: str):
     if generate_frame is not None:
         push_frame = PushFrame((p, "test.mp4"))
         if model == 'hybridnets':
-            process_frame = HybridnetLoader(p, weights)
+            model, draw_frame = HybridnetLoader(p, weights)
+            process_frame = lambda x: draw_frame(x, model(x))
         elif model == 'deeplab':
             process_frame = ProcessFrameDeeplab(p)
         elif model == 'yolo':
