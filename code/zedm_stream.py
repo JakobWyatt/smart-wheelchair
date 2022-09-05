@@ -73,6 +73,9 @@ def scale_xy_to_img(p):
         y = np.clip(p[:,1] / scale + dims[1], 1, dims[1] - 1)
         return np.column_stack((x, y)).astype(np.int32)
 
+def remove_sub_nans(a):
+    return a[~np.isnan(a).any(1)]
+
 def detect_floor_plane(zed):
     plane = sl.Plane()
     reset_tracking_floor_frame = sl.Transform()
@@ -99,15 +102,14 @@ def project_segmentation(zed, out):
     fil = out.flatten() != 0
     # We want to filter out non-seg pixels from the point cloud,
     # so we're left with (x, z) coordinates that are drivable.
-    drivable = scale_xy_to_img(point_cloud[fil]).tolist()
+    drivable = scale_xy_to_img(remove_sub_nans(point_cloud[fil])).tolist()
     for x, y in drivable:
-        # Some weird integer overflow going on, should fix before I submit my thesis
-        if x > 0 and y > 0:
-            birds_eye.putpixel((x, y), (0, 200, 0))
+        birds_eye.putpixel((x, y), (0, 200, 0))
     return np.array(birds_eye, dtype=np.uint8)
 
 
 # POINT CLOUD PROCESSING
+# There are nans in the point cloud
 floor_height_error = 100.0 # +- mm
 
 def find_floor(zed):
@@ -117,9 +119,10 @@ def find_floor(zed):
     pcloud = pcloud.get_data().reshape(-1, 4)
     print("here we are")
     y = pcloud[:,1]
+    print(y[0:100])
     print("here we are2")
-    with open("y.pickle", "wb") as f:
-        pickle.dump(y, f)
+    #with open("y.pickle", "wb") as f:
+    #    pickle.dump(y, f)
     print("fuck this I hate my life")
     lower = y < (floor_height_prior + floor_height_error)
     print("here we are3")
