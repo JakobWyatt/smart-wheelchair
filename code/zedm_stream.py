@@ -90,11 +90,12 @@ def remove_sub_nans(a):
     return a[~np.isnan(a).any(1)]
 
 
-def draw_top_down(a, pic):
-    #pic = np.zeros((*img_dims, 3),
-    drivable = scale_xy_to_img(a).tolist()
+def draw_top_down(a):
+    pic = np.full((img_dims[1], img_dims[0], 3), (255, 255, 255), np.uint8)
+    drivable = scale_xy_to_img(a)
     for x, y in drivable:
-        pic.putpixel((x, y), (0, 200, 0))
+        pic[y, x] = (0, 200, 0)
+    return pic
 
 # Note: the Stereolabs API zed.find_floor_plane can sometimes cause a segmentation fault!
 # No way to catch this :(
@@ -119,7 +120,6 @@ def detect_floor_plane(zed):
 
 # SEGMENTATION
 def project_segmentation(zed, out):
-    birds_eye = PIL.Image.new('RGB', img_dims, color='white')
     point_cloud = sl.Mat()
     status = zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
     if status != sl.ERROR_CODE.SUCCESS:
@@ -129,8 +129,7 @@ def project_segmentation(zed, out):
     fil = out.flatten() != 0
     # We want to filter out non-seg pixels from the point cloud,
     # so we're left with (x, z) coordinates that are drivable.
-    draw_top_down(remove_sub_nans(point_cloud[fil]), birds_eye)
-    return np.array(birds_eye, dtype=np.uint8)
+    return draw_top_down(remove_sub_nans(point_cloud[fil]))
 
 
 # POINT CLOUD PROCESSING
@@ -142,7 +141,6 @@ upper_floor_gradient = 0.2
 
 
 def find_floor(zed):
-    birds_eye = PIL.Image.new('RGB', img_dims, color='white')
     pcloud = sl.Mat()
     status = zed.retrieve_measure(pcloud, sl.MEASURE.XYZRGBA)
     if status != sl.ERROR_CODE.SUCCESS:
@@ -152,8 +150,7 @@ def find_floor(zed):
     y = pcloud[:, 1]
     pcloud = pcloud[:, (0, 2)]
     upper_bound = pcloud[:, 1] * upper_floor_gradient - floor_height_prior + floor_height_error
-    draw_top_down(pcloud[y < upper_bound], birds_eye)
-    return np.array(birds_eye, dtype=np.uint8)
+    return draw_top_down(pcloud[y < upper_bound])
 
 
 def main():

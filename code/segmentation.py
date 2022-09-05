@@ -33,14 +33,14 @@ def GenerateFrameVideo(path):
 
 # If fn is None only display image
 # fn is a tuple of (video properties, file name)
-def PushFrame(fn: str = None, name: str = "frame"):
+def PushFrame(fn: str = None, name: str = "frame", flag = cv2.WINDOW_NORMAL):
     #if platform.system() == "Darwin":
     if fn is not None:
         p = fn[0]
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         print(f"Video Properties:\nfps {p.fps} resolution {p.width},{p.height}")
         output = cv2.VideoWriter(fn[1], fourcc, p.fps, (p.width,  p.height))
-    cv2.namedWindow(name, cv2.WINDOW_NORMAL)
+    cv2.namedWindow(name, flag)
     def push_frame(frame):
         if frame is None:
             cv2.destroyAllWindows()
