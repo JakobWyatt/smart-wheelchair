@@ -30,7 +30,7 @@ def StreamInitParams(params):
     if args.source is None:
         return params
     params.set_from_svo_file(args.source)
-    params.svo_real_time_mode = False
+    params.svo_real_time_mode = True
     return params
 
 
@@ -175,7 +175,7 @@ def main():
     kernel = np.ones((10, 10), np.uint8)
 
     elapsed_time = 1 / 30
-    skip_frames = 5
+    skip_frames = 0
     for i, image in enumerate(generate_frame()):
         if skip_frames != 0 and i % skip_frames != 0:
             push_frame_segmentation(floor_seg)

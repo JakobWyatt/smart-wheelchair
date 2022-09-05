@@ -8,7 +8,8 @@ channels:
  - fastai
  - defaults
 dependencies:
- - python==3.10.6
+# Changed from 3.10.6 as Matlab Engine 2022a requires Python 9
+ - python==3.9.13
  # Essentials
  - pytorch::pytorch==1.12.1
  - pytorch::torchvision==0.13.1
