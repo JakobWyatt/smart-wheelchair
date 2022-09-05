@@ -58,7 +58,9 @@ def GenerateFrameZed():
             elif status == sl.ERROR_CODE.END_OF_SVOFILE_REACHED:
                 return
             else:
+                print("Frame")
                 print(repr(status))
+                print("Failed")
     return generate_frame
 
 ############## DIFFERENT PROCESSING METHODS ATTEMPTED #################
@@ -76,28 +78,35 @@ def scale_xy_to_img(p):
 def remove_sub_nans(a):
     return a[~np.isnan(a).any(1)]
 
+# Note: the Stereolabs API zed.find_floor_plane can sometimes cause a segmentation fault!
+# No way to catch this :(
 def detect_floor_plane(zed):
     plane = sl.Plane()
     reset_tracking_floor_frame = sl.Transform()
     status = zed.find_floor_plane(plane, reset_tracking_floor_frame, floor_height_prior)
-    if status == sl.ERROR_CODE.SUCCESS:
-        # init image, birds eye view
-        birds_eye = PIL.Image.new('RGB', dims, color='white')
-        draw = PIL.ImageDraw.Draw(birds_eye)
-        p = plane.get_bounds()
-        p = p[p[:,2] < 0] # reshape and filter
-        draw.polygon(scale_xy_to_img(p).flatten().tolist(), fill=(0, 200, 0), width=10)
-        return np.array(birds_eye, dtype=np.uint8)
-    else:
-        print(repr(status))
+    if status != sl.ERROR_CODE.SUCCESS:
+        print("No floor plane detected")
         return None
+    birds_eye = PIL.Image.new('RGB', dims, color='white')
+    draw = PIL.ImageDraw.Draw(birds_eye)
+    p = plane.get_bounds()
+    p = p[p[:,2] < 0] # Clean the image by not placing polygons behind us.
+    polygon = scale_xy_to_img(remove_sub_nans(p)).flatten().tolist()
+    if len(polygon) < 3:
+        print("Invalid floor plane detected")
+        return None
+    draw.polygon(polygon, fill=(0, 200, 0), width=10)
+    return np.array(birds_eye, dtype=np.uint8)
 
 
 # SEGMENTATION
 def project_segmentation(zed, out):
     birds_eye = PIL.Image.new('RGB', dims, color='white')
     point_cloud = sl.Mat()
-    zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
+    status = zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
+    if status != sl.ERROR_CODE.SUCCESS:
+        print("Could not retrieve point cloud")
+        return None
     point_cloud = point_cloud.get_data().reshape(-1, 4)[:,(0,2)]
     fil = out.flatten() != 0
     # We want to filter out non-seg pixels from the point cloud,
@@ -109,26 +118,23 @@ def project_segmentation(zed, out):
 
 
 # POINT CLOUD PROCESSING
-# There are nans in the point cloud
-floor_height_error = 100.0 # +- mm
+floor_height_error = 300.0 # +- mm
 
 def find_floor(zed):
     birds_eye = PIL.Image.new('RGB', dims, color='white')
     pcloud = sl.Mat()
-    zed.retrieve_measure(pcloud, sl.MEASURE.XYZRGBA)
-    pcloud = pcloud.get_data().reshape(-1, 4)
-    print("here we are")
+    status = zed.retrieve_measure(pcloud, sl.MEASURE.XYZRGBA)
+    if status != sl.ERROR_CODE.SUCCESS:
+        print("Could not retrieve point cloud")
+        return None
+    pcloud = remove_sub_nans(pcloud.get_data().reshape(-1, 4)) # remove nans from the point cloud
     y = pcloud[:,1]
-    print(y[0:100])
-    print("here we are2")
-    #with open("y.pickle", "wb") as f:
-    #    pickle.dump(y, f)
-    print("fuck this I hate my life")
-    lower = y < (floor_height_prior + floor_height_error)
-    print("here we are3")
+    pcloud = pcloud[:,(0,2)]
     criterion = np.logical_and(y < (floor_height_prior + floor_height_error), y > (floor_height_prior - floor_height_error))
-    #pcloud = pcloud[]
-
+    drivable = scale_xy_to_img(pcloud[criterion]).tolist()
+    for x, y in drivable:
+        birds_eye.putpixel((x, y), (0, 200, 0))
+    return np.array(birds_eye, dtype=np.uint8)
 
 def main():
     # Initialization
@@ -147,20 +153,25 @@ def main():
         print("Frame count: " + str(i), end="\r")
 
         # FLOOR PLANE
+        #print("Floor plane")
         floor_plane = detect_floor_plane(zed)
         if floor_plane is not None:
             push_frame_floor_plane(floor_plane)
 
         # SEGMENTATION
+        #print("Floor seg")
         image_rgb = np.delete(image, 3, 2)
         out = model(image_rgb)
         image = draw_frame(image_rgb, out)
         floor_seg = project_segmentation(zed, out)
-        push_frame_segmentation(floor_seg)
+        if floor_seg is not None:
+            push_frame_segmentation(floor_seg)
 
         # FLOOR POINT CLOUD PROCESSING
-        #floor_cloud = find_floor(zed)
-        #push_frame_floor_cloud(floor_cloud)
+        #print("Floor cloud")
+        floor_cloud = find_floor(zed)
+        if floor_cloud is not None:
+            push_frame_floor_cloud(floor_cloud)
 
         push_frame(image)
     # Cleanup
