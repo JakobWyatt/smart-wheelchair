@@ -1,8 +1,18 @@
-function [steerDir, vfh, scan, binmap] = vfhControllerCoder(pose, map, inputDir)
+function [steerDir, retvfh, scan, binmap] = vfhControllerCoder(pose, inputDir, map)
+    persistent vfh lidar range
+    if isempty(range)
+        range = [0 15];
+    end
+    if isempty(vfh)
+        vfh = controllerVFH('UseLidarScan', true, "SafetyDistance", 1.0, "DistanceLimits", range, "HistogramThresholds", [100 200], "MinTurningRadius", 1.0, "TargetDirectionWeight", 5.0);
+    end
+    if isempty(lidar)
+        lidar = rangeSensor("Range", range);
+    end
+
     binmap = binaryOccupancyMap(map);
-    lidar = rangeSensor("Range", [0 15]);
     [ranges, angles] = lidar(pose, binmap);
     scan = lidarScan(ranges, angles);
-    vfh = controllerVFH('UseLidarScan', true, "SafetyDistance", 1.0, "DistanceLimits", lidar.Range, "HistogramThresholds", [100 200], "MinTurningRadius", 1.0, "TargetDirectionWeight", 5.0);
     steerDir = vfh(scan, inputDir);
+    retvfh = vfh;
 end
