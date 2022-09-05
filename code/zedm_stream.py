@@ -8,6 +8,7 @@ import cv2
 import PIL
 import numpy as np
 import pickle
+import time
 
 zed = sl.Camera()
 
@@ -29,7 +30,7 @@ def StreamInitParams(params):
     if args.source is None:
         return params
     params.set_from_svo_file(args.source)
-    params.svo_real_time_mode = True
+    params.svo_real_time_mode = False
     return params
 
 
@@ -90,14 +91,16 @@ def remove_sub_nans(a):
     return a[~np.isnan(a).any(1)]
 
 
-def draw_top_down(a):
-    pic = np.full((img_dims[1], img_dims[0], 3), (255, 255, 255), np.uint8)
+def draw_top_down(a, *, pic = None, color = (0, 200, 0)):
+    if pic is None:
+        pic = np.full((img_dims[1], img_dims[0], 3), (255, 255, 255), np.uint8)
     drivable = scale_xy_to_img(a)
     for x, y in drivable:
-        pic[y, x] = (0, 200, 0)
+        pic[y, x] = color
     return pic
 
 # Note: the Stereolabs API zed.find_floor_plane can sometimes cause a segmentation fault!
+# Test on indoor.svo towards the end of the hallway
 # No way to catch this :(
 def detect_floor_plane(zed):
     plane = sl.Plane()
@@ -137,8 +140,9 @@ floor_height_error = 150.0  # +- mm
 # there is a negative gradient due to tilt on the sensor mount
 # z is negative in front of us
 # This is usually characterised as 0.145
-upper_floor_gradient = 0.2
-
+upper_floor_gradient = 0.1
+min_obstacle_height = 500.0 # mm
+max_obstacle_height = 2000.0 # mm
 
 def find_floor(zed):
     pcloud = sl.Mat()
@@ -150,27 +154,39 @@ def find_floor(zed):
     y = pcloud[:, 1]
     pcloud = pcloud[:, (0, 2)]
     upper_bound = pcloud[:, 1] * upper_floor_gradient - floor_height_prior + floor_height_error
-    return draw_top_down(pcloud[y < upper_bound])
+    pic = draw_top_down(pcloud[y < upper_bound])
+    # Lets try coloring in obstacles too
+    obstacle_criteria = np.logical_and(y > upper_bound + min_obstacle_height, y < upper_bound + max_obstacle_height)
+    pic = draw_top_down(pcloud[obstacle_criteria], pic=pic, color=(0, 0, 0))
+    return pic
 
 
 def main():
     # Initialization
-    generate_frame = GenerateFrameZed()
-    push_frame = seg.PushFrame(None, "camera", cv2.WINDOW_FULLSCREEN)
-    #push_frame_floor_plane = seg.PushFrame(None, "floor_plane")
-    push_frame_segmentation = seg.PushFrame(None, "segmentation")
-    push_frame_floor_cloud = seg.PushFrame(None, "floor_cloud")
     p = seg.VideoProperties(30, 1920, 1080)
+    generate_frame = GenerateFrameZed()
+    push_frame = seg.PushFrame((p, "test.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
+    #push_frame_floor_plane = seg.PushFrame(None, "floor_plane")
+    push_frame_segmentation = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_seg.mp4"), "segmentation")
+    push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_pcloud.mp4"), "floor_cloud")
     model, draw_frame = seg.HybridnetLoader(p)  # , "../models/hybridnet_epoch_1.pth")
     #kernel_sz = max(2, round(1 / scale * 100))
     #print(f"Kernel size: {kernel_sz}")
     kernel = np.ones((10, 10), np.uint8)
 
+    elapsed_time = 1 / 30
+    skip_frames = 5
     for i, image in enumerate(generate_frame()):
+        if skip_frames != 0 and i % skip_frames != 0:
+            push_frame_segmentation(floor_seg)
+            push_frame_floor_cloud(floor_cloud)
+            push_frame(image)
+            continue
+        start_time = time.time()
         # CAMERA LEFT VIEW
         if cv2.waitKey(1) == ord('q'):
             break
-        print("Frame count: " + str(i), end="\r")
+        print(f"Frame count: {i}, FPS: {1 / elapsed_time}", end="\r")
 
 
         # FLOOR PLANE
@@ -197,6 +213,7 @@ def main():
             push_frame_floor_cloud(floor_cloud)
 
         push_frame(image)
+        elapsed_time = time.time() - start_time
     # Cleanup
     push_frame(None)
     #push_frame_floor_plane(None)
