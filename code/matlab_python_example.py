@@ -4,6 +4,7 @@ import math
 from scipy.io import loadmat
 
 if __name__ == '__main__':
+    # Adds ./matlab to path
     eng = matlab.engine.start_matlab(option="-sd ./matlab")
     #vfh = eng.controllerVFH('UseLidarScan', True)
 

@@ -9,9 +9,10 @@ import PIL
 import numpy as np
 import pickle
 import time
+import matlab.engine
 
 zed = sl.Camera()
-
+eng = matlab.engine.start_matlab(option="-sd ./matlab")
 
 def handler(signal_received, frame):
     zed.close()
@@ -99,6 +100,9 @@ def draw_top_down(a, *, pic = None, color = (0, 200, 0)):
         pic[y, x] = color
     return pic
 
+def replace_pixels(a, find, replace):
+    a[(a == find).all(axis=-1)] = replace
+
 # Note: the Stereolabs API zed.find_floor_plane can sometimes cause a segmentation fault!
 # Test on indoor.svo towards the end of the hallway
 # No way to catch this :(
@@ -157,7 +161,7 @@ def find_floor(zed):
     pic = draw_top_down(pcloud[y < upper_bound])
     # Lets try coloring in obstacles too
     obstacle_criteria = np.logical_and(y > upper_bound + min_obstacle_height, y < upper_bound + max_obstacle_height)
-    pic = draw_top_down(pcloud[obstacle_criteria], pic=pic, color=(0, 0, 0))
+    pic = draw_top_down(pcloud[obstacle_criteria], pic=pic, color=(0, 0, 200))
     return pic
 
 
@@ -210,6 +214,7 @@ def main():
         floor_cloud = find_floor(zed)
         if floor_cloud is not None:
             floor_cloud = cv2.erode(floor_cloud, kernel)
+            replace_pixels(floor_cloud, (0, 0, 0), (0, 0, 200))
             push_frame_floor_cloud(floor_cloud)
 
         push_frame(image)
