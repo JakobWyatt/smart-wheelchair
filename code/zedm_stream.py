@@ -12,16 +12,6 @@ import pickle
 import time
 import matlab.engine
 
-zed = sl.Camera()
-eng = matlab.engine.start_matlab(option="-sd ./matlab")
-
-def handler(signal_received, frame):
-    zed.close()
-    sys.exit(0)
-
-
-signal(SIGINT, handler)
-
 
 ## NOTE: Attempting to print large arrays on windows will lead to a crash.
 
@@ -36,7 +26,7 @@ def StreamInitParams(params):
     return params
 
 
-def GenerateFrameZed():
+def GenerateFrameZed(zed):
     # Set up parameters
     init_params = sl.InitParameters()
     init_params.camera_resolution = sl.RESOLUTION.HD1080
@@ -167,7 +157,7 @@ def find_floor(zed):
 
 
 # FIRST CONTROL ALGORITHM - MATLAB INTERFACE
-def control_avoid_walls(map):
+def control_avoid_walls(eng, map):
     pose = matlab.double([5, 0, pi / 2])
     # 3rd channel red (200) pixels are walls, white (255) if clear
     # convert to true if obstacle, false if not
@@ -175,26 +165,27 @@ def control_avoid_walls(map):
     mapmat = matlab.logical(v)
     steerDir = eng.vfhControllerCoder(pose, 0.0, mapmat, 1000.0 / scale, nargout=1)
 
+
 def main():
     # Initialization
     p = seg.VideoProperties(30, 1920, 1080)
-    generate_frame = GenerateFrameZed()
-    push_frame = seg.PushFrame((p, "test.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
+    generate_frame = GenerateFrameZed(cleanup.zed)
+    cleanup.push_frame = seg.PushFrame((p, "test.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
     #push_frame_floor_plane = seg.PushFrame(None, "floor_plane")
-    push_frame_segmentation = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_seg.mp4"), "segmentation")
-    push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_pcloud.mp4"), "floor_cloud")
-    model, draw_frame = seg.HybridnetLoader(p)  # , "../models/hybridnet_epoch_1.pth")
+    #push_frame_segmentation = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_seg.mp4"), "segmentation")
+    cleanup.push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_pcloud.mp4"), "floor_cloud")
+    #model, draw_frame = seg.HybridnetLoader(p)  # , "../models/hybridnet_epoch_1.pth")
     #kernel_sz = max(2, round(1 / scale * 100))
     #print(f"Kernel size: {kernel_sz}")
     kernel = np.ones((10, 10), np.uint8)
 
-    elapsed_time = 1 / 30
+    elapsed_time = 1 / 30 # not important
     skip_frames = 0
     for i, image in enumerate(generate_frame()):
         if skip_frames != 0 and i % skip_frames != 0:
-            push_frame_segmentation(floor_seg)
-            push_frame_floor_cloud(floor_cloud)
-            push_frame(image)
+            #push_frame_segmentation(floor_seg)
+            cleanup.push_frame_floor_cloud(floor_cloud)
+            cleanup.push_frame(image)
             continue
         start_time = time.time()
         # CAMERA LEFT VIEW
@@ -211,32 +202,47 @@ def main():
 
         # SEGMENTATION
         # print("Floor seg")
-        image_rgb = np.delete(image, 3, 2)
-        out = model(image_rgb)
-        image = draw_frame(image_rgb, out)
-        floor_seg = project_segmentation(zed, out)
-        if floor_seg is not None:
-            floor_seg = cv2.erode(floor_seg, kernel)
-            push_frame_segmentation(floor_seg)
+        #image_rgb = np.delete(image, 3, 2)
+        #out = model(image_rgb)
+        #image = draw_frame(image_rgb, out)
+        #floor_seg = project_segmentation(zed, out)
+        #if floor_seg is not None:
+        #    floor_seg = cv2.erode(floor_seg, kernel)
+        #    push_frame_segmentation(floor_seg)
 
         # FLOOR POINT CLOUD PROCESSING
         # print("Floor cloud")
-        floor_cloud = find_floor(zed)
+        floor_cloud = find_floor(cleanup.zed)
         if floor_cloud is not None:
             floor_cloud = cv2.erode(floor_cloud, kernel)
             replace_pixels(floor_cloud, (0, 0, 0), (0, 0, 200))
-            push_frame_floor_cloud(floor_cloud)
+            cleanup.push_frame_floor_cloud(floor_cloud)
 
-        control_avoid_walls(floor_cloud)
+        control_avoid_walls(cleanup.eng, floor_cloud)
 
-        push_frame(image)
+        cleanup.push_frame(image)
         elapsed_time = time.time() - start_time
     # Cleanup
-    push_frame(None)
+    #push_frame(None)
     #push_frame_floor_plane(None)
-    push_frame_segmentation(None)
-    push_frame_floor_cloud(None)
+    #push_frame_segmentation(None)
+    #push_frame_floor_cloud(None)
+
+class Cleanup:
+    def __init__(self):
+        signal(SIGINT, self.handler)
+        self.zed = sl.Camera()
+        self.eng = matlab.engine.start_matlab(option="-sd ./matlab")
+        self.push_frame = None
+        self.push_frame_floor_cloud = None
+
+    def handler(self, signal_received, frame):
+        self.push_frame(None)
+        self.push_frame_floor_cloud(None)
+        self.zed.close()
+        sys.exit(0)
 
 
 if __name__ == "__main__":
+    cleanup = Cleanup()
     main()

@@ -2,7 +2,7 @@ function [steerDir, retvfh, scan, binmap] = vfhControllerCoder(pose, inputDir, m
     persistent vfh lidar range vfhfig otherfig
     WHEELCHAIR_WIDTH = 0.70;
     if isempty(range)
-        range = [0 15];
+        range = [0.1 15];
     end
     if isempty(vfh)
         vfh = controllerVFH('UseLidarScan', true, ...
@@ -13,7 +13,7 @@ function [steerDir, retvfh, scan, binmap] = vfhControllerCoder(pose, inputDir, m
             "MinTurningRadius", 0.5);
     end
     if isempty(lidar)
-        lidar = rangeSensor("Range", range);
+        lidar = rangeSensor("Range", range, "HorizontalAngleResolution", 0.005);
     end
     if isempty(vfhfig)
         vfhfig = figure;
@@ -38,4 +38,6 @@ function [steerDir, retvfh, scan, binmap] = vfhControllerCoder(pose, inputDir, m
     show(binmap);
     subplot(1, 2, 2);
     plot(scan);
+    xlim([0 15]);
+    ylim([-5 5]);
 end
