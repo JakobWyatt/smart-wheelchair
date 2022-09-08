@@ -2,13 +2,14 @@ import matplotlib.pyplot as plt
 import matlab.engine
 import math
 from scipy.io import loadmat
+import numpy as np
 
 if __name__ == '__main__':
     # Adds ./matlab to path
     eng = matlab.engine.start_matlab(option="-sd ./matlab")
     #vfh = eng.controllerVFH('UseLidarScan', True)
 
-    pose = matlab.double([4, 4, 0])
+    pose = matlab.double(np.array([4, 4, 0], dtype=np.double))
     inputDir = matlab.double(-math.pi / 2)
     mapmat = matlab.logical(loadmat("matlab/occupancy.mat")['mapmat'])
 

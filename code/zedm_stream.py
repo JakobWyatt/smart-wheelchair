@@ -1,5 +1,6 @@
 import argparse
-from math import ceil
+from math import ceil, pi
+from tabnanny import verbose
 import pyzed.sl as sl
 from signal import signal, SIGINT
 import sys
@@ -165,6 +166,15 @@ def find_floor(zed):
     return pic
 
 
+# FIRST CONTROL ALGORITHM - MATLAB INTERFACE
+def control_avoid_walls(map):
+    pose = matlab.double([5, 0, pi / 2])
+    # 3rd channel red (200) pixels are walls, white (255) if clear
+    # convert to true if obstacle, false if not
+    v = (map[:,:,2] == 200).tolist()
+    mapmat = matlab.logical(v)
+    steerDir = eng.vfhControllerCoder(pose, 0.0, mapmat, 1000.0 / scale, nargout=1)
+
 def main():
     # Initialization
     p = seg.VideoProperties(30, 1920, 1080)
@@ -216,6 +226,8 @@ def main():
             floor_cloud = cv2.erode(floor_cloud, kernel)
             replace_pixels(floor_cloud, (0, 0, 0), (0, 0, 200))
             push_frame_floor_cloud(floor_cloud)
+
+        control_avoid_walls(floor_cloud)
 
         push_frame(image)
         elapsed_time = time.time() - start_time
