@@ -22,7 +22,7 @@ def StreamInitParams(params):
     if args.source is None:
         return params
     params.set_from_svo_file(args.source)
-    params.svo_real_time_mode = True
+    params.svo_real_time_mode = False
     return params
 
 
@@ -163,35 +163,35 @@ def control_avoid_walls(eng, map):
     # convert to true if obstacle, false if not
     v = (map[:,:,2] == 200).tolist()
     mapmat = matlab.logical(v)
-    steerDir = eng.vfhControllerCoder(pose, 0.0, mapmat, 1000.0 / scale, nargout=1)
+    steerDir, vfh, scan, binmap, vfhfig, otherfig = eng.vfhControllerCoder(pose, 0.0, mapmat, 1000.0 / scale, nargout=6)
+    return eng.getframe(vfhfig, nargout=1), eng.getframe(otherfig, nargout=1)
 
 
 def main():
     # Initialization
     p = seg.VideoProperties(30, 1920, 1080)
     generate_frame = GenerateFrameZed(cleanup.zed)
-    cleanup.push_frame = seg.PushFrame((p, "test.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
+    cleanup.push_frame = seg.PushFrame((p, "capture.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
     #push_frame_floor_plane = seg.PushFrame(None, "floor_plane")
     #push_frame_segmentation = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_seg.mp4"), "segmentation")
-    cleanup.push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_pcloud.mp4"), "floor_cloud")
+    cleanup.push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "pcloud.mp4"), "floor_cloud")
     #model, draw_frame = seg.HybridnetLoader(p)  # , "../models/hybridnet_epoch_1.pth")
     #kernel_sz = max(2, round(1 / scale * 100))
     #print(f"Kernel size: {kernel_sz}")
     kernel = np.ones((10, 10), np.uint8)
 
-    elapsed_time = 1 / 30 # not important
-    skip_frames = 0
+    skip_frames = 30 // fps
     for i, image in enumerate(generate_frame()):
+        image_rgb = np.delete(image, 3, 2)
         if skip_frames != 0 and i % skip_frames != 0:
             #push_frame_segmentation(floor_seg)
-            cleanup.push_frame_floor_cloud(floor_cloud)
-            cleanup.push_frame(image)
+            #cleanup.push_frame_floor_cloud(floor_cloud)
+            cleanup.push_frame(image_rgb)
             continue
         start_time = time.time()
         # CAMERA LEFT VIEW
         if cv2.waitKey(1) == ord('q'):
             break
-        print(f"Frame count: {i}, FPS: {1 / elapsed_time}", end="\r")
 
 
         # FLOOR PLANE
@@ -218,10 +218,13 @@ def main():
             replace_pixels(floor_cloud, (0, 0, 0), (0, 0, 200))
             cleanup.push_frame_floor_cloud(floor_cloud)
 
-        control_avoid_walls(cleanup.eng, floor_cloud)
+        ret = control_avoid_walls(cleanup.eng, floor_cloud)
+        cleanup.vfh_frame.append(ret[0])
+        cleanup.control_frame.append(ret[1])
 
-        cleanup.push_frame(image)
+        cleanup.push_frame(image_rgb)
         elapsed_time = time.time() - start_time
+        print(f"Frame count: {i}, FPS: {1 / elapsed_time}", end="\r")
     # Cleanup
     #push_frame(None)
     #push_frame_floor_plane(None)
@@ -230,19 +233,31 @@ def main():
 
 class Cleanup:
     def __init__(self):
-        signal(SIGINT, self.handler)
+        signal(SIGINT, self.syshandler)
         self.zed = sl.Camera()
         self.eng = matlab.engine.start_matlab(option="-sd ./matlab")
         self.push_frame = None
         self.push_frame_floor_cloud = None
+        self.vfh_frame = []
+        self.control_frame = []
 
-    def handler(self, signal_received, frame):
+    def syshandler(self, signal_recieved, frame):
+        self.handler()
+
+    def handler(self):
         self.push_frame(None)
         self.push_frame_floor_cloud(None)
         self.zed.close()
+        #self.eng.workspace['control_frame'] = self.control_frame
+        #self.eng.workspace['vfh_frame'] = self.vfh_frame
+        #self.eng.save('frames.mat', 'control_frame', 'vfh_frame', nargout=0)
+        self.eng.videoWriterHelper('vfh_frame.mp4', self.vfh_frame, matlab.double(fps), nargout=0)
+        self.eng.videoWriterHelper('control_frame.mp4', self.control_frame, matlab.double(fps), nargout=0)
         sys.exit(0)
 
 
 if __name__ == "__main__":
+    fps = 5
     cleanup = Cleanup()
     main()
+    cleanup.handler()
