@@ -23,6 +23,10 @@ import cv2
 import numpy as np
 import math
 
+import sys
+sys.path.append('../../../../../code')
+from zedm_stream import StreamInitParams
+
 ## 
 # Basic class to handle the timestamp of the different sensors to know if it is a new sensors_data or an old one
 class TimestampHandler:
@@ -71,6 +75,7 @@ def main():
     zed = sl.Camera()
 
     init_params = sl.InitParameters()
+    init_params = StreamInitParams(init_params)
     init_params.depth_mode = sl.DEPTH_MODE.NONE
 
     # Open the camera
@@ -148,4 +153,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

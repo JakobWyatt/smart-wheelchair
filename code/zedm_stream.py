@@ -22,7 +22,7 @@ def StreamInitParams(params):
     if args.source is None:
         return params
     params.set_from_svo_file(args.source)
-    params.svo_real_time_mode = False
+    params.svo_real_time_mode = True
     return params
 
 
