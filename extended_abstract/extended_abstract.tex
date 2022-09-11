@@ -62,6 +62,7 @@ Department of Mechanical Engineering, Curtin University, Perth, WA 6845, Austral
 
 \begin{adjustwidth}{10mm}{10mm}
 \section*{\textbf{ABSTRACT}}
+% 10 lines
 This progress report involves the identification and definition of the core thesis problem;
 creating a semi-autonomous wheelchair that prioritises user safety and independence.
 A literature review details prior work in this field, and identifies potential algorithms
@@ -73,10 +74,6 @@ This dataset has been used to evaluate algorithms such as YOLOv5, DeepLabv3, and
 the problem of scene recognition, with promising results. VFH+ has been evaluated as an assistive
 control algorithm after being implemented in MATLAB. Additionally, sensors and hardware to be used
 alongside the wheelchair have been identified and evaluated.
-
-The methodology and technical roadmap of this project have been planned, and future work identified (to be completed
-next semester). This involves the collection of a second dataset using the final sensors, retraining of
-scene recognition models, and final integration of the semi-autonomous system with the wheelchair.
 \end{adjustwidth}
 
 \section*{\textbf{INTRODUCTION}}
@@ -86,15 +83,16 @@ This work specifically focuses on pathway assistance, which identifies suitable
 paths for the wheelchair to drive on. If a user unintentionally drives off their desired path,
 this can lead to uneven terrain and possibly falling from the wheelchair.
 By guiding the user along a path, these safety issues can be mitigated.
+\pagebreak % end of page
 
-\section*{\textbf{RESULTS AND DISCUSSION}}
+\section*{\textbf{RESULTS AND DISCUSSION}} % 2-3 figs/tables, 2/3-3/4 page
 Part of the current work this semester has included the selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
 as well as the identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
 A preliminary 34 minute driving dataset (1920x1080 @ 24 fps) has been collected around Curtin University using a GoPro Hero 4.
 The experimental setup to collect this dataset can be seen here, including the identified
 sensor mounting point.
 
-\section*{\textbf{CONCLUSIONS}}
+\section*{\textbf{CONCLUSIONS}} % 5 lines
 To evaluate this algorithm, a video encoder and decoder needed to be created. This was done using a Python generator,
 so that frames in the video could simply be iterated over within a for loop and only decoded when required.
 OpenCV \autocite{vuHybridNetsEndtoEndPerception2022} was the underlying library used to decode each video frame into a BGR pixel array.
@@ -103,6 +101,6 @@ After evaluation of the algorithm, each processed frame was displayed on the scr
 \section*{\textbf{ACKNOWLEDGEMENTS}}
 The author wishes to thank Glide for providing a powered wheelchair to the research team.
 
-\printbibliography[title=\textbf{REFERENCES},heading=bibliography]
+\printbibliography[title=\textbf{REFERENCES},heading=bibliography] % don't need titles for journal articles, just page #
 
 \end{document}
