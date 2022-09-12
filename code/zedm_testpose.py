@@ -65,15 +65,11 @@ def PositionTracker(zed):
         # Get the camera coordinate
         state = zed.get_position(pose, sl.REFERENCE_FRAME.WORLD)
         pose.pose_data(w2)
-        print(w2)
-        print(w1_inv)
         c = w1_inv * w2 # stereolabs api defines matmul for transforms with '*'
-        print(c)
         # Timestep
         w1_inv = sl.Transform()
         w1_inv.init_transform(w2) # prevent aliasing
         w1_inv.inverse() # this returns SUCCESS
-        print(w1_inv)
         # Extract parameters
         delta_z = c[2, 3]
         ct = sl.Transform()
@@ -93,7 +89,7 @@ def test_position_tracker():
         print(" " * 100, end="\r")
         push_frame(image)
         delta_z, delta_angle_y = position_tracker()
-        print(f"Δz: {delta_z}, δy: {delta_angle_y}")
+        print(f"Δz: {delta_z}, δy: {delta_angle_y}", end="\r")
         if cv2.waitKey(1) == ord('q'):
             break
     print()
