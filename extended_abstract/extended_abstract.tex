@@ -17,6 +17,11 @@
 \raggedbottom % allow pages to end early
 \pdfvariable minorversion 7 % updated pdf version
 \setlength\parindent{5mm} % change indent size
+\pagenumbering{gobble} % no page numbers
+\AtEveryBibitem{\clearfield{title}} % no article titles
+\AtEveryBibitem{\clearfield{url}} % no url
+\setlength\bibitemsep{0pt} % change separation between bib items
+% Fix references before submission
 
 % change section/subsection title font size to 10
 \usepackage{sectsty}
@@ -77,13 +82,44 @@ alongside the wheelchair have been identified and evaluated.
 \end{adjustwidth}
 
 \section*{\textbf{INTRODUCTION}}
-Multiple engineering project students are part of this team
-and are working on elements such as controller design, navigation assistance, and object detection.
-This work specifically focuses on pathway assistance, which identifies suitable
-paths for the wheelchair to drive on. If a user unintentionally drives off their desired path,
-this can lead to uneven terrain and possibly falling from the wheelchair.
-By guiding the user along a path, these safety issues can be mitigated.
-\pagebreak % end of page
+The use of powered wheelchairs has enabled greater independence for people with disability,
+however can be inaccessible or unsafe for people with visual impairment.
+Smart wheelchairs add intelligent sensing and control to an existing powered wheelchair
+in order to avoid obstacles in the environment. These wheelchairs can be fully-autonomous, moving the wheelchair
+to an end goal, or semi-autonomous, where input from the user is blended with the control unit to improve safety.
+
+Smart wheelchair implementations have used a variety of sensors to detect their environment, including RGB-D cameras (\cite{wangS2P2SelfSupervisedGoalDirected2021}),
+2d Lidar, ultrasonic sensors (\cite{levineNavChairAssistiveWheelchair1999}), and mmWave radar.
+Sensor fusion is often used to combine information from multiple sources to improve the model of the environment.
+When evaluating a sensor for a smart wheelchair, factors such as cost, resolution, accuracy, and field of view are important.
+The compute element inside a smart wheelchair often consists of a microcontroller to process user inputs and control the motors,
+a general-purpose computer to run pathfinding algorithms and log information, and an AI accelerator (such as an Nvidia Jetson or Google Coral)
+to improve the performance of machine learning algorithms.
+
+These machine learning algorithms process input from sensors to understand the surrounding environment.
+Image classification is a core problem within this field which involves identifying the subject of an image.
+The use of convolutional neural networks (CNNs) and deep learning has vastly improved the accuracy of
+classification models, with the 156 layer ResNet model (\cite{heDeepResidualLearning2016}) surpassing human performance
+on the ImageNet dataset with an error rate of 3.57\%.
+Object localisation involves classifying an object while also identifying its position within an image;
+YOLO (\cite{redmonYouOnlyLook2015}) is a popular object localisation model which can run in real-time on many accelerators.
+Semantic segmentation involves the classification of each pixel in an image, using an algorithm such as DeepLab (\cite{chenRethinkingAtrousConvolution2017}).
+This is often used for path detection or kerb detection, as these features cannot be cleanly identified with a bounding box.
+
+Assistive control algorithms can be used to navigate the user through the environment once obstacles are detected.
+Path-based algorithms such as A*
+plan a path between a start and goal pose, aiming to reduce the distance travelled or acceleration experienced by the user.
+In contrast, local algorithms such as VFH+ (\cite{ulrichVFHReliableObstacle1998})
+set the wheelchair's current speed and direction using a target direction, while avoiding nearby obstacles.
+
+The overall aim of the project team, which consists of multiple project students and interns,
+is to fully implement a smart semi-autonomous wheelchair
+using an existing CentroGlide powered wheelchair.
+The specific aim of this thesis is to implement navigation assistance,
+which involves both avoiding environmental obstacles such as walls and stairs,
+and guiding the user along pathways.
+% Future work: Kerbs, Productionizing on chip
+%\pagebreak % end of page
 
 \section*{\textbf{RESULTS AND DISCUSSION}} % 2-3 figs/tables, 2/3-3/4 page
 Part of the current work this semester has included the selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
