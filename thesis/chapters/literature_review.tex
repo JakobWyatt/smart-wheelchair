@@ -57,23 +57,57 @@ field of view, and operating range are important to consider.
 Several commercial options are compared in \Cref{table:stereo_camera}
 - all of the listed units come with an integrated IMU.
 
+\begin{landscape}
 \begin{table}[H]
     \centering
-\begin{adjustbox}{width=\textwidth}
     \begin{tabular}{c c c c c c}
     \toprule
-    Name & Type & Cost (AUD)\footnotemark[1] & Dimensions (mm) & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
+    Name & Type & Cost (AUD)\footnotemark[1] & Dimensions (mm) \\
     \midrule
-    Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & Passive & \$595 & $124.5\times 30.5\times 26.5$ & $90\degree\times 60\degree\times 100\degree$ & 0.1-15\\
-    Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & Passive & \$670 & $175\times 30\times 33$ & $110\degree\times 70\degree\times 120\degree$ & 0.3-20 \\
-    Intel RealSense D455 \cite{intelIntelRealSenseProduct2022} & Active IR (Stereo) & \$595 & $124\times 26\times 29$ & $90\degree\times 65\degree\times 87\degree$ & 0.6-6 \\
-    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (Time of Flight)\footnotemark[2] & \$595 & $103\times 39\times 126$ & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
+    Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & Passive & \$595 & $124.5\times 30.5\times 26.5$ \\
+    Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & Passive & \$670 & $175\times 30\times 33$ \\
+    Intel RealSense D455 \cite{intelIntelRealSenseProduct2022} & Active IR (Stereo) & \$595 & $124\times 26\times 29$ \\
+    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & Active IR (Time of Flight)\footnotemark[2] & \$595 & $103\times 39\times 126$ \\
     \bottomrule
     \end{tabular}
-\end{adjustbox}
     \caption{Stereo camera options}
     \label{table:stereo_camera}
 \end{table}
+\addtocounter{table}{-1}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c c c c c c}
+    \toprule
+    Name & FOV (Horizontal, Vertical, Depth) & Operating Range (m) \\
+    \midrule
+    Stereolabs Zed Mini \cite{stereolabsZEDMiniCamera2018} & $90\degree\times 60\degree\times 100\degree$ & 0.1-15\\
+    Stereolabs Zed 2 \cite{stereolabsZEDCameraSDK2019} & $110\degree\times 70\degree\times 120\degree$ & 0.3-20 \\
+    Intel RealSense D455 \cite{intelIntelRealSenseProduct2022} & $90\degree\times 65\degree\times 87\degree$ & 0.6-6 \\
+    Microsoft Azure Kinect DK \cite{microsoftAzureKinectDK2021} & $75\degree\times 65\degree\times 75\degree$ & 0.5-3.86 \\
+    \bottomrule
+    \end{tabular}
+    \captionsetup{list=no}
+    \caption{Stereo camera options (continued)}
+\end{table}
+
+\begin{table}[H]
+    \centering
+\begin{adjustbox}{width=1.3\textwidth}
+    \begin{tabular}{c c c c c c}
+    \toprule
+    Name & Cost (AUD)\footnotemark[1] & Release Year & Speed & Power & Notes \\
+    \midrule
+    Nvidia Jetson Nano \cite{nvidiaJetsonNanoSystemonModule2019} & \$150 & Early 2019 & 0.5 TFLOPS (FP16) & 10 W & - \\
+    Nvidia Jetson Xavier NX \cite{nvidiaJetsonXavierNX2019} & \$595 & Late 2019 & 21 TOPS (INT8) & 20 W & - \\
+    Nvidia RTX 2080 \cite{nvidiaTuringGPUArchitecture2018} & \$1040 & 2018 & \makecell{80.5 TFLOPS (FP16)\\161.1 TOPS (INT8)} & 215 W & Doesn't include single-board computer \\
+    Google Coral Edge TPU \cite{googlecoralCoralDevBoard2020} & \$190 & 2020 & 4 TOPS (INT8) & 2 W & Only supports TensorFlow Lite \\
+    \bottomrule
+    \end{tabular}
+\end{adjustbox}
+    \caption{AI accelerator options}
+    \label{table:compute_element}
+\end{table}
+\end{landscape}
 
 \footnotetext[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD}
 \footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes that trade-off between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good trade-off between operating range and resolution.}
@@ -105,24 +139,6 @@ operations per second).
 The Nvidia Jetson and Google Coral products are both popular options for embedded AI acceleration. These accelerators are compared
 in \Cref{table:compute_element} alongside a gaming GPU. 
 
-\begin{table}[H]
-    \centering
-\begin{adjustbox}{width=\textwidth}
-    \begin{tabular}{c c c c c c}
-    \toprule
-    Name & Cost (AUD)\footnotemark[1] & Release Year & Speed & Power & Notes \\
-    \midrule
-    Nvidia Jetson Nano \cite{nvidiaJetsonNanoSystemonModule2019} & \$150 & Early 2019 & 0.5 TFLOPS (FP16) & 10 W & - \\
-    Nvidia Jetson Xavier NX \cite{nvidiaJetsonXavierNX2019} & \$595 & Late 2019 & 21 TOPS (INT8) & 20 W & - \\
-    Nvidia RTX 2080 \cite{nvidiaTuringGPUArchitecture2018} & \$1040 & 2018 & \makecell{80.5 TFLOPS (FP16)\\161.1 TOPS (INT8)} & 215 W & Doesn't include single-board computer \\
-    Google Coral Edge TPU \cite{googlecoralCoralDevBoard2020} & \$190 & 2020 & 4 TOPS (INT8) & 2 W & Only supports TensorFlow Lite \\
-    \bottomrule
-    \end{tabular}
-\end{adjustbox}
-    \caption{AI accelerator options}
-    \label{table:compute_element}
-\end{table}
-
 \pagebreak
 \subsection{Scene Understanding}
 Scene understanding is a broad field and involves using computer vision methods
@@ -139,7 +155,7 @@ which consists of 15M images and 22K categories,
 and achieved an error of only 15.3\% on a 1000 class subset. The underlying architecture uses a series of 5 convolutional
 layers and 3 fully connected layers, which can be seen in \cref{fig:alexnet_architecture}.
 
-\begin{figure}[H]
+\begin{figure}[b]
     \centering
     \includegraphics[width=0.8\linewidth]{images/alexnet_architecture.png}
     \caption{Architecture of the AlexNet image classification network. Reproduced from Krizhevsky et al. \cite{krizhevskyImageNetClassificationDeep2012}}
@@ -187,13 +203,6 @@ U-net \cite{ronnebergerUNetConvolutionalNetworks2015} is a semantic segmentation
 by using higher-resolution features during deconvolution.
 This makes the segmented output sharper and more accurate.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\linewidth]{images/classification_types.png}
-    \caption{Types of classification in machine vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014}}
-    \label{fig:classification_types}
-\end{figure}
-
 Another semantic segmentation algorithm is DeepLab \cite{chenSemanticImageSegmentation2014}\cite{chenDeepLabSemanticImage2016}\cite{chenRethinkingAtrousConvolution2017}.
 DeepLab uses atrous convolution (otherwise known as dilated convolution), which is a type of convolution that widens the FOV of a convolutional layer.
 It does this by leaving gaps in the convolutional layer, as illustrated in \cref{fig:atrous_convolution}.
@@ -203,7 +212,14 @@ To obtain the segmented output, a technique called atrous spatial pyramid poolin
 scales using atrous convolution to classify each pixel in the image.
 These techniques improve both the accuracy and speed of the network - DeepLabv3 obtained 86.9\% accuracy on the PASCAL VOC 2012 test set.
 
-\begin{figure}[H]
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/classification_types.png}
+    \caption{Types of classification in machine vision. Reproduced from Lin et al. \cite{linMicrosoftCOCOCommon2014}}
+    \label{fig:classification_types}
+\end{figure}
+
+\begin{figure}[b]
     \centering
     \includegraphics[width=0.6\linewidth]{images/atrous_convolution.png}
     \caption{Atrous convolution with a 3x3 kernel, showing increasing FOV. Reproduced from Chen et al. \cite{chenRethinkingAtrousConvolution2017}}
@@ -230,9 +246,9 @@ and object detection. The model architecture of YOLOP is shown in \cref{fig:yolo
 This approach is valuable in situations where compute hardware is limited. Real-time applications such as
 autonomous wheelchair control require fast inference times to react to obstacles in the surrounding environment.
 
-\begin{figure}[H]
+\begin{figure}[b]
     \centering
-    \includegraphics[width=0.7\linewidth]{images/yolop.png}
+    \includegraphics[width=0.65\linewidth]{images/yolop.png}
     \caption{YOLOP model architecture. Reproduced from Wu et al. \cite{wuYOLOPYouOnly2021}}
     \label{fig:yolop}
 \end{figure}
@@ -271,8 +287,16 @@ Other algorithms such as RRT* (rapidly-exploring random tree) \cite{karamanSampl
 to find a path to the goal node. RRT* may not find the shortest path initially, but can find an efficient path with much less
 computation required.
 
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
+    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018}}
+    \label{fig:frenet_frame_local_path}
+\end{figure}
+
 One potential issue with these two algorithms is that they fail to take into account the smoothness of the resulting path.
 Although the path may be short, sharp changes in the trajectory could be uncomfortable for the user.
+
 Trajectory planning algorithms aim to solve this - one such algorithm is optimal-control in a Fren\'et-Frame \cite{werlingOptimalTrajectoryGeneration2010},
 which can be used in autonomous vehicle control.
 This algorithm takes a reference path as an input and outputs a local path that avoids collisions and minimises jerk (rate of change of acceleration).
@@ -294,6 +318,13 @@ turning radius and kinematics. Finally, a safe direction is chosen which is near
 An example binary histogram is shown in \cref{fig:binary_histogram_vfh}; the chosen direction avoids the obstacle in the
 desired direction.
 
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.38\linewidth]{images/binary_histogram_vfh.png}
+    \caption{VFH+ binary histogram, representing the direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022}}
+    \label{fig:binary_histogram_vfh}
+\end{figure}
+
 An advantage to this algorithm is that it gives the user more fine-grained control over their speed and direction,
 rather than planning a path to their assumed goal.
 However an issue with VFH+ is that it does not control the wheelchair's speed, and instead only finds a safe direction.
@@ -304,20 +335,6 @@ blending inputs from the autonomous software and the user, the joystick itself i
 to make it more difficult to move in the direction of obstacles \cite{kondoNavigationGuidanceControl2008}\cite{vanderpoortenPoweredWheelchairNavigation2012}.
 An advantage of this approach is that it gives the user total control over which direction of movement they choose,
 however, the additional force required to actuate the joystick may fatigue the user.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{images/frenet_frame_local_path.png}
-    \caption{Fren\'et-Frame path planning, with reference path and local path illustrated. Reproduced from Sakai et al. \cite{sakaiPythonRoboticsPythonCode2018}}
-    \label{fig:frenet_frame_local_path}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.35\linewidth]{images/binary_histogram_vfh.png}
-    \caption{VFH+ binary histogram, representing direction of obstacles. Reproduced from MathWorks \cite{mathworksVectorFieldHistogram2022}}
-    \label{fig:binary_histogram_vfh}
-\end{figure}
 
 %\subsubsection{Path and Trajectory Planning}
 %Path planning involves finding a path from the current location to the goal location.
