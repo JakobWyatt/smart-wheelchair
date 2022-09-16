@@ -1,7 +1,24 @@
-Powered wheelchairs have enabled greater independence for people with disability.
-However, the use of this technology can be inaccessible or unsafe for people
-with amyotrophic lateral sclerosis (ALS) or vision impairment,
-who may be unable to use a joystick or see their environment clearly.
+\subsection{Background and Motivation}
+Powered wheelchairs have substantially benefited people with mobility challenges.
+The use of these wheelchair systems has been shown to improve the user's independence, quality
+of life and feeling of well-being \cite{treflerOutcomesWheelchairSystems2004}.
+However, this technology can be inaccessible or unsafe for people with vision impairment,
+multiple sclerosis, ALS, and cerebral palsy, due to difficulties with environmental perception
+or joystick use. A survey of 65 clinicians found that 10-40\% of patients found it impossible or
+extremely difficult to use a powered wheelchair \cite{fehrAdequacyPowerWheelchair2000}.
+
+Smart wheelchairs add intelligent sensing and control to an existing powered wheelchair
+in order to avoid obstacles in the environment or navigate the user.
+Additionally, a smart wheelchair may include alternative input methods such as
+eye gaze \cite{eidNovelEyeGazeControlledWheelchair2016}, head tilt \cite{tomariEnhancingWheelchairControl2014},
+and voice recognition \cite{bakouriSteeringRoboticWheelchair2022}.
+Fully-autonomous smart wheelchairs move the user from a start to end goal,
+and often require a map of the surrounding environment or markers
+such as QR codes \cite{habhaAutonomousWheelchairIndoorOutdoor2021}.
+Semi-autonomous smart wheelchairs blend input from the user with the control unit
+to avoid obstacles and improve safety. Use of a smart wheelchair improves the user's
+safety and independence; Simpson et. al. found that over 61\% of
+current wheelchair users would benefit from some smart wheelchair features \cite{simpsonHowManyPeople2008}.
 
 \subsection{Aims}
 This research aims to develop a semi-autonomous smart wheelchair system.
@@ -10,23 +27,17 @@ who have provided an existing powered wheelchair (CentroGlide) to use as a base
 for this functionality (\cref{fig:wheelchair}). By developing assistive technology for the wheelchair,
 the user is granted greater mobility, confidence, and independence.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.55\linewidth,angle=270,origin=c]{images/wheelchair.jpg}
-    \caption{The CentroGlide wheelchair}
-    \label{fig:wheelchair}
-\end{figure}
+The project team consists of multiple engineering project students, researchers, and interns.
+This team is working on a wide range of smart wheelchair features, including controller design,
+object detection, doorway navigation, and alternative input methods.
+The specific aim of this thesis is to implement navigation assistance,
+which involves both avoiding environmental obstacles such as walls and stairs,
+and guiding the user along suitable pathways. If a user were to unintentionally
+drive off a pathway, they could encounter a kerb or uneven terrain which could lead
+to a fall.
 
 \pagebreak
 \subsection{Problem Definition}
-Multiple engineering project students are part of this team
-and are working on elements such as controller design, navigation assistance, and object detection.
-This work specifically focuses on pathway assistance, which identifies suitable
-paths for the wheelchair to drive on. If a user unintentionally drives off their desired path,
-this can lead to uneven terrain and possibly falling from the wheelchair.
-By guiding the user along a path, these safety issues can be mitigated.
-
-Emphasis is placed on the 'semi-autonomous' aspect of the wheelchair.
 An important requirement of this project is that the user still
 has control over their wheelchair, and can override any autonomous functionality
 if required. If the smart wheelchair system mistakenly detects an obstacle,
@@ -35,7 +46,7 @@ the user's mobility should not be compromised.
 Another requirement of the system is that any sensors mounted to the wheelchair
 should not impede the user's comfort or the wheelchair's manoeuvrability.
 Many wheelchair users have specific requirements for wheelchair seat adjustments,
-to avoid pressure sores and discomfort. \Cref{fig:wheelchair_reclined} shows the
+to avoid pressure sores and discomfort. \Cref{fig:wheelchair} shows the
 wheelchair configuration when fully reclined, demonstrating that some sensor mounting locations
 are infeasible.
 
@@ -45,9 +56,19 @@ for the system to operate either - the round trip time required to communicate w
 could compromise the safety of a user. Because of this, all processing is performed locally
 on the wheelchair.
 
-\begin{figure}[H]
+\begin{figure}[b]
     \centering
-    \includegraphics[width=0.4\linewidth]{images/wheelchair_reclined.jpg}
-    \caption{CentroGlide wheelchair in reclined position}
-    \label{fig:wheelchair_reclined}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[height=\linewidth,angle=270,origin=c]{images/wheelchair.jpg}
+        \caption{Upright}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/wheelchair_reclined.jpg}
+        \caption{Reclined}
+    \end{subfigure}
+    \caption{CentroGlide Wheelchair}
+    \label{fig:wheelchair}
 \end{figure}
