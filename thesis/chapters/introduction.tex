@@ -8,44 +8,44 @@ or joystick use. A survey of 65 clinicians found that 10-40\% of patients found 
 extremely difficult to use a powered wheelchair \cite{fehrAdequacyPowerWheelchair2000}.
 
 Smart wheelchairs add intelligent sensing and control to an existing powered wheelchair
-in order to avoid obstacles in the environment or navigate the user.
+to avoid obstacles in the environment or navigate the user.
 Additionally, a smart wheelchair may include alternative input methods such as
 eye gaze \cite{eidNovelEyeGazeControlledWheelchair2016}, head tilt \cite{tomariEnhancingWheelchairControl2014},
 and voice recognition \cite{bakouriSteeringRoboticWheelchair2022}.
-Fully-autonomous smart wheelchairs move the user from a start to end goal,
+Fully-autonomous smart wheelchairs move the user from a start pose to an end goal,
 and often require a map of the surrounding environment or markers
 such as QR codes \cite{habhaAutonomousWheelchairIndoorOutdoor2021}.
 Semi-autonomous smart wheelchairs blend input from the user with the control unit
-to avoid obstacles and improve safety. Use of a smart wheelchair improves the user's
-safety and independence; Simpson et. al. found that over 61\% of
+to avoid obstacles and improve safety. Using a smart wheelchair improves the user's
+safety and independence; Simpson et al. found that over 61\% of
 current wheelchair users would benefit from some smart wheelchair features \cite{simpsonHowManyPeople2008}.
 
 \subsection{Aims}
 This research aims to develop a semi-autonomous smart wheelchair system.
-This research is done in collaboration with Glide, a WA wheelchair manufacturer,
-who have provided an existing powered wheelchair (CentroGlide) to use as a base
+This research was done in collaboration with Glide, a WA wheelchair manufacturer,
+who has provided an existing powered wheelchair (CentroGlide) to use as a base
 for this functionality (\cref{fig:wheelchair}). By developing assistive technology for the wheelchair,
 the user is granted greater mobility, confidence, and independence.
 
-The project team consists of multiple engineering project students, researchers, and interns.
-This team is working on a wide range of smart wheelchair features, including controller design,
+The project team comprises multiple engineering project students, researchers, and interns.
+This team has worked on many smart wheelchair features, including controller design,
 object detection, doorway navigation, and alternative input methods.
 The specific aim of this thesis is to implement navigation assistance,
 which involves both avoiding environmental obstacles such as walls and stairs,
 and guiding the user along suitable pathways. If a user were to unintentionally
-drive off a pathway, they could encounter a kerb or uneven terrain which could lead
+drive off a pathway, they could encounter a kerb or uneven terrain, which could lead
 to a fall.
 
 \pagebreak
 \subsection{Problem Definition}
 An important requirement of this project is that the user still
-has control over their wheelchair, and can override any autonomous functionality
+has control over their wheelchair and can override any autonomous functionality
 if required. If the smart wheelchair system mistakenly detects an obstacle,
 the user's mobility should not be compromised.
 
 Another requirement of the system is that any sensors mounted to the wheelchair
 should not impede the user's comfort or the wheelchair's manoeuvrability.
-Many wheelchair users have specific requirements for wheelchair seat adjustments,
+Many wheelchair users have specific requirements for wheelchair seat adjustments
 to avoid pressure sores and discomfort. \Cref{fig:wheelchair} shows the
 wheelchair configuration when fully reclined, demonstrating that some sensor mounting locations
 are infeasible.

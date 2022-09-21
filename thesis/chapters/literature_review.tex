@@ -22,7 +22,7 @@ the Extended Kalman Filter (EKF) or Unscented Kalman Filter (UKF) \cite{wanUnsce
 outputs from multiple sensors to be used together to improve their accuracy. Additionally, sensors can
 be used for different applications on the smart wheelchair - a stereo camera could be used to sense the surrounding environment
 while an inertial measurement unit (IMU) could be used for wheelchair odometry.
-\Cref{table:sensor_options} gives a comparison of several available sensor types,
+\Cref{table:sensor_options} compares several available sensor types,
 taking into account factors such as resolution, cost, and accuracy.
 
 \begin{table}[H]
@@ -112,7 +112,7 @@ Several commercial options are compared in \Cref{table:stereo_camera}
 \footnotetext[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD}
 \footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes that trade-off between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good trade-off between operating range and resolution.}
 
-A caveat of the Stereolabs products is that they require a separate CUDA enabled GPU (manufactured by Nvidia) to generate the point-cloud
+A caveat of the Stereolabs products is that they require a separate CUDA-enabled GPU (manufactured by Nvidia) to generate the point-cloud
 and RGB-D image. In contrast, the Kinect DK only requires a CPU for processing, while the Intel RealSense performs processing onboard
 and requires a USB-C 3.1 interface to communicate.
 
@@ -127,11 +127,11 @@ and convolution) more efficiently than a CPU can. GPUs have been used widely for
 power usage is infeasible for some applications. Embedded AI accelerators aim to provide greater power efficiency
 at the cost of specialisation.
 
-Machine learning models often use mixed-precision (FP16) datatypes to store weights while training. Although improving the accuracy
-of the model, FP16 datatypes are slow to manipulate during inference. Model quantisation \cite{jacobQuantizationTrainingNeural2017} is a process where this FP16 datatype is replaced with an
+Machine learning models often use mixed-precision (FP16) datatypes to store weights while training.
+Although improving the model's accuracy, FP16 datatypes are slow to manipulate during inference.
+Model quantisation \cite{jacobQuantizationTrainingNeural2017} is a process where this FP16 datatype is replaced with an
 INT8 datatype (using a scaling factor and bias) after training.
-This gives a large speed improvement, while only losing a small amount
-of model accuracy.
+Quantisation greatly improves speed while only losing a small amount of model accuracy.
 For this reason, modern AI accelerators focus on the performance of INT8 operations (TOPS, $10^9$ operations per second),
 whereas earlier accelerators state the performance of FP16 operations (TFLOPS, $10^9$ floating-point
 operations per second).
@@ -185,7 +185,7 @@ YOLO (You Only Look Once) \cite{redmonYouOnlyLook2015}\cite{redmonYOLO9000Better
 is another object classification model which focuses on improving the speed of the model. In particular, YOLOv4 \cite{bochkovskiyYOLOv4OptimalSpeed2020}
 reaches over 60 fps (frames per second) on the Tesla V100, which enables its use in real-time applications such as autonomous driving and security camera footage. % RCNN and YOLO
 YOLO divides an image into an $S\times S$ grid, and uses a single convolutional network to output both bounding box predictions and
-an image classification for each grid square. Low-probability and overlapping bounding boxes are then removed before the final output.
+an image classification for each grid square. Low probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
 
 \subsubsection{Semantic Segmentation}
