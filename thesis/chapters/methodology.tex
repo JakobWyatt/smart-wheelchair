@@ -26,7 +26,7 @@ Some considerations must be addressed when using this mounting point.
 \end{enumerate}
 This sensor mounting point is positioned on the right-hand side of the wheelchair,
 \SI{720}{\milli\metre} above the ground and \SI{300}{\milli\metre} behind the
-front of the wheelchair (measured from the footplate).
+front of the wheelchair (measured from the footplate), and can be seen in \cref{fig:wheelchair_zed_1}.
 
 The RGB-D camera model selected was the Stereolabs ZED Mini, which uses passive stereo-vision
 to generate a depth map. Active IR RGB-D cameras were not viable for this application
@@ -57,19 +57,21 @@ on the wheelchair.
 
 \begin{figure}[b]
     \centering
-    \begin{minipage}[b]{.45\textwidth}
+    \begin{minipage}[b]{.4\textwidth}
       \centering
+      \captionsetup{width=.8\textwidth}
       \includegraphics[width=\linewidth]{images/zed_mount.png}
         \captionof{figure}{3D render of ZED Mini camera and wheelchair mount}
         \label{fig:zed_mount}
     \end{minipage}%
-    \begin{minipage}[b]{.45\textwidth}
+    \begin{minipage}[b]{.48\textwidth}
         \centering
+        \captionsetup{width=.8\textwidth}
         \includegraphics[height=\linewidth,angle=270,origin=c]{images/wheelchair_zed_1.jpg}
         \captionof{figure}{ZED Mini camera and mount fixed to joystick control unit}
         \label{fig:wheelchair_zed_1}
     \end{minipage}
-    \end{figure}
+\end{figure}
 
 In addition to the RGB-D camera and Lidar sensor, an AI accelerator is required to process the sensors'
 output and run ML algorithms. The literature review compares several AI accelerators across categories
@@ -87,6 +89,14 @@ A joystick module communicates user commands to a power module, which controls
 each motor. An intelligent seating module (ISM) adjusts the seat tilt and recline \cite{glideCentroGlideOWNERUSER2022}.
 This wheelchair is \SI{1100}{\milli\metre} in length (including footplate), \SI{620}{\milli\metre}
 in width, and \SI{1030}{\milli\metre} in height.
+Communication between the joystick module, power module, and ISM is shown in \cref{fig:module_communication}.
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/module_communication.png}
+    \caption{Communication between CentroGlide control modules. Reproduced from Curtiss-Wright. \cite{curtiss-wrightPGDRIVESTECHNOLOGY2016}}
+    \label{fig:module_communication}
+\end{figure}
 
 An input controller is being developed by project student Brian Smith to intercept
 commands from the joystick module and communicate with the smart wheelchair navigation system.
@@ -98,9 +108,61 @@ navigation system's output, ensuring that the user
 can still safely maneuver the wheelchair in the case of a software failure.
 Additionally, a motor controller was developed by project student
 Kosma Egan, which receives commands from the input controller to drive and monitor the motors.
+\pagebreak
 
 \subsection{Software}
+The software system involves several scene recognition algorithms to update an internal
+map of the surrounding area, keeping track of suitable driving paths and static obstacles
+such as walls and stairs. Once this map is created, an algorithm blends the
+user's input with this information to determine a safe path forward.
 
+First, the ZED SDK is used to communicate with the ZED Mini camera and retrieve image data,
+point cloud data, and depth map data. Next, several scene recognition algorithms
+identify drivable areas and environmental obstacles. A block diagram of the software system
+and how it interacts with the hardware is shown in \cref{fig:block_diagram}.
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/block_diagram.png}
+    \caption{Block diagram of software system and interaction with hardware components}
+    \label{fig:block_diagram}
+\end{figure}
+
+Hybridnets \cite{vuHybridNetsEndtoEndPerception2022},
+a machine learning model which performs drivable area segmentation and object detection on the same
+image recognition backbone, was trained and evaluated on the Berkely Deepdrive dataset \cite{yuBDD100KDiverseDriving2018}
+and the Cityscapes dataset \cite{cordtsCityscapesDatasetSemantic2016}. This model was used to identify
+which areas were suitable for the wheelchair user to drive on,
+and as a proof of concept for a shared-backbone model architecture.
+Machine learning was done using PyTorch \cite{paszkePyTorchImperativeStyle2019}, due to good compatibility
+with existing machine learning models such as Hybridnets and YOLOv5 \cite{ultralyticsYOLOv5}.
+\pagebreak
+The 3D point cloud data was used to identify the corresponding location of a segmented pixel in 3D space.
+This data was used to build a birds-eye view occupancy map of the local area, extending \SI{15}{\metre}
+in front of the wheelchair and \SI{5}{\metre} on either side.
+Large numerical computations were done using Numpy due to efficiency and ease of use.
+
+Morphological image processing techniques were used to improve the density of the occupancy map.
+The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilation was used to
+join the space between drivable pixels, to create a continuous driving surface in the occupancy map
+rather than many separate pixels.
+
+Manual processing of the 3D point cloud data was also tested to identify the floor plane and drivable area.
+This approach was compared with the inbuilt \texttt{find\_floor\_plane} ZED API function.
+Environmental obstacles between the heights of \SI{0.5}{\metre} and \SI{2.0}{\metre} were
+detected using the 3D point cloud data and added to the occupancy map.
+
+% MATLAB camera -> center of wheelchair transform?
+The VFH+ (vector field histogram) algorithm \cite{ulrichVFHReliableObstacle1998} was used to blend
+the user's desired direction with the occupancy map to determine a safe target direction.
+This algorithm was implemented in MATLAB using the Navigation toolbox. The `MATLAB Engine' API
+was used to transfer data between Python and MATLAB code.
+As the input controller had not been implemented yet, joystick commands could not be logged; instead,
+the user's desired direction was assumed to be the current direction of the wheelchair.
+
+The ZED Sensors API and ZED Positional Tracking API were tested to track the movement of the wheelchair.
+The Sensors API performs pose estimation using 6 DOF IMU sensor fusion and can also output raw accelerometer
+and gyroscope data. The Positional Tracking API combines sensor data with image data to track the camera's movement.
 
 \subsection{Dataset Collection}
 An RGB-D wheelchair driving dataset was collected around Curtin university
@@ -120,6 +182,11 @@ and H.265. Both video compression modes require a CUDA-enabled device during dat
 A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
 file size (results in \cref{table:dataset_compression_modes}).
 
+Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
+\Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
+
+\vspace{4.0cm}
+
 \begin{table}[H]
     \centering
     \begin{tabular}{c c c c}
@@ -135,9 +202,6 @@ file size (results in \cref{table:dataset_compression_modes}).
     \caption{Comparison between dataset compression modes}
     \label{table:dataset_compression_modes}
 \end{table}
-
-Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
-\Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
 
 \begin{figure}[b]
     \centering
