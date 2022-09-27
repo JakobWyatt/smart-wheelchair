@@ -24,6 +24,9 @@ Some considerations must be addressed when using this mounting point.
             the visibility of the rear and side of the wheelchair.
     \item Doorway maneuverability is impacted if RGB-D camera width exceeds \SI{150}{\milli\metre}.
 \end{enumerate}
+This sensor mounting point is positioned on the right-hand side of the wheelchair,
+\SI{720}{\milli\metre} above the ground and \SI{300}{\milli\metre} behind the
+front of the wheelchair (measured from the footplate).
 
 The RGB-D camera model selected was the Stereolabs ZED Mini, which uses passive stereo-vision
 to generate a depth map. Active IR RGB-D cameras were not viable for this application
@@ -34,7 +37,8 @@ Smart wheelchair applications such as wheelchair docking require
 obstacle detection on all sides of the wheelchair. To satisfy this requirement, a
 Cygbot CygLiDAR D1 was procured for short-range detection of obstacles at the rear of the
 wheelchair. Nicolas Lee, a project student focused on
-wheelchair navigation to personal vehicles, selected this sensor.
+wheelchair navigation to personal vehicles, selected this sensor. It should be noted that
+this sensor was not used for navigation assistance as part of this thesis.
 
 % Sensor mount design
 A 3D printed sensor mount was designed to fix the ZED Mini to the wheelchair mounting point.
@@ -51,6 +55,103 @@ with several major modifications made using Autodesk Inventor:
 \Cref{fig:wheelchair_zed_1} shows the ZED Mini camera mounted to the joystick control unit
 on the wheelchair.
 
-\subsection{Dataset Collection}
+\begin{figure}[b]
+    \centering
+    \begin{minipage}[b]{.45\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{images/zed_mount.png}
+        \captionof{figure}{3D render of ZED Mini camera and wheelchair mount}
+        \label{fig:zed_mount}
+    \end{minipage}%
+    \begin{minipage}[b]{.45\textwidth}
+        \centering
+        \includegraphics[height=\linewidth,angle=270,origin=c]{images/wheelchair_zed_1.jpg}
+        \captionof{figure}{ZED Mini camera and mount fixed to joystick control unit}
+        \label{fig:wheelchair_zed_1}
+    \end{minipage}
+    \end{figure}
+
+In addition to the RGB-D camera and Lidar sensor, an AI accelerator is required to process the sensors'
+output and run ML algorithms. The literature review compares several AI accelerators across categories
+such as computational speed, power draw, and price. An Nvidia Jetson Xavier NX was selected for this task,
+as the Stereolabs ZED Mini requires a CUDA-enabled accelerator to generate a depth map. This accelerator's
+low power draw and small form factor are suited for mobile robot applications such as smart wheelchairs.
+Due to budget constraints and the ongoing chip shortage, the project team could not procure this AI accelerator.
+Instead, a laptop with an RTX 3080 graphics card was used to record datasets and evaluate the speed of
+ML algorithms.
+
+A CentroGlide powered wheelchair was used as a base for the smart wheelchair functionality.
+The CentroGlide is a mid-wheel drive wheelchair with two independently controlled powered wheels and four
+unpowered castor wheels.
+A joystick module communicates user commands to a power module, which controls
+each motor. An intelligent seating module (ISM) adjusts the seat tilt and recline \cite{glideCentroGlideOWNERUSER2022}.
+This wheelchair is \SI{1100}{\milli\metre} in length (including footplate), \SI{620}{\milli\metre}
+in width, and \SI{1030}{\milli\metre} in height.
+
+An input controller is being developed by project student Brian Smith to intercept
+commands from the joystick module and communicate with the smart wheelchair navigation system.
+The input controller enables the navigation system to receive user commands and choose a safe
+direction and speed for the wheelchair.
+A high-level protocol between the navigation system and input controller has been designed
+and is detailed in the future work section of this thesis. The input controller will validate the
+navigation system's output, ensuring that the user
+can still safely maneuver the wheelchair in the case of a software failure.
+Additionally, a motor controller was developed by project student
+Kosma Egan, which receives commands from the input controller to drive and monitor the motors.
 
 \subsection{Software}
+
+
+\subsection{Dataset Collection}
+An RGB-D wheelchair driving dataset was collected around Curtin university
+to test and evaluate the performance of the navigation assistance system.
+This dataset is \SI{7.14}{\giga\byte} in size and \SI{47}{\minute} in length
+and includes features such as indoor and outdoor navigation, doorways, pedestrians,
+elevator use, wheelchair access ramps, and car parks. This dataset can be accessed at the
+\href{https://curtin.sharepoint.com/:f:/r/sites/CurtinXGlide/Shared%20Documents/Navigation%20and%20Object%20Detection/ZED?csf=1&web=1&e=tTau9D}{\underline{Curtin X Glide (Smart Wheelchair)}} Teams channel.
+
+This dataset is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
+This format includes image data from left and right cameras, IMU data, and metadata such as
+timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
+the file is read using the ZED SDK.
+
+Four compression modes are available during dataset collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
+and H.265. Both video compression modes require a CUDA-enabled device during dataset collection.
+A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
+file size (results in \cref{table:dataset_compression_modes}).
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c c c c}
+    \toprule
+    Compression mode & File size & Relative increase & Image quality \\
+    \midrule
+    Lossless (PNG) & \SI{1240}{\mega\byte} & 41 & Ok \\
+    Lossy (JPG) & \SI{640}{\mega\byte} & 21 & Some interlacing \\
+    H.264 & \SI{30}{\mega\byte} & 1 & OK \\
+    H.265 & \SI{30}{\mega\byte} & 1 & Some frame tearing \\
+    \bottomrule
+    \end{tabular}
+    \caption{Comparison between dataset compression modes}
+    \label{table:dataset_compression_modes}
+\end{table}
+
+Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
+\Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
+
+\begin{figure}[b]
+    \centering
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/zed_sample_image.png}
+        \caption{Image frame}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.47\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/zed_sample_depth.png}
+        \caption{Depth map}
+    \end{subfigure}
+    \caption{Sample data from the Curtin university RGB-D wheelchair driving dataset}
+    \label{fig:zed_sample_dataset}
+\end{figure}
