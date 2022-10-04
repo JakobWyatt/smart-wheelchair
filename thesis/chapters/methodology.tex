@@ -115,6 +115,7 @@ The software system involves several scene recognition algorithms to update an i
 map of the surrounding area, keeping track of suitable driving paths and static obstacles
 such as walls and stairs. Once this map is created, an algorithm blends the
 user's input with this information to determine a safe path forward.
+All relevant code can be found on \href{https://github.com/JakobWyatt/smart-wheelchair}{\underline{Github}}.
 
 First, the ZED SDK is used to communicate with the ZED Mini camera and retrieve image data,
 point cloud data, and depth map data. Next, several scene recognition algorithms
@@ -189,7 +190,7 @@ Due to the smaller file size, H.264 compression was used when collecting the whe
 \Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
 
 In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
-Curtin university \href{https://curtin.sharepoint.com/:v:/r/sites/CurtinXGlide/Shared%20Documents/Navigation%20and%20Object%20Detection/GoPro%20Dataset.mp4?csf=1&web=1&e=seLdRb}{\underline{(Curtin X Glide (Smart Wheelchair))}}.
+Curtin university \href{https://curtin.sharepoint.com/:v:/r/sites/CurtinXGlide/Shared%20Documents/Navigation%20and%20Object%20Detection/GoPro%20Dataset.mp4?csf=1&web=1&e=seLdRb}{\underline{(also hosted on teams)}}.
 This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
 and collected using a GoPro Hero 4.
 This dataset was used to evaluate machine learning scene recognition algorithms
