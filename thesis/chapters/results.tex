@@ -87,7 +87,14 @@ One such approach that was tested was the inbuilt ZED SDK function \texttt{find_
 which identifies the floor plane and returns a 3D polygon of the floor plane location.
 To display this floor plane, the polygon was projected onto the 2D XZ plane and displayed
 using the python Pillow library. Results from this approach were very poor,
-as seen in Figure X.
+as seen in Figure X. The identified floor plane is inaccurate and only identifies
+a small floor area, with difficulty finding a floor plane at all in some circumstances.
+% add find_floor_plane results
+
+Another approach which was tested is to directly process the 3D point cloud data to find the floor plane.
+The height of the camera above the floor was measured to be \SI{740}{\milli\metre}.
+Using an adjustable parameter $Y_{error} = \SI{150}{\milli\metre}$,
+any points outside $p_y = -740$
 
 \subsection{Evaluation of semi-autonomous assistive wheelchair control algorithm}
 % VFH+

@@ -131,13 +131,16 @@ def project_segmentation(zed, out):
 
 
 # POINT CLOUD PROCESSING
-floor_height_error = 150.0  # +- mm
+floor_height_error = 15.0  # +- mm
 # there is a negative gradient due to tilt on the sensor mount
 # z is negative in front of us
 # This is usually characterised as 0.145
-upper_floor_gradient = 0.1
-min_obstacle_height = 500.0 # mm
-max_obstacle_height = 2000.0 # mm
+floor_gradient = 0.145
+gradient_error = 0.00
+upper_floor_gradient = floor_gradient - gradient_error
+lower_floor_gradient = floor_gradient + gradient_error
+min_obstacle_height = 400.0 # mm
+max_obstacle_height = 410.0 # mm
 
 def find_floor(zed):
     pcloud = sl.Mat()
@@ -148,10 +151,12 @@ def find_floor(zed):
     pcloud = remove_sub_nans(pcloud.get_data().reshape(-1, 4))  # remove nans from the point cloud
     y = pcloud[:, 1]
     pcloud = pcloud[:, (0, 2)]
+    levels = pcloud[:,1] * floor_gradient - floor_height_prior
     upper_bound = pcloud[:, 1] * upper_floor_gradient - floor_height_prior + floor_height_error
-    pic = draw_top_down(pcloud[y < upper_bound])
+    lower_bound = pcloud[:, 1] * lower_floor_gradient - floor_height_prior - floor_height_error
+    pic = draw_top_down(pcloud[np.logical_and(y < upper_bound, y > lower_bound)])
     # Lets try coloring in obstacles too
-    obstacle_criteria = np.logical_and(y > upper_bound + min_obstacle_height, y < upper_bound + max_obstacle_height)
+    obstacle_criteria = np.logical_and(y > levels + min_obstacle_height, y < levels + max_obstacle_height)
     pic = draw_top_down(pcloud[obstacle_criteria], pic=pic, color=(0, 0, 200))
     return pic
 
@@ -172,10 +177,10 @@ def main():
     p = seg.VideoProperties(30, 1920, 1080)
     generate_frame = GenerateFrameZed(cleanup.zed)
     cleanup.push_frame = seg.PushFrame((p, "capture.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
-    #push_frame_floor_plane = seg.PushFrame(None, "floor_plane")
-    #push_frame_segmentation = seg.PushFrame((seg.VideoProperties(30, img_dims[0], img_dims[1]), "test_seg.mp4"), "segmentation")
+    push_frame_floor_plane = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "floor_plane.mp4"), "floor_plane")
+    push_frame_segmentation = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "segmentation.mp4"), "segmentation")
     cleanup.push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "pcloud.mp4"), "floor_cloud")
-    #model, draw_frame = seg.HybridnetLoader(p)  # , "../models/hybridnet_epoch_1.pth")
+    model, draw_frame = seg.HybridnetLoader(p)#, "../models/hybridnet_epoch_1.pth")
     #kernel_sz = max(2, round(1 / scale * 100))
     #print(f"Kernel size: {kernel_sz}")
     kernel = np.ones((10, 10), np.uint8)
@@ -185,7 +190,7 @@ def main():
         image_rgb = np.delete(image, 3, 2)
         if skip_frames != 0 and i % skip_frames != 0:
             #push_frame_segmentation(floor_seg)
-            #cleanup.push_frame_floor_cloud(floor_cloud)
+            cleanup.push_frame_floor_cloud(floor_cloud)
             cleanup.push_frame(image_rgb)
             continue
         start_time = time.time()
@@ -196,7 +201,7 @@ def main():
 
         # FLOOR PLANE
         # print("Floor plane")
-        #floor_plane = detect_floor_plane(zed)
+        #floor_plane = detect_floor_plane(cleanup.zed)
         #if floor_plane is not None:
         #    push_frame_floor_plane(floor_plane)
 
@@ -204,10 +209,10 @@ def main():
         # print("Floor seg")
         #image_rgb = np.delete(image, 3, 2)
         #out = model(image_rgb)
-        #image = draw_frame(image_rgb, out)
-        #floor_seg = project_segmentation(zed, out)
+        #image_rgb = draw_frame(image_rgb, out)
+        #floor_seg = project_segmentation(cleanup.zed, out)
         #if floor_seg is not None:
-        #    floor_seg = cv2.erode(floor_seg, kernel)
+            #floor_seg = cv2.erode(floor_seg, kernel)
         #    push_frame_segmentation(floor_seg)
 
         # FLOOR POINT CLOUD PROCESSING
@@ -228,8 +233,9 @@ def main():
     # Cleanup
     #push_frame(None)
     #push_frame_floor_plane(None)
-    #push_frame_segmentation(None)
+    push_frame_segmentation(None)
     #push_frame_floor_cloud(None)
+    push_frame_floor_plane(None)
 
 class Cleanup:
     def __init__(self):
