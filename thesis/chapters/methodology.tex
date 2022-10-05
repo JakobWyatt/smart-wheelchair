@@ -169,7 +169,18 @@ After some analysis of the raw point cloud data from the Curtin RGB-D driving da
 it was found that the camera was slightly tilted upwards while recording the dataset.
 This angle was mostly constant between data collection periods
 and was likely due to the ergonomics and tilt of the joystick control unit.
-To measure this angle, %% START HERE
+An example of this tilt can be seen in \cref{fig:meshlab_point_cloud}; note
+that the floor is angled downwards due to the tilt of the RGB-D camera.
+Meshlab was used to determine the coordinates of points
+on the ground at a close distance and far distance, and calculate the gradient.
+This was done for two different point clouds, one indoor and one outdoor.
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/meshlab_point_cloud.png}
+    \caption{Point cloud information of indoor hallway (visualized with Meshlab). Note the angle of the floor due to sensor tilt}
+    \label{fig:meshlab_point_cloud}
+\end{figure}
 
 In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
 Curtin university.
