@@ -96,6 +96,8 @@ output = np.array(output.resize((width, height)).convert("RGB"))
 cv2.addWeighted(frame, 1, output, 0.8, 0, frame)
 \end{minted}
 
+% perf improvement.
+
 \Cref{fig:hybridnets_outdoor} shows Hybridnet evaluated on the Curtin dataset, with the identified drivable area highlighted.
 This model performs well on uniform surfaces but has more difficulty identifying the drivable area on surfaces such as paved bricks.
 This could be due to domain adaptation problems, as this model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018}

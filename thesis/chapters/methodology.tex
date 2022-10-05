@@ -110,36 +110,249 @@ Additionally, a motor controller was developed by project student
 Kosma Egan, which receives commands from the input controller to drive and monitor the motors.
 \pagebreak
 
+\subsection{Dataset Collection}
+An RGB-D wheelchair driving dataset was collected around Curtin university
+to test and evaluate the performance of the navigation assistance system.
+This dataset is \SI{7.14}{\giga\byte} in size and \SI{47}{\minute} in length
+and includes features such as indoor and outdoor navigation, doorways, pedestrians,
+elevator use, wheelchair access ramps, and car parks. A link to the dataset
+can be found in Appendix C.
+
+This dataset was collected using the ZED Mini and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
+This format includes image data from left and right cameras, IMU data, and metadata such as
+timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
+the file is read using the ZED SDK.
+
+Four compression modes are available during dataset collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
+and H.265. Both video compression modes require a CUDA-enabled device during dataset collection.
+A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
+file size (results in \cref{table:dataset_compression_modes}). Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
+\Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
+
+\begin{table}[H]
+    \centering
+    \begin{adjustbox}{width=0.7\textwidth}
+    \begin{tabular}{c c c c}
+    \toprule
+    Compression mode & File size & Relative increase & Image quality \\
+    \midrule
+    Lossless (PNG) & \SI{1240}{\mega\byte} & 41 & Ok \\
+    Lossy (JPG) & \SI{640}{\mega\byte} & 21 & Some interlacing \\
+    H.264 & \SI{30}{\mega\byte} & 1 & OK \\
+    H.265 & \SI{30}{\mega\byte} & 1 & Some frame tearing \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Comparison between dataset compression modes}
+    \label{table:dataset_compression_modes}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/zed_sample_image.png}
+        \caption{Image frame}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.47\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/zed_sample_depth.png}
+        \caption{Depth map}
+    \end{subfigure}
+    \caption{Sample data from the Curtin university RGB-D wheelchair driving dataset}
+    \label{fig:zed_sample_dataset}
+\end{figure}
+\pagebreak
+
+After some analysis of the raw point cloud data from the Curtin RGB-D driving dataset,
+it was found that the camera was slightly tilted upwards while recording the dataset.
+This angle was mostly constant between data collection periods
+and was likely due to the ergonomics and tilt of the joystick control unit.
+To measure this angle, %% START HERE
+
+In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
+Curtin university.
+This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
+and collected using a GoPro Hero 4; the experimental setup used to collect this
+dataset can be seen in \cref{fig:gopro_dataset_collection}.
+This dataset was used to evaluate machine learning scene recognition algorithms
+before the ZED Mini had been ordered.
+
+%\vspace{4.0cm}
+
+
 \subsection{Software}
 The software system involves several scene recognition algorithms to update an internal
 map of the surrounding area, keeping track of suitable driving paths and static obstacles
 such as walls and stairs. Once this map is created, an algorithm blends the
 user's input with this information to determine a safe path forward.
-All relevant code can be found on \href{https://github.com/JakobWyatt/smart-wheelchair}{\underline{Github}}.
-
-First, the ZED SDK is used to communicate with the ZED Mini camera and retrieve image data,
-point cloud data, and depth map data. Next, several scene recognition algorithms
-identify drivable areas and environmental obstacles. A block diagram of the software system
+Appendix C contains a link to the source code. A block diagram of the software system
 and how it interacts with the hardware is shown in \cref{fig:block_diagram}.
+
+\subsubsection{Evaluation of ML models on preliminary dataset}
+The preliminary video-only driving dataset was used to evaluate
+several machine learning models before the ZED Mini had been ordered.
+Object detection models such as YOLOv5 \cite{ultralyticsYOLOv5} and image segmentation models such as
+DeepLabv3 \cite{chenRethinkingAtrousConvolution2017} were evaluated for speed, accuracy, and efficacy.
+Hybridnets \cite{vuHybridNetsEndtoEndPerception2022}, a machine learning model which
+performs drivable area segmentation and object detection on the same backbone, was also evaluated on
+this dataset.
+
+To evaluate these models, a video encoder and decoder needed to be created
+to feed image frames into the model. This was implemented using a python generator
+so that frames in the video could be iterated over within a for loop and only decoded
+when required. OpenCV \cite{bradskiOpenCVLibrary2000} was the underlying library used
+to decode each video frame into a BGR pixel array.
+
+Some scene processing algorithms do not run in real-time due to hardware limitations or performance issues.
+When this occurs, some frames must be dropped during model evaluation to keep the scene model up to date and minimise latency.
+The number of frames to drop can be calculated using \cref{eq:frames_to_drop},
+where $t_{frame}$ is the time taken to process the previous frame.
+A frame is dropped by simply discarding it once decoded.
+
+\begin{equation}
+n_{drop} = \ceil{fps\times t_{frame}} - 1
+\label{eq:frames_to_drop}
+\end{equation}
+
+%First, the ZED SDK is used to communicate with the ZED Mini camera and retrieve image data,
+%point cloud data, and depth map data. Next, several scene recognition algorithms
+%identify drivable areas and environmental obstacles. A block diagram of the software system
+%and how it interacts with the hardware is shown in \cref{fig:block_diagram}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
+    \caption{Experimental setup for preliminary dataset collection}
+    \label{fig:gopro_dataset_collection}
+\end{figure}
 
 \begin{figure}[b]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/block_diagram.png}
+    \includegraphics[width=0.8\linewidth]{images/block_diagram.png}
     \caption{Block diagram of software system and interaction with hardware components}
     \label{fig:block_diagram}
 \end{figure}
+\pagebreak
 
-Hybridnets \cite{vuHybridNetsEndtoEndPerception2022},
-a machine learning model which performs drivable area segmentation and object detection on the same
-image recognition backbone, was trained and evaluated on the Berkely Deepdrive dataset \cite{yuBDD100KDiverseDriving2018}
-and the Cityscapes dataset \cite{cordtsCityscapesDatasetSemantic2016}. This model was used to identify
-which areas were suitable for the wheelchair user to drive on,
-and as a proof of concept for a shared-backbone model architecture.
-Object detection models such as YOLOv5 \cite{ultralyticsYOLOv5} and image segmentation models such as
-DeepLabv3 \cite{chenRethinkingAtrousConvolution2017} were evaluated and compared to Hybridnets using a preliminary
-video-only wheelchair driving dataset.
+To avoid training each model from scratch, a pre-trained model is loaded from PyTorch Hub.
+The DeepLabv3 and YOLOv5 models were both trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset,
+while the Hybridnets model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018} (BDD100K).
+
+As mentioned in the literature review, some machine learning algorithms can accept
+different image classifiers as a model backbone.
+MobileNetV3 \cite{howardSearchingMobileNetV32019} was used as a backbone for DeepLabv3 due to its fast performance.
+YOLOv5 has 5 model backbones to choose between (nano, small, medium, large, extra-large),
+with smaller models sacrificing accuracy for speed. Due to the low latency requirements
+of a fast-moving wheelchair, YOLOv5 was evaluated using the small model size (known as YOLOv5s).
 Machine learning was done using PyTorch \cite{paszkePyTorchImperativeStyle2019}, due to good compatibility
 with existing machine learning models.
+
+\subsubsection{Hybridnets drivable area segmentation}
+To improve the performance of the Hybridnets model when segmenting drivable areas,
+the performance of the model was quantitatively evaluated using the BDD100K dataset
+and the Cityscapes dataset \cite{cordtsCityscapesDatasetSemantic2016}.
+The Hybridnets model was also retrained using the Cityscapes dataset
+to improve its performance in some scenarios. %% which scenarios?? TODO
+
+%% Training methodology will likely take a while to write.
+%This model was used to identify
+%which areas were suitable for the wheelchair user to drive on,
+%and as a proof of concept for a shared-backbone model architecture.
+
+\subsubsection{Birds-eye view occupancy map}
+%The 3D point cloud data was used to identify the corresponding location of a drivable segmented pixel in 3D space.
+%This data was used to build a birds-eye view occupancy map of the local area, extending \SI{15}{\metre}
+%in front of the wheelchair and \SI{5}{\metre} on either side.
+%Large numerical computations were done using Numpy due to efficiency and ease of use.
+
+The output of the Hybridnets drivable area segmentation model is a
+segmentation mask, an array that indicates which pixels are drivable
+and which are not.
+This output must be transformed into a 2D birds-eye view occupancy map,
+which indicates the drivable area around the wheelchair. The occupancy
+map extends \SI{15}{\metre} in front of the wheelchair and \SI{5}{\metre} on either side.
+This occupancy map is a simplified representation of the surrounding world
+and is used as an input to the wheelchair control algorithms.
+
+The ZED Mini 3D point cloud data was used
+to transform the segmentation mask into an occupancy grid.
+The ZED SDK uses the pinhole camera model, as seen in \cref{fig:pinhole_camera_model},
+to describe the relationship between pixels on the image plane
+and the coordinates of corresponding objects.
+The point cloud data is represented as an array the same size as
+the original image, with each pixel containing XYZ data about the location of that object
+in 3D space.
+% add representation diagram
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/pinhole_camera_model.png}
+    \caption{Pinhole camera model. Reproduced from Nvidia \cite{nvidiaVisionProgrammingInterface}}
+    \label{fig:pinhole_camera_model}
+\end{figure}
+
+To obtain the occupancy map, the point cloud is first filtered using the segmentation mask so that
+non-drivable points are removed. The ZED SDK is unable to resolve the depth of some pixels
+and instead represents their location as \texttt{nan}; these points are also removed.
+Next, the array is simplified by removing non-essential information such as colour and altitude
+data. What remains is an array of XZ points that represent drivable areas
+identified by the segmentation algorithm. These XZ points are referenced
+using a right-handed y-up coordinate frame, with the origin at the left lens of the ZED Mini;
+see \cref{fig:zed_mini_coordinate_frame}.
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/zed_mini_coordinate_frame.jpg}
+    \caption{ZED Mini coordinate frame (right-handed y-up)}
+    \label{fig:zed_mini_coordinate_frame}
+\end{figure}
+% Add frame of reference
+
+These points must be scaled to place them on the occupancy grid. This occupancy grid
+extends \SI{15}{\metre} in front of the wheelchair and \SI{5}{\metre} on either side,
+with each cell of the grid corresponding to a $\SI{25}{\milli\metre}\times \SI{25}{\milli\metre}$ area.
+\Cref{eq:occupancy_scaling} was used to scale these points. Note that $p_x$ and $p_z$ are
+represented in metres.
+\begin{align}
+i_x = min\left(max\left(\frac{p_x + 5.0}{0.025}, 1\right), \frac{10.0}{0.025}\right) - 1\\
+i_y = min\left(max\left(\frac{p_z + 15.0}{0.025}, 1\right), \frac{15.0}{0.025}\right) - 1
+\label{eq:occupancy_scaling}
+\end{align}
+
+An issue with the occupancy grid at this stage is that it is rather sparse
+due to the one-to-one mapping between segmented pixels and grid cells.
+Morphological image processing techniques were used to improve the density of the occupancy map.
+The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilation was used to
+join the space between drivable pixels, to create a continuous driving surface in the occupancy map
+rather than many separate pixels. A $10\times 10$ kernel was used to perform this dilation.
+
+\subsubsection{3D point cloud obstacle detection}
+Another method that was tested to identify environmental obstacles and drivable areas
+was the direct processing of the 3D point cloud data, which removes any use of RGB image data.
+One approach that was tested was the inbuilt ZED SDK function \texttt{find\_floor\_plane}.
+This function takes the current floor height and camera orientation as arguments
+and uses them to identify the floor plane. The \texttt{find\_floor\_plane} function
+returns a 3D polygon of the floor plane boundary, which was projected onto the 2D XZ plane
+and displayed using the python Pillow library.
+% add find_floor_plane results
+
+Another approach that was tested was a custom algorithm that processes the 3D point cloud data
+to identify the drivable area.
+The inequality in \cref{eq:flat_filter} was used to filter the points which were identified as drivable,
+using a measured camera height $y_{camera} = \SI{740}{\milli\metre}$
+and an initial error parameter $y_{error} = \SI{150}{\milli\metre}$.
+\begin{equation}
+-y_{camera} - y_{error} \leq p_y \leq -y_{camera} + y_{error}
+\label{eq:flat_filter}
+\end{equation}
+
+
+
+
+\subsubsection{Assistive control algorithm}
+
+\subsubsection{Pose estimation}
+
 
 The 3D point cloud data was used to identify the corresponding location of a drivable segmented pixel in 3D space.
 This data was used to build a birds-eye view occupancy map of the local area, extending \SI{15}{\metre}
@@ -167,66 +380,3 @@ the user's desired direction was assumed to be the current direction of the whee
 The ZED Sensors API and ZED Positional Tracking API were tested to track the movement of the wheelchair.
 The Sensors API performs pose estimation using 6 DOF IMU sensor fusion and can also output raw accelerometer
 and gyroscope data. The Positional Tracking API combines sensor data with image data to track the camera's movement.
-
-\subsection{Dataset Collection}
-An RGB-D wheelchair driving dataset was collected around Curtin university
-to test and evaluate the performance of the navigation assistance system.
-This dataset is \SI{7.14}{\giga\byte} in size and \SI{47}{\minute} in length
-and includes features such as indoor and outdoor navigation, doorways, pedestrians,
-elevator use, wheelchair access ramps, and car parks. This dataset can be accessed at the
-\href{https://curtin.sharepoint.com/:f:/r/sites/CurtinXGlide/Shared%20Documents/Navigation%20and%20Object%20Detection/ZED?csf=1&web=1&e=tTau9D}{\underline{Curtin X Glide (Smart Wheelchair)}} Teams channel.
-
-This dataset was collected using the ZED Mini and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
-This format includes image data from left and right cameras, IMU data, and metadata such as
-timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
-the file is read using the ZED SDK.
-
-Four compression modes are available during dataset collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
-and H.265. Both video compression modes require a CUDA-enabled device during dataset collection.
-A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
-file size (results in \cref{table:dataset_compression_modes}).
-
-Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
-\Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
-
-In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
-Curtin university \href{https://curtin.sharepoint.com/:v:/r/sites/CurtinXGlide/Shared%20Documents/Navigation%20and%20Object%20Detection/GoPro%20Dataset.mp4?csf=1&web=1&e=seLdRb}{\underline{(also hosted on teams)}}.
-This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
-and collected using a GoPro Hero 4.
-This dataset was used to evaluate machine learning scene recognition algorithms
-before the ZED Mini had been ordered.
-
-%\vspace{4.0cm}
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{c c c c}
-    \toprule
-    Compression mode & File size & Relative increase & Image quality \\
-    \midrule
-    Lossless (PNG) & \SI{1240}{\mega\byte} & 41 & Ok \\
-    Lossy (JPG) & \SI{640}{\mega\byte} & 21 & Some interlacing \\
-    H.264 & \SI{30}{\mega\byte} & 1 & OK \\
-    H.265 & \SI{30}{\mega\byte} & 1 & Some frame tearing \\
-    \bottomrule
-    \end{tabular}
-    \caption{Comparison between dataset compression modes}
-    \label{table:dataset_compression_modes}
-\end{table}
-
-\begin{figure}[b]
-    \centering
-    \begin{subfigure}{.48\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/zed_sample_image.png}
-        \caption{Image frame}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.47\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/zed_sample_depth.png}
-        \caption{Depth map}
-    \end{subfigure}
-    \caption{Sample data from the Curtin university RGB-D wheelchair driving dataset}
-    \label{fig:zed_sample_dataset}
-\end{figure}
