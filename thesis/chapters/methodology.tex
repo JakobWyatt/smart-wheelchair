@@ -171,9 +171,21 @@ This angle was mostly constant between data collection periods
 and was likely due to the ergonomics and tilt of the joystick control unit.
 An example of this tilt can be seen in \cref{fig:meshlab_point_cloud}; note
 that the floor is angled downwards due to the tilt of the RGB-D camera.
+
 Meshlab was used to determine the coordinates of points
 on the ground at a close distance and far distance, and calculate the gradient.
-This was done for two different point clouds, one indoor and one outdoor.
+This was done for two different point clouds (one indoor and one outdoor)
+with the results averaged. Working is shown in \cref{eq:tilt_calculation}.
+
+\begin{align}
+p_{1,1} = (-0.53, -1.30, -3.81) \qquad p_{1,2} &= (-0.54, -2.31, -11.31)\\
+\textrm{gradient}_1 &= \frac{y_2 - y_1}{z_2 - z_1} = -0.135\\
+p_{2,1} = (1.03, -1.29, -4.17) \qquad p_{2,2} &= (0.93, -2.80, -14.03)\\
+\textrm{gradient}_2 &= -0.153\\
+\textrm{gradient}_{avg} &= -0.144\\
+\theta_{tilt} &= -\tan^{-1}\left(-0.144\right) = 8.2\degree
+\label{eq:tilt_calculation}
+\end{align}
 
 \begin{figure}[b]
     \centering
@@ -273,6 +285,7 @@ to improve its performance in some scenarios. %% which scenarios?? TODO
 %and as a proof of concept for a shared-backbone model architecture.
 
 \subsubsection{Birds-eye view occupancy map}
+\label{sec:birds_eye_view_occupancy_map}
 %The 3D point cloud data was used to identify the corresponding location of a drivable segmented pixel in 3D space.
 %This data was used to build a birds-eye view occupancy map of the local area, extending \SI{15}{\metre}
 %in front of the wheelchair and \SI{5}{\metre} on either side.
@@ -288,7 +301,7 @@ This occupancy map is a simplified representation of the surrounding world
 and is used as an input to the wheelchair control algorithms.
 
 The ZED Mini 3D point cloud data was used
-to transform the segmentation mask into an occupancy grid.
+to transform the segmentation mask into an occupancy map.
 The ZED SDK uses the pinhole camera model, as seen in \cref{fig:pinhole_camera_model},
 to describe the relationship between pixels on the image plane
 and the coordinates of corresponding objects.
@@ -319,7 +332,7 @@ see \cref{fig:zed_mini_coordinate_frame}.
 \end{figure}
 % Add frame of reference
 
-These points must be scaled to place them on the occupancy grid. This occupancy grid
+These points must be scaled to place them on the occupancy map. This occupancy map
 extends \SI{15}{\metre} in front of the wheelchair and \SI{5}{\metre} on either side,
 with each cell of the grid corresponding to a $\SI{25}{\milli\metre}\times \SI{25}{\milli\metre}$ area.
 \Cref{eq:occupancy_scaling} was used to scale these points. Note that $p_x$ and $p_z$ are
@@ -330,7 +343,7 @@ i_y = min\left(max\left(\frac{p_z + 15.0}{0.025}, 1\right), \frac{15.0}{0.025}\r
 \label{eq:occupancy_scaling}
 \end{align}
 
-An issue with the occupancy grid at this stage is that it is rather sparse
+An issue with the occupancy map at this stage is that it is rather sparse
 due to the one-to-one mapping between segmented pixels and grid cells.
 Morphological image processing techniques were used to improve the density of the occupancy map.
 The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilation was used to
@@ -349,16 +362,49 @@ and displayed using the python Pillow library.
 
 Another approach that was tested was a custom algorithm that processes the 3D point cloud data
 to identify the drivable area.
-The inequality in \cref{eq:flat_filter} was used to filter the points which were identified as drivable,
+The inequality in \cref{eq:flat_filter} was initially used to filter the points
+which were identified as drivable,
 using a measured camera height $y_{camera} = \SI{740}{\milli\metre}$
 and an initial error parameter $y_{error} = \SI{150}{\milli\metre}$.
+\Cref{eq:flat_filter} only retains 3D points within a certain error margin of the floor plane.
+
 \begin{equation}
--y_{camera} - y_{error} \leq p_y \leq -y_{camera} + y_{error}
+-y_{error} \leq p_y + y_{camera} \leq y_{error}
 \label{eq:flat_filter}
 \end{equation}
 
+An issue with this equation is that it does not take camera tilt into account.
+Additionally, a wheelchair ramp may not be recognised as drivable, as the gradient of a ramp
+may cause sections of the ramp to fall outside the $y_{error}$ margin.
+Australian Standard 1428.1:2021 \cite{standardsaustralia14282021Design2021} specifies that
+the maximum gradient of a wheelchair ramp should not be greater than 1:14 (section 7.3a).
+The approach specified in \cref{eq:tilt_filter} was also tested to identify the drivable area.
+This approach takes sensor tilt and wheelchair ramps into account,
+assuming that any ramps will be encountered face-on (along the z-axis) and that
+sensor tilt remains constant.
 
+\begin{align}
+\mathrm{Note that &p_z is -ve in front of wheelchair}\\
+p_h &= p_y - p_z\tan\theta_{tilt} + y_{camera}\\
+p_z\times\frac{1}{14} - y_{error} &\leq p_h \leq -p_z\times\frac{1}{14} + y_{error}
+\label{eq:tilt_filter}
+\end{align}
 
+Direct processing of the 3D point cloud data was also tested to detect static obstacles,
+such as stairs and walls. A basic implementation was tested using the existing sensor
+tilt compensation in \cref{eq:tilt_filter}. \Cref{eq:obstacle_filter} shows the point filtering
+criteria for obstacles between \SI{0.5}{\metre} and \SI{2.0}{\metre} tall.
+
+\begin{equation}
+0.5 \leq p_h \leq 2.0
+\label{eq:obstacle_filter}
+\end{equation}
+
+Once the 3D points for drivable areas and environmental obstacles have been identified,
+they must be placed on the birds-eye view occupancy map. The approach used to do this
+is identical to the approach outlined in \cref{sec:birds_eye_view_occupancy_map};
+each point is scaled to fit on the map and morphology is used to improve the density
+of this map.
 
 \subsubsection{Assistive control algorithm}
 
