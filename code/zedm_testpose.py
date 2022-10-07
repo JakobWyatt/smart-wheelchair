@@ -1,4 +1,3 @@
-from turtle import position
 import pyzed.sl as sl
 from zedm_stream import GenerateFrameZed
 import segmentation as seg
@@ -121,6 +120,7 @@ def main():
     # sensors are sampled at different rates
     ts_handler = TimestampHandler()
     zed_transform_imu = sl.Transform()
+    print(zed.get_camera_information().sensors_configuration.barometer_parameters.sampling_rate)
     for i, image in enumerate(generate_frame()):
         # initially some test code to see how camera reference frame works
         #if i % 10 != 0:
@@ -147,7 +147,7 @@ def main():
         #if ts_handler.is_new(zed_imu):
         zed_imu.get_pose(zed_transform_imu)
         zed_translation_imu = zed_transform_imu.get_translation().get() # sl.Translation
-        #print(f"IMU Pose: {zed_translation_imu}", end="\r")
+        print(f"IMU Pose: {zed_translation_imu}", end="\r")
 
         if cv2.waitKey(1) == ord('q'):
             break
@@ -155,5 +155,5 @@ def main():
     zed.close()
 
 if __name__ == '__main__':
-    #main()
-    test_position_tracker()
+    main()
+    #test_position_tracker()

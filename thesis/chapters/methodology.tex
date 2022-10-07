@@ -121,7 +121,7 @@ can be found in Appendix C.
 This dataset was collected using the ZED Mini and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
 This format includes image data from left and right cameras, IMU data, and metadata such as
 timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
-the file is read using the ZED SDK.
+the file is read using the ZED SDK. Image data was recorded at 1080p, 30fps for the left and right cameras.
 
 Four compression modes are available during dataset collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
 and H.265. Both video compression modes require a CUDA-enabled device during dataset collection.
@@ -407,33 +407,88 @@ each point is scaled to fit on the map and morphology is used to improve the den
 of this map.
 
 \subsubsection{Assistive control algorithm}
-
-\subsubsection{Pose estimation}
-
-
-The 3D point cloud data was used to identify the corresponding location of a drivable segmented pixel in 3D space.
-This data was used to build a birds-eye view occupancy map of the local area, extending \SI{15}{\metre}
-in front of the wheelchair and \SI{5}{\metre} on either side.
-Large numerical computations were done using Numpy due to efficiency and ease of use.
-
-Morphological image processing techniques were used to improve the density of the occupancy map.
-The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilation was used to
-join the space between drivable pixels, to create a continuous driving surface in the occupancy map
-rather than many separate pixels.
-
-Manual processing of the 3D point cloud data was also tested to identify the floor plane and drivable area.
-This approach was compared with the inbuilt \texttt{find\_floor\_plane} ZED API function.
-Environmental obstacles between the heights of \SI{0.5}{\metre} and \SI{2.0}{\metre} were
-detected using the 3D point cloud data and added to the occupancy map.
-
-% MATLAB camera -> center of wheelchair transform?
 The VFH+ (vector field histogram) algorithm \cite{ulrichVFHReliableObstacle1998} was used to blend
 the user's desired direction with the occupancy map to determine a safe target direction.
-This algorithm was implemented in MATLAB using the Navigation toolbox. The `MATLAB Engine' API
-was used to transfer data between Python and MATLAB code.
-As the input controller had not been implemented yet, joystick commands could not be logged; instead,
-the user's desired direction was assumed to be the current direction of the wheelchair.
+One limitation of the VFH+ algorithm is that it only adjusts the direction of the wheelchair
+and not the wheelchairs speed; as such, this algorithm was implemented as a
+proof of concept rather than a complete assistive control algorithm.
 
-The ZED Sensors API and ZED Positional Tracking API were tested to track the movement of the wheelchair.
+This algorithm was implemented in MATLAB using the Navigation toolbox and encapsulated into a MATLAB function.
+The `MATLAB Engine' Python API was used to call the assistive control algorithm from within Python code.
+Full implementation of a control algorithm would require the ability to log joystick commands during
+dataset collection, and to intercept joystick commands from the user. As the input controller had not
+been implemented at this time, the user's desired direction was assumed to be the current direction
+of the wheelchair.
+
+As the VFH+ control algorithm had already been implemented within the Navigation toolbox,
+the MATLAB implementation was relatively simple. \Cref{eq:pose_adjustment} was used to adjust
+the pose from the RGB-D camera to the centre of the wheelchair.
+
+\begin{align}
+p_{wheelchair,x} &= p_{camera,x} - \frac{w_{wheelchair}}{2}\\
+p_{wheelchair,y} &= p_{camera,y} + \mathrm{offset_{sensor}} - \frac{l_{wheelchair}}{2}
+\label{eq:pose_adjustment}
+\end{align}
+
+\subsubsection{Pose estimation}
+Pose estimation allows the smart wheelchair to update its position within the surrounding world.
+The ZED Sensors API and ZED Positional Tracking API were tested to estimate the pose of the wheelchair.
+These APIs were tested as a proof of concept for pose estimation and were not directly used
+for assistive control.
+
+%This is important for mapping and control, as it requires 
+%The wheelchair can be modelled as a 2 wheeled differential drive robot, which means that the
+%instantaneous velocity of the wheelchair 
 The Sensors API performs pose estimation using 6 DOF IMU sensor fusion and can also output raw accelerometer
-and gyroscope data. The Positional Tracking API combines sensor data with image data to track the camera's movement.
+and gyroscope data. Although the IMU has a sampling rate of \SI{800}{\hertz}, this sensor information
+is only saved to the SVO file at the camera frame rate of \SI{30}{\hertz}.
+
+The Positional Tracking API combines sensor data with image data to track the camera's movement.
+The camera's movement can be specified using two coordinate frames: CAMERA and WORLD.
+The WORLD frame outputs the position of the camera relative to the point where the ZED Mini started
+motion tracking ($P_i$), while the CAMERA frame outputs the difference between the current camera position and
+the camera position in the previous image ($\Delta P$).
+
+Another method to calculate $\Delta P$ would be to store the previous camera pose
+and use \cref{eq:pose_estimation} to calculate the difference between consecutive poses.
+An advantage of this approach over using the CAMERA reference frame is that if a frame
+is skipped due to performance or latency issues, no movement data is lost.
+Performance should not be a concern, as the inversion of a pose matrix can be done
+very efficiently.
+
+% add 2 wheeled differential kinematics here
+
+\begin{align}
+P_i \Delta P &= P_{i+1}\\
+\Delta P &= P_i^{-1} P_{i+1}
+\label{eq:pose_estimation}
+\end{align}
+
+% add 2 wheeled differential drive robot diagram
+
+%The 3D point cloud data was used to identify the corresponding location of a drivable segmented pixel in 3D space.
+%This data was used to build a birds-eye view occupancy map of the local area, extending \SI{15}{\metre}
+%in front of the wheelchair and \SI{5}{\metre} on either side.
+%Large numerical computations were done using Numpy due to efficiency and ease of use.
+
+%Morphological image processing techniques were used to improve the density of the occupancy map.
+%The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilation was used to
+%join the space between drivable pixels, to create a continuous driving surface in the occupancy map
+%rather than many separate pixels.
+
+%Manual processing of the 3D point cloud data was also tested to identify the floor plane and drivable area.
+%This approach was compared with the inbuilt \texttt{find\_floor\_plane} ZED API function.
+%Environmental obstacles between the heights of \SI{0.5}{\metre} and \SI{2.0}{\metre} were
+%detected using the 3D point cloud data and added to the occupancy map.
+
+% MATLAB camera -> center of wheelchair transform?
+%The VFH+ (vector field histogram) algorithm \cite{ulrichVFHReliableObstacle1998} was used to blend
+%the user's desired direction with the occupancy map to determine a safe target direction.
+%This algorithm was implemented in MATLAB using the Navigation toolbox. The `MATLAB Engine' API
+%was used to transfer data between Python and MATLAB code.
+%As the input controller had not been implemented yet, joystick commands could not be logged; instead,
+%the user's desired direction was assumed to be the current direction of the wheelchair.
+
+%The ZED Sensors API and ZED Positional Tracking API were tested to track the movement of the wheelchair.
+%The Sensors API performs pose estimation using 6 DOF IMU sensor fusion and can also output raw accelerometer
+%and gyroscope data. The Positional Tracking API combines sensor data with image data to track the camera's movement.
