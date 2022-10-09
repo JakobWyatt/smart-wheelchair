@@ -36,6 +36,7 @@ it would have to be retrained on a labelled driving dataset such as BDD100K or C
 An example of Hybridnets drivable area segmentation can be seen in \cref{fig:hybridnets}.
 This model accurately detects drivable areas outdoors when a path is uniform, however
 has more difficulty identifying a drivable path for non-uniform surfaces such as paved brick.
+Hybridnets can also struggle to identify drivable paths indoors in some circumstances.
 This is likely due to problems with domain adaptation, as the Hybridnets model was trained on the
 BDD100K dataset which primarily consists of bitumen roads.
 Hybridnets does not identify drivable area consistently when indoors
@@ -87,7 +88,7 @@ however struggled with some non-uniform pathways such as paved brick.
 The model was originally trained on the BDD100K dataset, which 
 
 \pagebreak
-\subsection{Efficiacy of birds-eye view occupancy map}
+\subsection{Efficiacy of birds-eye view occupancy map transform}
 Once the drivable area has been segmented, it is transformed into the XZ plane
 as a birds-eye view occupancy map. This is done by processing the 3D point cloud
 data from the ZED Mini camera.
@@ -159,15 +160,157 @@ when compared to other sections of this code.
     \begin{subfigure}{.3\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/occupancy_map1.png}
+        \caption{After processing}
     \end{subfigure}
-    \caption{After processing}
+    \caption{Comparison of occupancy map before and after morphological processing}
     \label{fig:morphological_processing}
 \end{figure}
 
-\subsection{Evaluation of 3D point cloud obstacle detection algorithm}
+\subsection{Evaluation of 3D point cloud obstacle detection algorithms}
 % sensor tilt, find_floor_plane
 % compare performance vs ultra depth mode
+Direct processing of the 3D point cloud data was tested to identify environmental obstacles and drivable areas.
+One such approach involved using the inbuilt ZED SDK function \texttt{find\_floor\_plane},
+which outputs a polygon of the floor plane.
+This is shown in \cref{fig:find_floor_plane} and compared alongside the segmentation occupancy map.
+This approach is very poor at identifying the floor plane accurately and has large frame-to-frame
+variation in its output. The only redeeming factor of this approach is its speed;
+as the function is GPU accelerated, this calculation takes approximately \SI{60}{\milli\seconds}.
 
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/find_floor_plane_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/find_floor_plane_seg.PNG}
+        \caption{Segmentation occupancy map}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/find_floor_plane.PNG}
+        \caption{Output from \texttt{find\_floor\_plane}}
+    \end{subfigure}
+    \caption{ZED SDK \texttt{find\_floor\_plane} function compared with segmentation occupancy map}
+    \label{fig:find_floor_plane}
+\end{figure}
+
+Another approach that was tested was a custom algorithm to process the point cloud data,
+detailed in \cref{sec:point_cloud_obstacle_detection}. The results of this algorithm
+are shown in three scenarios: one indoor (\cref{fig:pcloud_indoor}) and two outdoor (\cref{sec:pcloud_outdoor_bad} and \cref{sec:pcloud_outdoor_good}).
+Note that the drivable area is labelled in green and the environmental obstacles are labelled in red.
+
+\begin{figure}[H]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.64\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \caption{Point cloud processing result (Indoor)}
+    \label{fig:pcloud_indoor}
+\end{figure}
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.64\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_outdoor_bad_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_outdoor_bad.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \caption{Point cloud processing result (Outdoor, uniform path)}
+    \label{fig:pcloud_outdoor_bad}
+\end{figure}
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.64\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_outdoor_good_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_outdoor_good.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \caption{Point cloud processing result (Outdoor, wheelchair ramp)}
+    \label{fig:pcloud_outdoor_good}
+\end{figure}
+
+This algorithm works well in indoor settings (\cref{fig:pcloud_indoor}) at identifying the drivable area
+as well as the position of walls and other static objects. Accurate occupancy maps are also generated for
+outdoor settings with well-defined boundaries, such as a wheelchair ramp with handrails (\cref{fig:pcloud_outdoor_good}).
+However, this algorithm can struggle with open outdoor settings as seen in \cref{fig:pcloud_outdoor_bad}.
+Due to the uniformity of the pedestrian path in this image, the ZED Mini is unable to
+reliably generate a depth map and 3D point cloud for the path. This leads to the algorithm
+mistakenly identifying grassy and uneven terrain as drivable, but not identifying the
+path as drivable.
+
+This algorithm is slower than the segmentation approach, with a mean latency of \SI{550}{\milli\seconds}.
+Due to this limitation, it is more suited for identifying non-moving objects such as walls
+as opposed to identifying moving objects such as people and vehicles.
+
+The ZED Mini has three depth modes: \texttt{ULTRA}, \texttt{QUALITY}, and \texttt{PERFORMANCE}.
+These depth modes trade performance for depth accuracy - a comparison between the occupancy maps
+generated by these modes can be seen in \cref{fig:depth_mode_comparison}.
+The \texttt{ULTRA} depth mode accurately identifies the back wall as flat.
+However, the \texttt{PERFORMANCE} depth mode does not identify the back wall
+as flat, and incorrectly classifies an area beyond the wall as drivable.
+Due to the high latency of the rest of this algorithm, the difference in speed between these two depth modes is negligible,
+and therefore the \texttt{ULTRA} depth mode was selected.
+
+%% can include some ramp comparisons if need be, but probably not
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor_comparison.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor_performance.PNG}
+        \caption{Performance depth mode}
+    \end{subfigure}
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor_ultra.PNG}
+        \caption{Ultra depth mode}
+    \end{subfigure}
+    \caption{Comparison of ZED Mini depth modes}
+    \label{fig:depth_mode_comparison}
+\end{figure}
 
 \subsection{Evaluation of assistive control algorithm}
 % VFH+

@@ -22,7 +22,7 @@ def StreamInitParams(params):
     if args.source is None:
         return params
     params.set_from_svo_file(args.source)
-    params.svo_real_time_mode = True
+    params.svo_real_time_mode = False
     return params
 
 
@@ -115,32 +115,17 @@ def detect_floor_plane(zed):
     draw.polygon(polygon, fill=(0, 200, 0), width=10)
     return np.array(birds_eye, dtype=np.uint8)
 
-
-# SEGMENTATION
-def project_segmentation(zed, out):
-    point_cloud = sl.Mat()
-    status = zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
-    if status != sl.ERROR_CODE.SUCCESS:
-        print("Could not retrieve point cloud")
-        return None
-    point_cloud = point_cloud.get_data().reshape(-1, 4)[:, (0, 2)]
-    fil = out.flatten() != 0
-    # We want to filter out non-seg pixels from the point cloud,
-    # so we're left with (x, z) coordinates that are drivable.
-    return draw_top_down(remove_sub_nans(point_cloud[fil]))
-
-
 # POINT CLOUD PROCESSING
-floor_height_error = 15.0  # +- mm
+floor_height_error = 150.0  # +- mm
 # there is a negative gradient due to tilt on the sensor mount
 # z is negative in front of us
 # This is usually characterised as 0.145
-floor_gradient = 0.145
-gradient_error = 0.00
+floor_gradient = 0.1441
+gradient_error = 2 * (1 / 14)
 upper_floor_gradient = floor_gradient - gradient_error
 lower_floor_gradient = floor_gradient + gradient_error
-min_obstacle_height = 400.0 # mm
-max_obstacle_height = 410.0 # mm
+min_obstacle_height = 500.0 # mm
+max_obstacle_height = 2000.0 # mm
 
 def find_floor(zed):
     pcloud = sl.Mat()
@@ -150,10 +135,10 @@ def find_floor(zed):
         return None
     pcloud = remove_sub_nans(pcloud.get_data().reshape(-1, 4))  # remove nans from the point cloud
     y = pcloud[:,1] - pcloud[:,2] * floor_gradient + floor_height_prior
-    #pcloud = pcloud[:, (0, 2)]
+    pcloud = pcloud[:, (0, 2)]
     #levels = pcloud[:,1] * floor_gradient - floor_height_prior
-    upper_bound = -pcloud[:,2] * gradient_error + floor_height_error
-    lower_bound = pcloud[:,2] * gradient_error - floor_height_error
+    upper_bound = -pcloud[:,1] * gradient_error + floor_height_error
+    lower_bound = pcloud[:,1] * gradient_error - floor_height_error
     pic = draw_top_down(pcloud[np.logical_and(y < upper_bound, y > lower_bound)])
     # Lets try coloring in obstacles too
     obstacle_criteria = np.logical_and(y > min_obstacle_height, y < max_obstacle_height)
@@ -263,7 +248,7 @@ class Cleanup:
 
 
 if __name__ == "__main__":
-    fps = 5
+    fps = 1
     cleanup = Cleanup()
     main()
     cleanup.handler()
