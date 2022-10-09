@@ -162,8 +162,7 @@ def main():
     p = seg.VideoProperties(30, 1920, 1080)
     generate_frame = GenerateFrameZed(cleanup.zed)
     cleanup.push_frame = seg.PushFrame((p, "capture.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
-    push_frame_floor_plane = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "floor_plane.mp4"), "floor_plane")
-    push_frame_segmentation = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "segmentation.mp4"), "segmentation")
+    #push_frame_floor_plane = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "floor_plane.mp4"), "floor_plane")
     cleanup.push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "pcloud.mp4"), "floor_cloud")
     model, draw_frame = seg.HybridnetLoader(p)#, "../models/hybridnet_epoch_1.pth")
     #kernel_sz = max(2, round(1 / scale * 100))
@@ -174,8 +173,6 @@ def main():
     for i, image in enumerate(generate_frame()):
         image_rgb = np.delete(image, 3, 2)
         if skip_frames != 0 and i % skip_frames != 0:
-            #push_frame_segmentation(floor_seg)
-            cleanup.push_frame_floor_cloud(floor_cloud)
             cleanup.push_frame(image_rgb)
             continue
         start_time = time.time()
@@ -183,25 +180,12 @@ def main():
         if cv2.waitKey(1) == ord('q'):
             break
 
-
         # FLOOR PLANE
-        # print("Floor plane")
         #floor_plane = detect_floor_plane(cleanup.zed)
         #if floor_plane is not None:
         #    push_frame_floor_plane(floor_plane)
 
-        # SEGMENTATION
-        # print("Floor seg")
-        #image_rgb = np.delete(image, 3, 2)
-        #out = model(image_rgb)
-        #image_rgb = draw_frame(image_rgb, out)
-        #floor_seg = project_segmentation(cleanup.zed, out)
-        #if floor_seg is not None:
-            #floor_seg = cv2.erode(floor_seg, kernel)
-        #    push_frame_segmentation(floor_seg)
-
         # FLOOR POINT CLOUD PROCESSING
-        # print("Floor cloud")
         floor_cloud = find_floor(cleanup.zed)
         if floor_cloud is not None:
             floor_cloud = cv2.erode(floor_cloud, kernel)
@@ -215,12 +199,7 @@ def main():
         cleanup.push_frame(image_rgb)
         elapsed_time = time.time() - start_time
         print(f"Frame count: {i}, FPS: {1 / elapsed_time}", end="\r")
-    # Cleanup
-    #push_frame(None)
     #push_frame_floor_plane(None)
-    push_frame_segmentation(None)
-    #push_frame_floor_cloud(None)
-    push_frame_floor_plane(None)
 
 class Cleanup:
     def __init__(self):
@@ -239,9 +218,9 @@ class Cleanup:
         self.push_frame(None)
         self.push_frame_floor_cloud(None)
         self.zed.close()
-        #self.eng.workspace['control_frame'] = self.control_frame
-        #self.eng.workspace['vfh_frame'] = self.vfh_frame
-        #self.eng.save('frames.mat', 'control_frame', 'vfh_frame', nargout=0)
+        self.eng.workspace['control_frame'] = self.control_frame
+        self.eng.workspace['vfh_frame'] = self.vfh_frame
+        self.eng.save('frames.mat', 'control_frame', 'vfh_frame', nargout=0)
         self.eng.videoWriterHelper('vfh_frame.mp4', self.vfh_frame, matlab.double(fps), nargout=0)
         self.eng.videoWriterHelper('control_frame.mp4', self.control_frame, matlab.double(fps), nargout=0)
         sys.exit(0)

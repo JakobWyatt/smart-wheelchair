@@ -8,7 +8,7 @@ The YOLOv5, DeepLabv3, and Hybridnets models were tested on the preliminary
 video-only Curtin driving dataset. As this dataset is unlabelled, the
 models were evaluated in terms of speed and potential usage, rather than accuracy.
 
-A frame of YOLOv5 evaluated on the preliminary dataset can be seen in \cref{fig:yolov5}.
+A frame of YOLOv5 evaluated on the preliminary dataset can be seen in \cref{fig:yolov5s}.
 This model identifies vehicles and pedestrians with high accuracy, with the confidence in
 a prediction decreasing as the object moves further away from the camera.
 
@@ -19,7 +19,7 @@ a prediction decreasing as the object moves further away from the camera.
     \label{fig:yolov5s}
 \end{figure}
 
-A frame of DeepLabv3 evaluated on the preliminary dataset can be seen in \cref{fig:yolov5}.
+A frame of DeepLabv3 evaluated on the preliminary dataset can be seen in \cref{fig:yolov5s}.
 DeepLabv3 identifies pedestrians with a high level of accuracy. However, the vehicles in the
 image are not accurately segmented. This is likely due to the lower occurrence of vehicles
 in the MS COCO dataset, which was used to train the model.
@@ -175,7 +175,7 @@ which outputs a polygon of the floor plane.
 This is shown in \cref{fig:find_floor_plane} and compared alongside the segmentation occupancy map.
 This approach is very poor at identifying the floor plane accurately and has large frame-to-frame
 variation in its output. The only redeeming factor of this approach is its speed;
-as the function is GPU accelerated, this calculation takes approximately \SI{60}{\milli\seconds}.
+as the function is GPU accelerated, this calculation takes approximately \SI{60}{\milli\second}.
 
 \begin{figure}[b]
     % 16:6 width ratio
@@ -204,7 +204,7 @@ as the function is GPU accelerated, this calculation takes approximately \SI{60}
 
 Another approach that was tested was a custom algorithm to process the point cloud data,
 detailed in \cref{sec:point_cloud_obstacle_detection}. The results of this algorithm
-are shown in three scenarios: one indoor (\cref{fig:pcloud_indoor}) and two outdoor (\cref{sec:pcloud_outdoor_bad} and \cref{sec:pcloud_outdoor_good}).
+are shown in three scenarios: one indoor (\cref{fig:pcloud_indoor}) and two outdoor (\cref{fig:pcloud_outdoor_bad} and \cref{fig:pcloud_outdoor_good}).
 Note that the drivable area is labelled in green and the environmental obstacles are labelled in red.
 
 \begin{figure}[H]
@@ -273,7 +273,7 @@ reliably generate a depth map and 3D point cloud for the path. This leads to the
 mistakenly identifying grassy and uneven terrain as drivable, but not identifying the
 path as drivable.
 
-This algorithm is slower than the segmentation approach, with a mean latency of \SI{550}{\milli\seconds}.
+This algorithm is slower than the segmentation approach, with a mean latency of \SI{550}{\milli\second}.
 Due to this limitation, it is more suited for identifying non-moving objects such as walls
 as opposed to identifying moving objects such as people and vehicles.
 
@@ -313,7 +313,95 @@ and therefore the \texttt{ULTRA} depth mode was selected.
 \end{figure}
 
 \subsection{Evaluation of assistive control algorithm}
-% VFH+
+VFH+ was implemented as a proof-of-concept assistive control algorithm.
+This algorithm blends the user's target direction with the occupancy map
+to determine a safe steering direction.
+
+\Cref{fig:vfh_implementation} shows the VFH+ algorithm detecting an obstacle in front of
+the wheelchair and steering left to avoid this obstacle. This
+%demonstrates that  VFH+ works reliably as an assistive control algorithm and
+showcases the end-to-end navigation assistance pipeline,
+from environmental obstacle detection to
+avoidance of that obstacle using VFH+.
+
+The VFH+ algorithm takes
+\SI{240}{\milli\second} to determine the steering direction, which increases to
+\SI{430}{\milli\second} when called from Python due to the overhead of the MATLAB Engine API.
+This latency could be a concern for a complete semi-autonomous wheelchair implementation;
+however, this algorithm is a proof of concept, and latency was not a concern during implementation.
+Additionally, VFH+ only adjusts the direction of the wheelchair and not the wheelchair's speed,
+making it unsuitable as a final assistive control algorithm.
+
+Due to the FOV of the camera, obstacles directly to the left or right of the wheelchair are not added
+to the occupancy map. \Cref{fig:vfh_mistake} demonstrates a scenario where this can
+become an issue. VFH+ mistakenly steers to the left to avoid the narrow hallway walls,
+which would cause a crash with the walls directly to the left of the wheelchair.
+This occurs because these walls are not in the occupancy map, and so the VFH+ algorithm
+assumes that there is free space in this area.
+Several approaches that could improve the occupancy map and rectify this issue
+are suggested in \cref{sec:future_work}.
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_example_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_example_map.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_example_lidar.PNG}
+        \caption{Binary occupancy grid and LIDAR scan of obstacles}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_example_hist.PNG}
+        \caption{Polar histogram of obstacles with target and steering directions}
+    \end{subfigure}
+    \caption{VFH+ changing direction to avoid an obstacle}
+    \label{fig:vfh_implementation}
+\end{figure}
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_fov_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_fov_map.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_fov_lidar.PNG}
+        \caption{Binary occupancy grid and LIDAR scan of obstacles}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/vfh_fov_hist.PNG}
+        \caption{Polar histogram of obstacles with target and steering directions}
+    \end{subfigure}
+    \caption{VFH+ mistakenly changing direction due to low sensor FOV}
+    \label{fig:vfh_mistake}
+\end{figure}
+
+% include speed, turning behind
 
 \subsection{Evaluation of pose estimation APIs}
 % positional tracking API
