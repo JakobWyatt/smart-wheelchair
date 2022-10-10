@@ -83,11 +83,102 @@ YOLOv5 runs in real-time on our 24fps dataset, and can likely reach much higher 
 
 \subsection{Hybridnets drivable area segmentation}
 % do this first
-In the last section, it was seen that the Hybridnets model generalised well in most cases,
-however struggled with some non-uniform pathways such as paved brick.
-The model was originally trained on the BDD100K dataset, which 
+Evaluating the pretrained Hybridnets model on the BDD100K validation dataset gives a mIoU
+of 0.857. When the same model is evaluated against the Cityscapes dataset,
+the model achieves a mIoU of 0.266. This difference is due to the methodology behind
+the labelling of these datasets: Cityscapes labels all road surfaces as 'road',
+whereas BDD100K only labels the current lane as 'drivable'. This can be seen in \cref{fig:dataset_comparison}.
 
-\pagebreak
+The recall for road detection on the Cityscapes dataset is 30.6\%, whereas the recall for
+sidewalk detection is only 1.52\%. Sidewalks are a much smaller segmentation target than
+roads in this dataset; refer to \cref{table:pretrained_confusion_matrix} for the
+confusion matrix after evaluation.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c c c}
+    \toprule
+    & None & Road & Sidewalk \\
+    \midrule
+    Non-drivable & 81.0\% & 11.4\% & 2.33\% \\
+    Drivable & 0.197\% & 5.03\% & 0.036\% \\
+    \bottomrule
+    \end{tabular}
+    \caption{Confusion matrix of Hybridnets model on Cityscapes dataset (before training)}
+    \label{table:pretrained_confusion_matrix}
+\end{table}
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/bdd100k.jpg}
+        \caption{BDD100K}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/cityscapes.png}
+        \caption{Cityscapes}
+    \end{subfigure}
+    \caption{BDD100K drivable area compared with Cityscapes road segmentation}
+    \label{fig:dataset_comparison}
+\end{figure}
+
+The model generalises to the new dataset very quickly during training,
+as seen in \cref{fig:hybridnet_training_curve}. The validation accuracy vastly
+increases after the first epoch, with not much change after that point
+apart from a further drop in training loss (which can indicate overfitting).
+
+After epoch 1, the mIoU is 87.5\% (a 56.9\% improvement), with a
+road detection recall of 96.2\% and sidewalk detection recall of
+68.2\%. As seen in the training curve, the sidewalk detection recall
+varies epoch to epoch, with a variance of 4.2\%. This higher variance is
+due to the lower occurance of sidewalks in the dataset (compared to roads).
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/hybridnet_training_curve.png}
+    \caption{Hybridnets training curve}
+    \label{fig:hybridnet_training_curve}
+\end{figure}
+
+\Cref{fig:compare_trained_hybridnets} shows an example of the retrained Hybridnets model
+(epoch 1) compared to the pre-trained model, evaluated on the Curtin driving dataset.
+The new model identifies the paved drivable area further away from
+the wheelchair but struggles to identify the drivable area directly in front of the wheelchair.
+This is still an improvement compared to the pre-trained model, which does not identify any drivable
+area at all.
+
+The retrained model (Cityscapes) produces a much noisier output than the pre-trained model (BDD100K).
+This could be due to the structure of the Cityscapes dataset - as pedestrian paths are often
+separated from the road by verges, the drivable area is more likely to be disconnected.
+This is another domain adaptation problem - although the model may identify pedestrian
+pathways easily from the viewpoint of a road, it can struggle with identifying these
+same pathways from a wheelchair user's perspective. This would also explain the
+retrained model struggling to identify the paved drivable area directly in front of the wheelchair.
+
+\begin{figure}[b]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/hybridnets_untrained.PNG}
+        \caption{Before retraining}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/hybridnets_trained.PNG}
+        \caption{After retraining}
+    \end{subfigure}
+    \caption{Hybridnets segmentation on the Curtin driving dataset (example 1)}
+    \label{fig:compare_trained_hybridnets}
+\end{figure}
+
 \subsection{Efficiacy of birds-eye view occupancy map transform}
 Once the drivable area has been segmented, it is transformed into the XZ plane
 as a birds-eye view occupancy map. This is done by processing the 3D point cloud
@@ -404,4 +495,54 @@ are suggested in \cref{sec:future_work}.
 % include speed, turning behind
 
 \subsection{Evaluation of pose estimation APIs}
-% positional tracking API
+The ZED Sensors API and ZED Positional Tracking API
+were tested to estimate the pose of the wheelchair.
+
+The Sensors API was able to produce accurate estimates
+of the Euler angles of the ZED Mini. The camera has
+a slight tilt which was noted in the dataset collection methodology
+and measured as approximately 8.2\degree using point cloud data.
+The IMU measures this tilt (x-axis rotation) to be approximately 8.5\degree
+when travelling across flat ground, which agrees with the
+point cloud tilt measurement to within 0.3\degree.
+
+The Sensors API performs much worse when measuring the overall distance
+travelled by the wheelchair. As part of the dataset, the wheelchair was
+driven along the length of the Curtin bus station in a straight line,
+for a distance of approximately \SI{83}{\metre} (measured using Google Maps).
+The Sensors API is barely able to register any movement in the
+wheelchair and records a distance of \SI{7.0}{\metre} in this time.
+
+This error could be due to several factors. IMUs can have
+high position errors (drift) as the position is calculated
+by integrating the acceleration twice.
+Additionally, the sampling rate of the sensors is \SI{800}{\hertz},
+however is recorded in the dataset at \SI{30}{\hertz}. The lower
+sampling rate could have helped these errors to propagate.
+In this scenario, the wheelchair was travelling at a relatively constant
+velocity, which would have caused the average acceleration to be close to zero throughout
+the trip. A small error in the initial velocity estimate would have led to a larger
+error in the resulting position estimate.
+
+The Positional Tracking API, which combines sensor data with visual odometry,
+was also tested in this scenario. This API recorded
+a distance of \SI{127}{\metre}, which is larger
+than the measured distance of \SI{83}{\metre} by 53\%.
+The wheelchair's movement is plotted in \cref{fig:map_outline} and scaled to
+show the actual path around the bus station; although the distance is not accurate,
+the estimated path taken by the wheelchair is relatively accurate. Note that the measured distance only
+consists of the path taken on the eastern side of the bus station.
+
+A `jump' can be seen in \cref{fig:map_outline}; this can occur during visual odometry when
+the positional tracking algorithm attempts to correct the ZED Mini's location. The Positional
+Tracking API implements a parameter \texttt{enable\_pose\_smoothing} which is meant
+to smooth the impact of this jump over several frames. However, some testing
+indicates this feature is defective, as it produces completely unusable results
+when used alongside \texttt{enable\_imu\_fusion} in ZED SDK version 3.7.7.
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/map_outline.png}
+    \caption{Movement of the wheelchair around the Curtin bus station, recorded using the Positional Tracking API. Map data: Google \copyright 2022 \cite{googlemapsGoogleMaps2022}}
+    \label{fig:map_outline}
+\end{figure}

@@ -111,6 +111,8 @@ Kosma Egan, which receives commands from the input controller to drive and monit
 \pagebreak
 
 \subsection{Dataset Collection}
+\label{sec:dataset_collection}
+
 An RGB-D wheelchair driving dataset was collected around Curtin university
 to test and evaluate the performance of the navigation assistance system.
 This dataset is \SI{7.14}{\giga\byte} in size and \SI{47}{\minute} in length
@@ -273,11 +275,49 @@ Machine learning was done using PyTorch \cite{paszkePyTorchImperativeStyle2019},
 with existing machine learning models.
 
 \subsubsection{Hybridnets drivable area segmentation}
-To improve the performance of the Hybridnets model when segmenting drivable areas,
-the performance of the model was quantitatively evaluated using the BDD100K dataset
-and the Cityscapes dataset \cite{cordtsCityscapesDatasetSemantic2016}.
-The Hybridnets model was also retrained using the Cityscapes dataset
-to improve its performance in some scenarios. %% which scenarios?? TODO
+To test the performance of the Hybridnets drivable area segmentation model,
+the model was evaluated on the BDD100K and Cityscapes \cite{cordtsCityscapesDatasetSemantic2016}
+datasets. The model was also retrained using the Cityscapes dataset
+to improve its performance on non-uniform surfaces such as paved brick.
+
+Machine learning was done within the Google Colaboratory environment,
+and a Colab Pro subscription was purchased to enable access to
+a faster Nvidia V100 GPU (with 16GB memory \cite{nvidiaNvidiaTeslaV1002018}).
+Datasets were uploaded onto Google Drive so that they could be mounted onto Colab
+and unzipped into the allocated machine's storage. Pytorch was used to train
+the model, with \texttt{torchvision.datasets.Cityscapes} used to load the Cityscapes
+dataset. To load the BDD100K dataset, a data loader within the Hybridnets source code
+was used.
+
+% could be added back for kerb detection
+The Hybridnets model contains an image classification backbone, an object
+detection head, and a segmentation head. The final layer of the segmentation head
+was modified so that it would output only drivable area predictions, rather
+than both lane predictions and drivable area predictions.
+The weights for the backbone and detection head were `frozen', which means
+they were not changed during training. This is standard practice when training
+large models such as these, and reduces the time taken to train the model.
+
+The mIoU (mean intersection over union) metric was used to evaluate the
+performance of the model. \Cref{eq:miou} can be used to calculate the mIoU
+which relies on the true positive, false positive, and false negative
+pixel counts in the segmented image.
+
+\begin{equation}
+mIoU = \frac{1}{N} \sum_{i=1}^{N} \frac{tp_i}{tp_i + fp_i + fn_i}
+\label{eq:miou}
+\end{equation}
+
+The Cityscapes dataset was selected to improve the model's performance on non-uniform
+surfaces such as paved brick. This dataset includes sidewalks as well as roads;
+this was hypothesised to provide a wider variety of surfaces during training.
+Both sidewalks and roads were classified as drivable areas during evaluation
+and training. The recall metric (true positive rate, $\frac{tp}{tp + fn}$) was used to quantify the model's
+performance on sidewalks and roads separately, for comparison.
+
+The AdamW optimizer \cite{kingmaAdamMethodStochastic2014}\cite{loshchilovDecoupledWeightDecay2017} was
+used during training, with the model weights and other metrics saved to Google Drive
+each epoch. The model was trained for 20 epochs in total.
 
 %% Training methodology will likely take a while to write.
 %This model was used to identify
