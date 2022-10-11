@@ -13,6 +13,9 @@
 \usepackage{siunitx} % format si units
 \usepackage{changepage} % for the adjustwidth environment
 \usepackage[authordate,backend=biber]{biblatex-chicago} \addbibresource{../zotero.bib} % referencing
+\usepackage[export]{adjustbox} % frame figure
+\usepackage{booktabs} % rules in table
+\usepackage{subcaption} % subfigures
 
 \raggedbottom % allow pages to end early
 \pdfvariable minorversion 7 % updated pdf version
@@ -103,14 +106,15 @@ classification models, with the 156 layer ResNet model (\cite{heDeepResidualLear
 on the ImageNet dataset with an error rate of 3.57\%.
 Object localisation involves classifying an object while also identifying its position within an image;
 YOLO (\cite{redmonYouOnlyLook2015}) is a popular object localisation model which can run in real-time on many accelerators.
-Semantic segmentation involves the classification of each pixel in an image, using an algorithm such as DeepLab (\cite{chenRethinkingAtrousConvolution2017}).
-This is often used for path detection or kerb detection, as these features cannot be cleanly identified with a bounding box.
+Semantic segmentation involves the classification of each pixel in an image, which is often used
+on objects that cannot be cleanly identified with a bounding box.
+The Hybridnets model \cite{vuHybridNetsEndtoEndPerception2022} is a model which performs drivable area segmentation.
 
 Assistive control algorithms can be used to navigate the user through the environment once obstacles are detected.
 Path-based algorithms such as A*
 plan a path between a start and goal pose, aiming to reduce the distance travelled or acceleration experienced by the user.
 In contrast, local algorithms such as VFH+ (\cite{ulrichVFHReliableObstacle1998})
-set the wheelchair's current speed and direction using a target direction, while avoiding nearby obstacles.
+set the wheelchair's current direction using a target direction, while avoiding nearby obstacles.
 
 The overall aim of the project team, which consists of multiple project students and interns,
 is to fully implement a smart semi-autonomous wheelchair
@@ -122,17 +126,68 @@ and guiding the user along pathways.
 %\pagebreak % end of page
 
 \section*{\textbf{RESULTS AND DISCUSSION}} % 2-3 figs/tables, 2/3-3/4 page
-Part of the current work this semester has included the selection of the sensor (Stereolabs Zed 2 Mini) and compute element (Nvidia Jetson),
-as well as the identification of viable sensor mounting points on the wheelchair. This process has been detailed in the methodology.
-A preliminary 34 minute driving dataset (1920x1080 @ 24 fps) has been collected around Curtin University using a GoPro Hero 4.
-The experimental setup to collect this dataset can be seen here, including the identified
-sensor mounting point.
+A ZED Mini RGB-D camera was mounted to the wheelchair to enable it to
+sense the surrounding environment. To test the performance of the navigation
+assistance system, a \SI{47}{\minute} wheelchair driving dataset was collected around
+Curtin university.
+
+The navigation assistance system involves identifying pathways and obstacles,
+and placing these obstacles onto a 2D birds-eye view occupancy map of the
+surrounding environment. Hybridnets was used to identify drivable
+areas; the model was retrained on the Cityscapes dataset to improve its performance (\cref{table:retraining}).
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c c c}
+    \toprule
+    Metric (Cityscapes) & Pre-trained & After training \\
+    \midrule
+    mIoU & 26.6\% & 87.5\% \\
+    Road Recall & 30.6\% & 96.2\% \\
+    Sidewalk Recall & 1.5\% & 68.2\% \\
+    \bottomrule
+    \end{tabular}
+    \caption{Comparison between dataset compression modes}
+    \label{table:retraining}
+\end{table}
+
+To identify static obstacles such as walls, a custom algorithm was used to process 3D point cloud data.
+An example of this algorithm can be seen in \cref{fig:algorithm},
+with the wheelchair location identified with an `X' and obstacles shown in red.
+This image also demonstrates drivable area segmentation, shown in green.
+The algorithm correctly identifies the wall on the right and the handrail on the left as obstacles
+and has a mean processing latency of \SI{550}{\milli\second} on a test laptop.
+Due to the FOV of the camera, drivable areas and obstacles directly in front or to the side of
+the wheelchair are not stored in the occupancy map.
+
+\begin{figure}[H]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.35\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/segmentation.PNG}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/map.jpg}
+    \end{subfigure}
+    \caption{Drivable area segmentation and obstacle detection (top-down occupancy map)}
+    \label{fig:algorithm}
+\end{figure}
+
+A proof of concept semi-autonomous wheelchair control algorithm was implemented using VFH+.
+This algorithm successfully modifies the wheelchair's direction to avoid obstacles using the
+occupancy map. However, VFH+ does not change the wheelchair's speed.
 
 \section*{\textbf{CONCLUSIONS}} % 5 lines
-To evaluate this algorithm, a video encoder and decoder needed to be created. This was done using a Python generator,
-so that frames in the video could simply be iterated over within a for loop and only decoded when required.
-OpenCV \autocite{vuHybridNetsEndtoEndPerception2022} was the underlying library used to decode each video frame into a BGR pixel array.
-After evaluation of the algorithm, each processed frame was displayed on the screen and encoded into a video file using OpenCV.
+The results indicate that image segmentation is effective at identifying drivable areas outdoors.
+The custom 3D point cloud processing algorithm works well at identifying walls,
+however, is not yet fast enough for moving objects such as pedestrians.
+The navigation assistance technology developed and tested in this thesis can be integrated
+with other thesis students' work to create a semi-autonomous wheelchair. To work around the FOV
+of the RGB-D camera, a SLAM algorithm could be used to keep obstacles in memory.
 
 \section*{\textbf{ACKNOWLEDGEMENTS}}
 The author wishes to thank Glide for providing a powered wheelchair to the research team.
