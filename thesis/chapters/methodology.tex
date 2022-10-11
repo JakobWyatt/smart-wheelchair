@@ -93,7 +93,7 @@ Communication between the joystick module, power module, and ISM is shown in \cr
 
 \begin{figure}[b]
     \centering
-    \includegraphics[width=0.7\linewidth]{images/module_communication.png}
+    \includegraphics[width=0.85\linewidth]{images/module_communication.png}
     \caption{Communication between CentroGlide control modules. Reproduced from Curtiss-Wright. \cite{curtiss-wrightPGDRIVESTECHNOLOGY2016}}
     \label{fig:module_communication}
 \end{figure}
@@ -179,15 +179,17 @@ on the ground at a close distance and far distance, and calculate the gradient.
 This was done for two different point clouds (one indoor and one outdoor)
 with the results averaged. Working is shown in \cref{eq:tilt_calculation}.
 
-\begin{align}
+\begin{equation}
+\begin{split}
 p_{1,1} = (-0.53, -1.30, -3.81) \qquad p_{1,2} &= (-0.54, -2.31, -11.31)\\
 \textrm{gradient}_1 &= \frac{y_2 - y_1}{z_2 - z_1} = -0.135\\
 p_{2,1} = (1.03, -1.29, -4.17) \qquad p_{2,2} &= (0.93, -2.80, -14.03)\\
 \textrm{gradient}_2 &= -0.153\\
 \textrm{gradient}_{avg} &= -0.144\\
 \theta_{tilt} &= -\tan^{-1}\left(-0.144\right) = 8.2\degree
+\end{split}
 \label{eq:tilt_calculation}
-\end{align}
+\end{equation}
 
 \begin{figure}[b]
     \centering
@@ -205,7 +207,19 @@ This dataset was used to evaluate machine learning scene recognition algorithms
 before the ZED Mini had been ordered.
 
 %\vspace{4.0cm}
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.45\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
+    \caption{Experimental setup for preliminary dataset collection}
+    \label{fig:gopro_dataset_collection}
+\end{figure}
 
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/block_diagram.png}
+    \caption{Block diagram of software system and interaction with hardware components}
+    \label{fig:block_diagram}
+\end{figure}\clearpage
 
 \subsection{Software}
 The software system involves several scene recognition algorithms to update an internal
@@ -241,29 +255,14 @@ n_{drop} = \ceil{fps\times t_{frame}} - 1
 \label{eq:frames_to_drop}
 \end{equation}
 
+To avoid training each model from scratch, a pre-trained model is loaded from PyTorch Hub.
+The DeepLabv3 and YOLOv5 models were both trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset,
+while the Hybridnets model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018} (BDD100K).
+
 %First, the ZED SDK is used to communicate with the ZED Mini camera and retrieve image data,
 %point cloud data, and depth map data. Next, several scene recognition algorithms
 %identify drivable areas and environmental obstacles. A block diagram of the software system
 %and how it interacts with the hardware is shown in \cref{fig:block_diagram}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
-    \caption{Experimental setup for preliminary dataset collection}
-    \label{fig:gopro_dataset_collection}
-\end{figure}
-
-\begin{figure}[b]
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/block_diagram.png}
-    \caption{Block diagram of software system and interaction with hardware components}
-    \label{fig:block_diagram}
-\end{figure}
-\pagebreak
-
-To avoid training each model from scratch, a pre-trained model is loaded from PyTorch Hub.
-The DeepLabv3 and YOLOv5 models were both trained on the MS COCO \cite{linMicrosoftCOCOCommon2014} dataset,
-while the Hybridnets model was trained on the Berkeley DeepDrive dataset \cite{yuBDD100KDiverseDriving2018} (BDD100K).
 
 As mentioned in the literature review, some machine learning algorithms can accept
 different image classifiers as a model backbone.
@@ -312,9 +311,10 @@ The Cityscapes dataset was selected to improve the model's performance on non-un
 surfaces such as paved brick. This dataset includes sidewalks as well as roads;
 this was hypothesised to provide a wider variety of surfaces during training.
 Both sidewalks and roads were classified as drivable areas during evaluation
-and training. The recall metric (true positive rate, $\frac{tp}{tp + fn}$) was used to quantify the model's
-performance on sidewalks and roads separately, for comparison.
+and training.
 
+Recall (true positive rate, $\frac{tp}{tp + fn}$) was used as a metric to quantify the model's
+performance on sidewalks and roads separately.
 The AdamW optimizer \cite{kingmaAdamMethodStochastic2014}\cite{loshchilovDecoupledWeightDecay2017} was
 used during training, with the model weights and other metrics saved to Google Drive
 each epoch. The model was trained for 20 epochs in total.
@@ -351,7 +351,7 @@ in 3D space.
 % add representation diagram
 \begin{figure}[b]
     \centering
-    \includegraphics[width=0.6\linewidth]{images/pinhole_camera_model.png}
+    \includegraphics[width=0.8\linewidth]{images/pinhole_camera_model.png}
     \caption{Pinhole camera model. Reproduced from Nvidia \cite{nvidiaVisionProgrammingInterface}}
     \label{fig:pinhole_camera_model}
 \end{figure}
@@ -366,7 +366,7 @@ using a right-handed y-up coordinate frame, with the origin at the left lens of 
 see \cref{fig:zed_mini_coordinate_frame}.
 \begin{figure}[b]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/zed_mini_coordinate_frame.jpg}
+    \includegraphics[width=0.8\linewidth]{images/zed_mini_coordinate_frame.jpg}
     \caption{ZED Mini coordinate frame (right-handed y-up)}
     \label{fig:zed_mini_coordinate_frame}
 \end{figure}
@@ -377,11 +377,14 @@ extends \SI{15}{\metre} in front of the wheelchair and \SI{5}{\metre} on either 
 with each cell of the grid corresponding to a $\SI{25}{\milli\metre}\times \SI{25}{\milli\metre}$ area.
 \Cref{eq:occupancy_scaling} was used to scale these points. Note that $p_x$ and $p_z$ are
 represented in metres.
-\begin{align}
+
+\begin{equation}
+\begin{split}
 i_x = min\left(max\left(\frac{p_x + 5.0}{0.025}, 1\right), \frac{10.0}{0.025}\right) - 1\\
 i_y = min\left(max\left(\frac{p_z + 15.0}{0.025}, 1\right), \frac{15.0}{0.025}\right) - 1
+\end{split}
 \label{eq:occupancy_scaling}
-\end{align}
+\end{equation}
 
 An issue with the occupancy map at this stage is that it is rather sparse
 due to the one-to-one mapping between segmented pixels and grid cells.
@@ -390,6 +393,7 @@ The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilat
 join the space between drivable pixels, to create a continuous driving surface in the occupancy map
 rather than many separate pixels. A $10\times 10$ kernel was used to perform this dilation.
 
+\pagebreak
 \subsubsection{3D point cloud obstacle detection}
 \label{sec:point_cloud_obstacle_detection}
 
@@ -420,17 +424,20 @@ Additionally, a wheelchair ramp may not be recognised as drivable, as the gradie
 may cause sections of the ramp to fall outside the $y_{error}$ margin.
 Australian Standard 1428.1:2021 \cite{standardsaustralia14282021Design2021} specifies that
 the maximum gradient of a wheelchair ramp should not be greater than 1:14 (section 7.3a).
-The approach specified in \cref{eq:tilt_filter} was also tested to identify the drivable area.
+
+To rectify these issues, \cref{eq:tilt_filter} was also tested to identify the drivable area.
 This approach takes sensor tilt and wheelchair ramps into account,
 assuming that any ramps will be encountered face-on (along the z-axis) and that
-sensor tilt remains constant.
+sensor tilt remains constant. Note that in our coordinate system,
+$p_z$ is negative in front of the wheelchair.
 
-\begin{align}
-\mathrm{Note that p_z is -ve in front of wheelchair}\\
-p_h &= p_y - p_z\tan\theta_{tilt} + y_{camera}\\
-p_z\times\frac{1}{14} - y_{error} \leq p_h \leq -p_z\times\frac{1}{14} + y_{error}
+\begin{equation}
+\begin{split}
+p_h = p_y - &p_z\tan\theta_{tilt} + y_{camera}\\
+p_z\times\frac{1}{14} - y_{error} &\leq p_h \leq -p_z\times\frac{1}{14} + y_{error}
+\end{split}
 \label{eq:tilt_filter}
-\end{align}
+\end{equation}
 
 Direct processing of the 3D point cloud data was also tested to detect static obstacles,
 such as stairs and walls. A basic implementation was tested using the existing sensor
@@ -468,11 +475,13 @@ As the VFH+ control algorithm had already been implemented within the Navigation
 the MATLAB implementation was relatively simple. \Cref{eq:pose_adjustment} was used to adjust
 the pose from the RGB-D camera to the centre of the wheelchair.
 
-\begin{align}
+\begin{equation}
+\begin{split}
 p_{wheelchair,x} &= p_{camera,x} - \frac{w_{wheelchair}}{2}\\
 p_{wheelchair,y} &= p_{camera,y} + \mathrm{offset_{sensor}} - \frac{l_{wheelchair}}{2}
+\end{split}
 \label{eq:pose_adjustment}
-\end{align}
+\end{equation}
 
 \subsubsection{Pose estimation}
 Pose estimation allows the smart wheelchair to update its position within the surrounding world.
@@ -482,7 +491,8 @@ for assistive control.
 
 %This is important for mapping and control, as it requires 
 %The wheelchair can be modelled as a 2 wheeled differential drive robot, which means that the
-%instantaneous velocity of the wheelchair 
+%instantaneous velocity of the wheelchair
+\pagebreak
 The Sensors API performs pose estimation using 6 DOF IMU sensor fusion and can also output raw accelerometer
 and gyroscope data. Although the IMU has a sampling rate of \SI{800}{\hertz}, this sensor information
 is only saved to the SVO file at the camera frame rate of \SI{30}{\hertz}.
@@ -495,18 +505,20 @@ the camera position in the previous image ($\Delta P$).
 
 Another method to calculate $\Delta P$ would be to store the previous camera pose
 and use \cref{eq:pose_estimation} to calculate the difference between consecutive poses.
+% add 2 wheeled differential kinematics here
+
+\begin{equation}
+\begin{split}
+P_i \Delta P &= P_{i+1}\\
+\Delta P &= P_i^{-1} P_{i+1}
+\end{split}
+\label{eq:pose_estimation}
+\end{equation}
+
 An advantage of this approach over using the CAMERA reference frame is that if a frame
 is skipped due to performance or latency issues, no movement data is lost.
 Performance should not be a concern, as the inversion of a pose matrix can be done
 very efficiently.
-
-% add 2 wheeled differential kinematics here
-
-\begin{align}
-P_i \Delta P &= P_{i+1}\\
-\Delta P &= P_i^{-1} P_{i+1}
-\label{eq:pose_estimation}
-\end{align}
 
 % add 2 wheeled differential drive robot diagram
 

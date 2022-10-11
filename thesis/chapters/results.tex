@@ -12,25 +12,30 @@ A frame of YOLOv5 evaluated on the preliminary dataset can be seen in \cref{fig:
 This model identifies vehicles and pedestrians with high accuracy, with the confidence in
 a prediction decreasing as the object moves further away from the camera.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.65\linewidth]{images/yolov5s.png}
-    \caption{YOLOv5s evaluated on the Curtin dataset}
-    \label{fig:yolov5s}
-\end{figure}
-
-A frame of DeepLabv3 evaluated on the preliminary dataset can be seen in \cref{fig:yolov5s}.
+A frame of DeepLabv3 evaluated on the preliminary dataset can be seen in \cref{fig:deeplab}.
 DeepLabv3 identifies pedestrians with a high level of accuracy. However, the vehicles in the
 image are not accurately segmented. This is likely due to the lower occurrence of vehicles
 in the MS COCO dataset, which was used to train the model.
 To repurpose this model for the task of drivable area segmentation,
 it would have to be retrained on a labelled driving dataset such as BDD100K or Cityscapes.
 
-\begin{figure}[H]
+\begin{figure}[b]
     \centering
-    \includegraphics[width=0.65\linewidth]{images/deeplab.png}
-    \caption{DeepLabv3 evaluated on the Curtin dataset}
-    \label{fig:deeplab}
+    \begin{minipage}[b]{.45\textwidth}
+        \centering
+        \captionsetup{width=.8\textwidth}
+        \includegraphics[width=\linewidth]{images/yolov5s_cropped.png}
+        \captionof{figure}{YOLOv5s evaluated on the Curtin dataset}
+        \label{fig:yolov5s}
+    \end{minipage}%
+    \quad
+    \begin{minipage}[b]{.45\textwidth}
+        \centering
+        \captionsetup{width=.8\textwidth}
+        \includegraphics[width=\linewidth]{images/deeplab_cropped.png}
+        \captionof{figure}{DeepLabv3 evaluated on the Curtin dataset}
+        \label{fig:deeplab}
+    \end{minipage}
 \end{figure}
 
 An example of Hybridnets drivable area segmentation can be seen in \cref{fig:hybridnets}.
@@ -42,7 +47,7 @@ BDD100K dataset which primarily consists of bitumen roads.
 Hybridnets does not identify drivable area consistently when indoors
 but does work well in some cases.
 
-\begin{figure}[H]
+\begin{figure}[b]
     \centering
     \begin{subfigure}{.48\textwidth}
         \centering
@@ -69,18 +74,16 @@ YOLOv5 runs in real-time on our 24fps dataset, and can likely reach much higher 
 \begin{table}[H]
     \centering
     \begin{tabular}{c c c}
-    \toprule
     Model Name & FPS & Notes \\
-    \midrule
     YOLOv5 & Real-time & (Frame-rate of dataset was 24fps) \\
-    DeepLabv3 & 21 &  \\
+    DeepLabv3 & 21 & - \\
     Hybridnets & 10 & CPU limited (can likely be optimized) \\
-    \bottomrule
     \end{tabular}
     \caption{Performance comparison of ML models}
     \label{table:model_fps}
 \end{table}
 
+\pagebreak
 \subsection{Hybridnets drivable area segmentation}
 % do this first
 Evaluating the pretrained Hybridnets model on the BDD100K validation dataset gives a mIoU
@@ -96,13 +99,14 @@ confusion matrix after evaluation.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c c c}
-    \toprule
+    \begin{tabular}{|c|c|c|c|}
+    \hline
     & None & Road & Sidewalk \\
-    \midrule
+    \hline
     Non-drivable & 81.0\% & 11.4\% & 2.33\% \\
+    \hline
     Drivable & 0.197\% & 5.03\% & 0.036\% \\
-    \bottomrule
+    \hline
     \end{tabular}
     \caption{Confusion matrix of Hybridnets model on Cityscapes dataset (before training)}
     \label{table:pretrained_confusion_matrix}
@@ -138,13 +142,6 @@ road detection recall of 96.2\% and sidewalk detection recall of
 varies epoch to epoch, with a variance of 4.2\%. This higher variance is
 due to the lower occurance of sidewalks in the dataset (compared to roads).
 
-\begin{figure}[b]
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/hybridnet_training_curve.png}
-    \caption{Hybridnets training curve}
-    \label{fig:hybridnet_training_curve}
-\end{figure}
-
 \Cref{fig:compare_trained_hybridnets} shows an example of the retrained Hybridnets model
 (epoch 1) compared to the pre-trained model, evaluated on the Curtin driving dataset.
 The new model identifies the paved drivable area further away from
@@ -160,17 +157,24 @@ pathways easily from the viewpoint of a road, it can struggle with identifying t
 same pathways from a wheelchair user's perspective. This would also explain the
 retrained model struggling to identify the paved drivable area directly in front of the wheelchair.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/hybridnet_training_curve.png}
+    \caption{Hybridnets training curve}
+    \label{fig:hybridnet_training_curve}
+\end{figure}
+
 \begin{figure}[b]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/hybridnets_untrained.PNG}
         \caption{Before retraining}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/hybridnets_trained.PNG}
         \caption{After retraining}
@@ -179,6 +183,7 @@ retrained model struggling to identify the paved drivable area directly in front
     \label{fig:compare_trained_hybridnets}
 \end{figure}
 
+\pagebreak
 \subsection{Efficiacy of birds-eye view occupancy map transform}
 Once the drivable area has been segmented, it is transformed into the XZ plane
 as a birds-eye view occupancy map. This is done by processing the 3D point cloud
@@ -189,40 +194,43 @@ with the drivable area highlighted in green.
 Note that the occupancy map is 15 metres long and 10 metres wide. The location of the ZED Mini camera is depicted
 with an `X'; the camera is mounted to the right-hand side of the wheelchair.
 
-\begin{figure}[b]
+\begin{figure}[H]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
-    \begin{subfigure}{.64\textwidth}
+    \begin{subfigure}{.55\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/segmentation_1.PNG}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.24\textwidth}
+    \begin{subfigure}{.2\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/occupancy_map1.png}
     \end{subfigure}
-    \begin{subfigure}{.64\textwidth}
+    \smallskip
+    \begin{subfigure}{.55\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/segmentation_2.PNG}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.24\textwidth}
+    \begin{subfigure}{.2\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/occupancy_map2.png}
     \end{subfigure}
-    \begin{subfigure}{.64\textwidth}
+    \smallskip
+    \begin{subfigure}{.55\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/segmentation_3.PNG}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.24\textwidth}
+    \begin{subfigure}{.2\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/occupancy_map3.png}
     \end{subfigure}
     \caption{Segmented image output and corresponding occupancy map for three locations around Curtin university}
     \label{fig:occupancy_map_seg}
 \end{figure}
+\pagebreak
 
 This segmented image to occupancy map transform works well in all observed cases, as long as the Hybridnets model identifies the
 drivable area accurately. One improvement that could be made to this implementation is its speed.
@@ -242,21 +250,21 @@ when compared to other sections of this code.
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
-    \begin{subfigure}{.3\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/occupancy_map1_nomorph.png}
+        \includegraphics[width=\linewidth,frame]{images/occupancy_map1_nomorph.png}
         \caption{Before processing}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.3\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/occupancy_map1.png}
+        \includegraphics[width=\linewidth,frame]{images/occupancy_map1.png}
         \caption{After processing}
     \end{subfigure}
     \caption{Comparison of occupancy map before and after morphological processing}
     \label{fig:morphological_processing}
 \end{figure}
-
+\pagebreak
 \subsection{Evaluation of 3D point cloud obstacle detection algorithms}
 % sensor tilt, find_floor_plane
 % compare performance vs ultra depth mode
@@ -280,13 +288,13 @@ as the function is GPU accelerated, this calculation takes approximately \SI{60}
     \quad
     \begin{subfigure}{.2\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/find_floor_plane_seg.PNG}
+        \includegraphics[width=\linewidth,frame]{images/find_floor_plane_seg.PNG}
         \caption{Segmentation occupancy map}
     \end{subfigure}
     \quad
     \begin{subfigure}{.2\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/find_floor_plane.PNG}
+        \includegraphics[width=\linewidth,frame]{images/find_floor_plane.PNG}
         \caption{Output from \texttt{find\_floor\_plane}}
     \end{subfigure}
     \caption{ZED SDK \texttt{find\_floor\_plane} function compared with segmentation occupancy map}
@@ -297,63 +305,6 @@ Another approach that was tested was a custom algorithm to process the point clo
 detailed in \cref{sec:point_cloud_obstacle_detection}. The results of this algorithm
 are shown in three scenarios: one indoor (\cref{fig:pcloud_indoor}) and two outdoor (\cref{fig:pcloud_outdoor_bad} and \cref{fig:pcloud_outdoor_good}).
 Note that the drivable area is labelled in green and the environmental obstacles are labelled in red.
-
-\begin{figure}[H]
-    % 16:6 width ratio
-    % 0.64, 0.24
-    \centering
-    \begin{subfigure}{.64\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_indoor_video.PNG}
-        \caption{Video footage}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_indoor.PNG}
-        \caption{Occupancy map}
-    \end{subfigure}
-    \caption{Point cloud processing result (Indoor)}
-    \label{fig:pcloud_indoor}
-\end{figure}
-
-\begin{figure}[b]
-    % 16:6 width ratio
-    % 0.64, 0.24
-    \centering
-    \begin{subfigure}{.64\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_outdoor_bad_video.PNG}
-        \caption{Video footage}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_outdoor_bad.PNG}
-        \caption{Occupancy map}
-    \end{subfigure}
-    \caption{Point cloud processing result (Outdoor, uniform path)}
-    \label{fig:pcloud_outdoor_bad}
-\end{figure}
-
-\begin{figure}[b]
-    % 16:6 width ratio
-    % 0.64, 0.24
-    \centering
-    \begin{subfigure}{.64\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_outdoor_good_video.PNG}
-        \caption{Video footage}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_outdoor_good.PNG}
-        \caption{Occupancy map}
-    \end{subfigure}
-    \caption{Point cloud processing result (Outdoor, wheelchair ramp)}
-    \label{fig:pcloud_outdoor_good}
-\end{figure}
 
 This algorithm works well in indoor settings (\cref{fig:pcloud_indoor}) at identifying the drivable area
 as well as the position of walls and other static objects. Accurate occupancy maps are also generated for
@@ -368,6 +319,88 @@ This algorithm is slower than the segmentation approach, with a mean latency of 
 Due to this limitation, it is more suited for identifying non-moving objects such as walls
 as opposed to identifying moving objects such as people and vehicles.
 
+% squeeze in!
+\begin{figure}[p]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    % 0.48, 0.18
+    \centering
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/pcloud_indoor.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \caption{Point cloud processing result (Indoor)}
+    \label{fig:pcloud_indoor}
+\end{figure}
+
+\begin{figure}[p]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_outdoor_bad_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/pcloud_outdoor_bad.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \caption{Point cloud processing result (Outdoor, uniform path)}
+    \label{fig:pcloud_outdoor_bad}
+\end{figure}\clearpage
+
+\begin{figure}[p]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_outdoor_good_video.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/pcloud_outdoor_good.PNG}
+        \caption{Occupancy map}
+    \end{subfigure}
+    \caption{Point cloud processing result (Outdoor, wheelchair ramp)}
+    \label{fig:pcloud_outdoor_good}
+\end{figure}
+
+\begin{figure}[p]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.55\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/pcloud_indoor_comparison.PNG}
+        \caption{Video footage}
+    \end{subfigure}
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/pcloud_indoor_performance.PNG}
+        \caption{Performance depth mode}
+    \end{subfigure}
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/pcloud_indoor_ultra.PNG}
+        \caption{Ultra depth mode}
+    \end{subfigure}
+    \caption{Comparison of ZED Mini depth modes}
+    \label{fig:depth_mode_comparison}
+\end{figure}\clearpage
+
 The ZED Mini has three depth modes: \texttt{ULTRA}, \texttt{QUALITY}, and \texttt{PERFORMANCE}.
 These depth modes trade performance for depth accuracy - a comparison between the occupancy maps
 generated by these modes can be seen in \cref{fig:depth_mode_comparison}.
@@ -378,30 +411,6 @@ Due to the high latency of the rest of this algorithm, the difference in speed b
 and therefore the \texttt{ULTRA} depth mode was selected.
 
 %% can include some ramp comparisons if need be, but probably not
-
-\begin{figure}[b]
-    % 16:6 width ratio
-    % 0.64, 0.24
-    \centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_indoor_comparison.PNG}
-        \caption{Video footage}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.2\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_indoor_performance.PNG}
-        \caption{Performance depth mode}
-    \end{subfigure}
-    \begin{subfigure}{.2\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/pcloud_indoor_ultra.PNG}
-        \caption{Ultra depth mode}
-    \end{subfigure}
-    \caption{Comparison of ZED Mini depth modes}
-    \label{fig:depth_mode_comparison}
-\end{figure}
 
 \subsection{Evaluation of assistive control algorithm}
 VFH+ was implemented as a proof-of-concept assistive control algorithm.
@@ -432,28 +441,29 @@ assumes that there is free space in this area.
 Several approaches that could improve the occupancy map and rectify this issue
 are suggested in \cref{sec:future_work}.
 
-\begin{figure}[b]
+\setlength{\abovecaptionskip}{4pt}
+\begin{figure}[p]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
-    \begin{subfigure}{.6\textwidth}
+    \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/vfh_example_video.PNG}
         \caption{Video footage}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.3\textwidth}
+    \begin{subfigure}{.2\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/vfh_example_map.PNG}
+        \includegraphics[width=\linewidth,frame]{images/vfh_example_map.PNG}
         \caption{Occupancy map}
     \end{subfigure}
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/vfh_example_lidar.PNG}
         \caption{Binary occupancy grid and LIDAR scan of obstacles}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.55\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/vfh_example_hist.PNG}
         \caption{Polar histogram of obstacles with target and steering directions}
@@ -462,38 +472,38 @@ are suggested in \cref{sec:future_work}.
     \label{fig:vfh_implementation}
 \end{figure}
 
-\begin{figure}[b]
+\begin{figure}[p]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
-    \begin{subfigure}{.6\textwidth}
+    \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/vfh_fov_video.PNG}
         \caption{Video footage}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.3\textwidth}
+    \begin{subfigure}{.2\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/vfh_fov_map.PNG}
+        \includegraphics[width=\linewidth,frame]{images/vfh_fov_map.PNG}
         \caption{Occupancy map}
     \end{subfigure}
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.4\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/vfh_fov_lidar.PNG}
-        \caption{Binary occupancy grid and LIDAR scan of obstacles}
+        \caption{Binary occupancy grid}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.55\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/vfh_fov_hist.PNG}
-        \caption{Polar histogram of obstacles with target and steering directions}
+        \caption{Polar histogram of obstacles}
     \end{subfigure}
     \caption{VFH+ mistakenly changing direction due to low sensor FOV}
     \label{fig:vfh_mistake}
-\end{figure}
+\end{figure}\clearpage
+\setlength{\abovecaptionskip}{12pt}
 
 % include speed, turning behind
-
 \subsection{Evaluation of pose estimation APIs}
 The ZED Sensors API and ZED Positional Tracking API
 were tested to estimate the pose of the wheelchair.
@@ -501,10 +511,10 @@ were tested to estimate the pose of the wheelchair.
 The Sensors API was able to produce accurate estimates
 of the Euler angles of the ZED Mini. The camera has
 a slight tilt which was noted in the dataset collection methodology
-and measured as approximately 8.2\degree using point cloud data.
-The IMU measures this tilt (x-axis rotation) to be approximately 8.5\degree
+and measured as approximately 8.2\degree{} using point cloud data.
+The IMU measures this tilt (x-axis rotation) to be approximately 8.5\degree{}
 when travelling across flat ground, which agrees with the
-point cloud tilt measurement to within 0.3\degree.
+point cloud tilt measurement to within 0.3\degree{}.
 
 The Sensors API performs much worse when measuring the overall distance
 travelled by the wheelchair. As part of the dataset, the wheelchair was
@@ -542,7 +552,7 @@ when used alongside \texttt{enable\_imu\_fusion} in ZED SDK version 3.7.7.
 
 \begin{figure}[b]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/map_outline.png}
-    \caption{Movement of the wheelchair around the Curtin bus station, recorded using the Positional Tracking API. Map data: Google \copyright 2022 \cite{googlemapsGoogleMaps2022}}
+    \includegraphics[width=0.7\linewidth,frame]{images/map_outline.png}
+    \caption{Movement of the wheelchair around the Curtin bus station, recorded using the Positional Tracking API. Map data: Google \copyright 2022 \cite{googleGoogleMaps2022}}
     \label{fig:map_outline}
 \end{figure}
