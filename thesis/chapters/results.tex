@@ -1,6 +1,9 @@
 This thesis project has involved the implementation and evaluation
 of many different components required to create an end-to-end wheelchair
-navigation assistance system.
+navigation assistance system. The algorithms and methods discussed in the
+software methodology have been tested on the Curtin dataset, and their accuracy
+and speed have been evaluated. The strengths and weaknesses of
+each approach are discussed.
 
 \subsection{Evaluation of machine learning models on preliminary dataset}
 %include speed
@@ -74,10 +77,13 @@ YOLOv5 runs in real-time on our 24fps dataset, and can likely reach much higher 
 \begin{table}[H]
     \centering
     \begin{tabular}{c c c}
+    \toprule
     Model Name & FPS & Notes \\
+    \midrule
     YOLOv5 & Real-time & (Frame-rate of dataset was 24fps) \\
     DeepLabv3 & 21 & - \\
     Hybridnets & 10 & CPU limited (can likely be optimized) \\
+    \bottomrule
     \end{tabular}
     \caption{Performance comparison of ML models}
     \label{table:model_fps}
@@ -510,7 +516,7 @@ were tested to estimate the pose of the wheelchair.
 
 The Sensors API was able to produce accurate estimates
 of the Euler angles of the ZED Mini. The camera has
-a slight tilt which was noted in the dataset collection methodology
+a slight tilt which was noted in the data collection methodology
 and measured as approximately 8.2\degree{} using point cloud data.
 The IMU measures this tilt (x-axis rotation) to be approximately 8.5\degree{}
 when travelling across flat ground, which agrees with the

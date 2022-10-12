@@ -41,10 +41,14 @@
 % change spacing around captions and equations
 % indent equations
 \setlength{\abovecaptionskip}{10pt}
+\setlength{\belowcaptionskip}{10pt}
 \setlength{\abovedisplayskip}{10pt}
 \setlength{\belowdisplayskip}{10pt}
 \setlength{\abovedisplayshortskip}{10pt}
 \setlength{\belowdisplayshortskip}{10pt}
+\setlength{\textfloatsep}{0pt}
+\setlength{\floatsep}{0pt}
+\setlength{\intextsep}{0pt}
 
 \begin{document}
 
@@ -55,7 +59,7 @@
 
 \vspace{11pt}
 
-Jakob D. WYATT and S. Khaksar
+Jakob D. WYATT, S. Khaksar, Y. Ren
 
 \vspace{11pt}
 
@@ -130,14 +134,30 @@ A ZED Mini RGB-D camera was mounted to the wheelchair to enable it to
 sense the surrounding environment. To test the performance of the navigation
 assistance system, a \SI{47}{\minute} wheelchair driving dataset was collected around
 Curtin university.
-
 The navigation assistance system involves identifying pathways and obstacles,
 and placing these obstacles onto a 2D birds-eye view occupancy map of the
 surrounding environment. Hybridnets was used to identify drivable
 areas; the model was retrained on the Cityscapes dataset to improve its performance (\cref{table:retraining}).
 
-\begin{table}[H]
-    \centering
+To identify static obstacles such as walls, a custom algorithm was used to process 3D point cloud data.
+An example of this algorithm can be seen in \cref{fig:algorithm},
+with the wheelchair location identified with an `X' and obstacles shown in black.
+This image also demonstrates drivable area segmentation, shown in light grey on the
+occupancy map and as a pattern on the original image.
+The algorithm correctly identifies the wall on the right and the handrail on the left as obstacles
+and has a mean processing latency of \SI{550}{\milli\second} on a test laptop.
+Due to the FOV of the camera, drivable areas and obstacles directly in front or to the side of
+the wheelchair are not stored in the occupancy map.
+
+A proof of concept semi-autonomous wheelchair control algorithm was implemented using VFH+.
+This algorithm successfully modifies the wheelchair's direction to avoid obstacles using the
+occupancy map. However, VFH+ does not change the wheelchair's speed.
+
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{10pt}
+\begin{center}
+    \captionof{table}{Hybridnet performance metrics before and after retraining}
+    \label{table:retraining}
     \begin{tabular}{c c c}
     \toprule
     Metric (Cityscapes) & Pre-trained & After training \\
@@ -147,39 +167,26 @@ areas; the model was retrained on the Cityscapes dataset to improve its performa
     Sidewalk Recall & 1.5\% & 68.2\% \\
     \bottomrule
     \end{tabular}
-    \caption{Comparison between dataset compression modes}
-    \label{table:retraining}
-\end{table}
+\end{center}
 
-To identify static obstacles such as walls, a custom algorithm was used to process 3D point cloud data.
-An example of this algorithm can be seen in \cref{fig:algorithm},
-with the wheelchair location identified with an `X' and obstacles shown in red.
-This image also demonstrates drivable area segmentation, shown in green.
-The algorithm correctly identifies the wall on the right and the handrail on the left as obstacles
-and has a mean processing latency of \SI{550}{\milli\second} on a test laptop.
-Due to the FOV of the camera, drivable areas and obstacles directly in front or to the side of
-the wheelchair are not stored in the occupancy map.
-
+\setlength{\abovecaptionskip}{10pt}
+\setlength{\belowcaptionskip}{0pt}
 \begin{figure}[H]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
     \begin{subfigure}{.35\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{images/segmentation.PNG}
+        \includegraphics[width=\linewidth]{images/segmentation_gs.png}
     \end{subfigure}
     \quad
     \begin{subfigure}{.2\textwidth}
         \centering
-        \includegraphics[width=\linewidth,frame]{images/map.jpg}
+        \includegraphics[width=\linewidth,frame]{images/map_gs.png}
     \end{subfigure}
     \caption{Drivable area segmentation and obstacle detection (top-down occupancy map)}
     \label{fig:algorithm}
 \end{figure}
-
-A proof of concept semi-autonomous wheelchair control algorithm was implemented using VFH+.
-This algorithm successfully modifies the wheelchair's direction to avoid obstacles using the
-occupancy map. However, VFH+ does not change the wheelchair's speed.
 
 \section*{\textbf{CONCLUSIONS}} % 5 lines
 The results indicate that image segmentation is effective at identifying drivable areas outdoors.

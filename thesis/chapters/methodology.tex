@@ -110,7 +110,7 @@ Additionally, a motor controller was developed by project student
 Kosma Egan, which receives commands from the input controller to drive and monitor the motors.
 \pagebreak
 
-\subsection{Dataset Collection}
+\subsection{Data Collection}
 \label{sec:dataset_collection}
 
 An RGB-D wheelchair driving dataset was collected around Curtin university
@@ -125,8 +125,8 @@ This format includes image data from left and right cameras, IMU data, and metad
 timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
 the file is read using the ZED SDK. Image data was recorded at 1080p, 30fps for the left and right cameras.
 
-Four compression modes are available during dataset collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
-and H.265. Both video compression modes require a CUDA-enabled device during dataset collection.
+Four compression modes are available during data collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
+and H.265. Both video compression modes require a CUDA-enabled device during data collection.
 A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
 file size (results in \cref{table:dataset_compression_modes}). Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
 \Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
@@ -210,7 +210,7 @@ before the ZED Mini had been ordered.
 \begin{figure}[p]
     \centering
     \includegraphics[width=0.45\linewidth,angle=270,origin=c]{images/gopro_dataset_collection.jpg}
-    \caption{Experimental setup for preliminary dataset collection}
+    \caption{Experimental setup for preliminary data collection}
     \label{fig:gopro_dataset_collection}
 \end{figure}
 
@@ -467,7 +467,7 @@ was used as the input into the VFH+ algorithm.
 This algorithm was implemented in MATLAB using the Navigation toolbox and encapsulated into a MATLAB function.
 The `MATLAB Engine' Python API was used to call the assistive control algorithm from within Python code.
 Full implementation of a control algorithm would require the ability to log joystick commands during
-dataset collection, and to intercept joystick commands from the user. As the input controller had not
+data collection, and to intercept joystick commands from the user. As the input controller had not
 been implemented at this time, the user's desired direction was assumed to be the current direction
 of the wheelchair.
 
