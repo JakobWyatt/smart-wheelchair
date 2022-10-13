@@ -1,7 +1,129 @@
 \subsection{Conclusion}
+The results show that the proposed navigation assistance system
+can successfully identify drivable areas and obstacles,
+place these drivable areas and obstacles on an occupancy map, and avoid obstacles
+using a semi-autonomous assistive control algorithm.
 
+Retraining was able to improve the performance of the Hybridnets model on the Cityscapes dataset
+and enable it to correctly identify a wider range of non-uniform surfaces as drivable.
+Due to the content of the training dataset, Hybridnets has difficulty
+recognising drivable areas while indoors, making drivable area segmentation
+more suitable for outdoor use.
+%The occupancy map was effective
+%at encapsulating all information about the surrounding area.
+
+The custom 3D point cloud processing algorithm is effective when identifying static
+obstacles that are part of the surrounding environment, such as stairs, walls,
+and handrails. Due to the latency of this algorithm, it is not yet fast enough
+for use on moving obstacles such as pedestrians and vehicles.
+Machine learning approaches explored by Krishnadas Suresh
+(a project student within the smart wheelchair team) could be more suitable
+for moving objects such as pedestrians, as they can be cleanly identified using
+a bounding box.
+
+The birds-eye view occupancy map was effective at combining information
+from several separate scene recognition algorithms into one
+map of the local environment. Morphological processing was found
+to improve the density of the occupancy map, however, did impact the resolution
+of the map. Due to the FOV of the ZED Mini camera, the occupancy map
+did not contain obstacles behind, to the side of, or directly in front
+of the wheelchair.
+
+VFH+ was used as a proof-of-concept assistive control algorithm and successfully
+steered to avoid obstacles identified in the occupancy map. As VFH+ does not change
+the speed of the wheelchair, it is not likely to be suitable for a final smart wheelchair
+implementation. However, the algorithm was effective at demonstrating the end-to-end
+navigation assistance pipeline, from obstacle detection to avoidance.
+
+Pose estimation is likely to form an important part of future mapping and control algorithms.
+The ZED Positional Tracking API was found to be much more effective
+than the ZED Sensors API at determining the absolute position of the
+sensor; although distance measurements were inaccurate,
+the path of the wheelchair was accurately estimated.
+
+The Curtin University RGB-D wheelchair driving dataset was invaluable
+when testing various smart wheelchair algorithms, and a pre-existing dataset will
+aid future thesis project students in the development process.
+The navigation assistance technology developed and tested in this thesis project
+can be integrated with the work of other thesis students to create a semi-autonomous
+wheelchair system. This technology will grant safety and independence
+to wheelchair users.
+
+\pagebreak
 \subsection{Future work}
 \label{sec:future_work}
+Future work beyond this thesis will be carried out by the next
+group of thesis project students, in collaboration with Glide.
+The recommended future work involves improving the accuracy
+and speed of algorithms developed in this paper, developing
+new components required for a final smart wheelchair implementation,
+and integrating components developed by different project students into 
+one cohesive system.
+
+Although retraining the Hybridnets model was effective at improving
+accuracy on pathways such as paved brick, this came at the cost
+of greater noise. The effect of this noise on model accuracy
+could not be quantitatively determined, as the Curtin driving dataset
+was not labelled with drivable areas. Future work could involve labelling sections of the
+dataset to evaluate model performance; in appendix C, a \SI{6}{\minute} segment
+of the Curtin driving dataset was coarsely labelled with drivable areas to
+test the V7 Labs Darwin labelling software. A drivable area labelled dataset could
+also be used to train the drivable area segmentation models,
+and would likely improve their performance indoors.
+
+Several other models such as DeepLabv3 and YOLOP perform drivable area
+segmentation, however, could not be tested in this thesis due to time constraints.
+These models could be retrained and compared to Hybridnets
+to choose the most effective model for this task.
+Models such as YOLOP and Hybridnets can perform
+lane segmentation on roads. This functionality could be repurposed
+during retraining to enable the segmentation and identification of kerbs,
+which can present a serious risk to a wheelchair user. Kerbs can be difficult
+to identify using 3D point cloud data as some kerbs only rise above
+the ground by a small amount.
+
+The 3D point cloud obstacle detection algorithm was effective
+at identifying environmental obstacles such as walls and handrails.
+However, the latency of this algorithm can reduce its effectiveness
+in some scenarios. This could likely be addressed by rewriting the
+implementation in a faster language such as C++ or performing all
+computations on the GPU using a library such as PyTorch.
+The speed of the implementation was not a priority during development,
+and as such, significant performance gains could be found by
+profiling the code. The Hybridnets drivable area
+algorithm is also bottlenecked by the occupancy map transformation code,
+and would see significant performance gains using the same techniques.
+
+Another more general approach that could be used to improve the
+efficiency of a slow algorithm would be to cache results in the occupancy map.
+If the object is assumed to be unmoving, its position within the occupancy
+map can be updated using the wheelchair's change in position and heading
+(obtained using the positional tracking API). This allows different scene recognition
+algorithms to update the occupancy map at their own pace and not bottleneck
+one another.
+
+The FOV of the camera reduces the number of obstacles that can be perceived near the wheelchair,
+which makes both assistive control and fully-autonomous control less effective. One approach
+to fix this would be to use hardware, either by adding a 2D LIDAR sensor to the rear of the
+wheelchair or adding several ultrasonic sensors to detect obstacles at the rear or side
+of the wheelchair. Another approach would be to cache objects in the occupancy map,
+as mentioned above, and use the positional tracking API to determine the
+wheelchair's movement and update their position.
+
+A more robust solution would be
+to use an existing SLAM algorithm, such as ORB-SLAM2 \cite{mur-artalORBSLAM2OpenSourceSLAM2017},
+to update the occupancy map. This algorithm has the added benefit of performing
+loop closures, which would help to keep an accurate model of the surrounding environment.
+As the SLAM algorithm performs relocalization, the positional tracking API may not
+be necessary to determine the location of the wheelchair in this case.
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
+    \caption{Block diagram for future smart wheelchair system}
+    \label{fig:top_level_software_pipeline}
+\end{figure}
+
 %Future work of this project involves remaining technical progress detailed in the methodology,
 %and the final thesis write-up.
 %Once the desired RGB-D and Lidar sensors have been procured, they will be mounted to the wheelchair

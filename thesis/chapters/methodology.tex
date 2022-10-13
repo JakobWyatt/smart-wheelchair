@@ -118,7 +118,7 @@ to test and evaluate the performance of the navigation assistance system.
 This dataset is \SI{7.14}{\giga\byte} in size and \SI{47}{\minute} in length
 and includes features such as indoor and outdoor navigation, doorways, pedestrians,
 elevator use, wheelchair access ramps, and car parks. A link to the dataset
-can be found in Appendix C.
+can be found in Appendix B.
 
 This dataset was collected using the ZED Mini and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
 This format includes image data from left and right cameras, IMU data, and metadata such as
@@ -226,7 +226,7 @@ The software system involves several scene recognition algorithms to update an i
 map of the surrounding area, keeping track of suitable driving paths and static obstacles
 such as walls and stairs. Once this map is created, an algorithm blends the
 user's input with this information to determine a safe path forward.
-Appendix C contains a link to the source code. A block diagram of the software system
+Appendix B contains a link to the source code. A block diagram of the software system
 and how it interacts with the hardware is shown in \cref{fig:block_diagram}.
 
 \subsubsection{Evaluation of ML models on preliminary dataset}
@@ -243,7 +243,6 @@ to feed image frames into the model. This was implemented using a python generat
 so that frames in the video could be iterated over within a for loop and only decoded
 when required. OpenCV \cite{bradskiOpenCVLibrary2000} was the underlying library used
 to decode each video frame into a BGR pixel array.
-
 Some scene processing algorithms do not run in real-time due to hardware limitations or performance issues.
 When this occurs, some frames must be dropped during model evaluation to keep the scene model up to date and minimise latency.
 The number of frames to drop can be calculated using \cref{eq:frames_to_drop},
