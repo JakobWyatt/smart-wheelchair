@@ -17,6 +17,7 @@
 \usepackage{booktabs} % rules in table
 \usepackage{subcaption} % subfigures
 \usepackage{wrapfig}
+\usepackage[justification=centering,labelfont=it,textfont=it]{caption}
 
 \raggedbottom % allow pages to end early
 \pdfvariable minorversion 7 % updated pdf version
@@ -60,17 +61,18 @@
 
 \vspace{11pt}
 
-Jakob D. WYATT, S. Khaksar, Y. Ren
+Jakob D. WYATT, Y. Ren*, S. Khaksar*
 
 \vspace{11pt}
 
-Department of Mechanical Engineering, Curtin University, Perth, WA 6845, Australia
+Department of Mechanical Engineering, Curtin University, Perth, WA 6845, Australia\\
+*Department of Electrical and Computer Engineering, Curtin University, Perth, WA 6845, Australia
 
 \vspace{11pt}
 
 \end{center}
 \begin{flushright}
-\textit{siavash.khaksar@curtin.edu.au}
+\textit{E-mail: siavash.khaksar@curtin.edu.au}
 \end{flushright}
 
 \begin{adjustwidth}{10mm}{10mm}
@@ -79,7 +81,7 @@ Semi-autonomous smart wheelchairs can enable visually impaired users to drive a 
 safely. In collaboration with wheelchair manufacturer Glide, a navigation assistance system for a
 smart wheelchair was designed. This smart wheelchair uses a CentroGlide wheelchair
 base and a ZED Mini RGB-D camera to detect the surrounding environment.
-This system identifies drivable areas using machine learning
+The system identifies drivable areas using machine learning
 and identifies obstacles using 3D point cloud data. A RGB-D wheelchair driving dataset was
 collected around Curtin University and used to evaluate this system. Identification of drivable
 areas is effective in outdoor areas, but less effective indoors. Obstacle detection
@@ -98,7 +100,7 @@ to an end goal, or semi-autonomous, where input from the user is blended with th
 Previous smart wheelchair implementations have used a variety of sensors to detect their environment.
 Many have used RGB-D cameras (\cite{wangS2P2SelfSupervisedGoalDirected2021}), with other implementations
 utilizing 2D Lidar, ultrasonic sensors, or mmWave radar.
-The compute element inside a smart wheelchair will consist of a microcontroller to process user inputs and control the motors,
+The compute element inside a smart wheelchair generally consists of a microcontroller to process user inputs and control the motors,
 a general-purpose computer to run pathfinding algorithms and log information, and an AI accelerator (such as an Nvidia Jetson or Google Coral)
 to improve the performance of machine learning algorithms.
 
@@ -161,13 +163,13 @@ Hybridnets was able to run at 10 fps on an RTX 3080 GPU, however, was CPU limite
 To identify static obstacles such as walls, a custom algorithm was used to process 3D point cloud data
 and place these obstacles onto the occupancy map.
 \Cref{fig:algorithm} shows this algorithm in use,
-with the wheelchair location identified with an `X' and obstacles shown in black.
+with the wheelchair's location identified with an `X' and obstacles shown in black.
 This image also demonstrates drivable area segmentation, shown in light grey on the
 occupancy map and as a pattern on the original image.
-The algorithm correctly identifies the wall on the right and the handrail on the left as obstacles
+The algorithm correctly identifies the right wall and left handrail as obstacles
 and has a mean processing latency of \SI{550}{\milli\second} on a test laptop.
 Due to the FOV of the camera, drivable areas and obstacles directly in front or to the side of
-the wheelchair are not stored in the occupancy map.
+the wheelchair are not stored in the map.
 
 A proof of concept semi-autonomous wheelchair control algorithm was implemented using VFH+.
 This algorithm successfully modifies the wheelchair's direction to avoid obstacles using the
