@@ -60,6 +60,13 @@ new components required for a final smart wheelchair implementation,
 and integrating components developed by different project students into 
 one cohesive system.
 
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
+    \caption{Block diagram for future smart wheelchair system (drawn by Avinash Sudhakaran)}
+    \label{fig:top_level_software_pipeline}
+\end{figure}
+
 Although retraining the Hybridnets model was effective at improving
 accuracy on pathways such as paved brick, this came at the cost
 of greater noise. The effect of this noise on model accuracy
@@ -81,6 +88,15 @@ during retraining to enable the segmentation and identification of kerbs,
 which can present a serious risk to a wheelchair user. Kerbs can be difficult
 to identify using 3D point cloud data as some kerbs only rise above
 the ground by a small amount.
+
+The joystick controller of the wheelchair allows the user to choose between
+indoor and outdoor mode to control the speed of the wheelchair. This information could be intercepted using
+the input controller and passed to the software system, allowing different modes
+of operation for indoor and outdoor use. For example, it is likely that
+most indoor flooring will be drivable, making obstacle detection more important
+than drivable area detection in this setting. If drivable area detection was
+only enabled when in outdoor mode, the accuracy of the segmentation model
+in indoor settings would not be a concern.
 
 The 3D point cloud obstacle detection algorithm was effective
 at identifying environmental obstacles such as walls and handrails.
@@ -117,12 +133,85 @@ loop closures, which would help to keep an accurate model of the surrounding env
 As the SLAM algorithm performs relocalization, the positional tracking API may not
 be necessary to determine the location of the wheelchair in this case.
 
-\begin{figure}[b]
-    \centering
-    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
-    \caption{Block diagram for future smart wheelchair system}
-    \label{fig:top_level_software_pipeline}
-\end{figure}
+\Cref{fig:top_level_software_pipeline} shows the top-level block diagram for a future
+smart wheelchair system. The block diagram was planned alongside Krishnadas Suresh and
+Avinash Sudhakaran, and shows how the software components developed by thesis project students
+would work together in a complete smart wheelchair implementation. The default mode of operation
+of the smart wheelchair is semi-autonomous, in which path segmentation and point cloud analysis
+(explored in this thesis project) are used to generate a top-down occupancy map. Object detection,
+which was the focus of Krishnadas' thesis, would also be used to add moving objects such as
+pedestrians to the occupancy map. A SLAM algorithm could be used to update the occupancy map, as detailed above.
+
+%These systems would work by running detection algorithms
+%in the background, and prompting the user to enter fully autonomous navigation using a button
+%if a valid ramp or doorway was detected. These systems would then send a goal state to the
+%software control system, which would perform path planning using the occupancy map and
+%drive the wheelchair to this location before resuming semi-autonomous control.
+
+% add flowchart?
+% outdoor vs indoor mode
+% software design - ROS and backbone
+% control interface with hardware
+% integration with odometry and sensors API
+
+Once this occupancy map is built, it is passed to the software control system and used to determine
+a safe speed and direction for the wheelchair using user input.
+A proof-of-concept assistive control system was developed in this thesis using VFH+,
+but a more robust solution would likely be required for a final implementation. The wheelchair has
+two modes of operation for fully autonomous control, which are ramp/vehicle navigation (Nicolas Lee)
+and doorway navigation (Avinash Sudhakaran). These modes of operation will require the user to
+press a button to begin autonomous navigation when a valid ramp or doorway is detected.
+These systems will send a goal pose to the software control system, which plans a safe path
+using the occupancy map and drives the wheelchair to this pose. Once this has been performed,
+semi-autonomous wheelchair control can resume.
+
+To communicate between different software components, a publish/subscribe architecture
+is proposed. Using a framework such as ROS (robot operating system), each component would
+be defined as a node. These nodes can subscribe to other nodes to recieve data,
+and publish data to a topic (recieved by other nodes) once processed. ROS supports Python and C++, which would allow
+high-performance components in C++ and prototype or machine learning components in Python
+to communicate. An advantage of this approach is that interfaces between nodes
+are well defined, which speeds up development when multiple project students
+are working on the same system.
+
+System resources must be considered when designing a large system with many software components.
+If too many processes are using the CPU or GPU accelerator, the performance of the system
+will be impacted. In particular, an AI accelerator may not have enough memory or compute capability to run many complex
+models at once. One way to improve the performance of the AI accelerator would be to use a shared-backbone model
+architecture, which is used by Hybridnets and YOLOP. In this architecture, a complex model backbone
+is used to generate image features before several smaller `heads' utilise these features for different purposes.
+This would allow several models (e.g. obstacle detection, drivable area detection, doorway detection)
+to run at once with only a small performance impact.
+% TODO cite ROS
+
+To communicate with the wheelchair hardware, an interface between the software control system and the
+input controller/joystick controller must be implemented. The simplest way to implement this
+interface would be to use a USB serial port to communicate between the microcontroller and
+SBC (single board computer), with packets of data sent between the machines.
+The input controller would send information such as joystick position,
+seat position, and operation mode (indoor or outdoor) to the SBC. The SBC would relay back the
+desired velocity and direction of the wheelchair. Additional low-bandwidth sensors, such as
+1D ultrasonic sensors or wheel odometry sensors, could interface with the input controller
+which would relay this information back to the SBC. The input controller would validate
+the desired velocity and direction of the wheelchair before sending this information
+to the motor controller, allowing it to override the SBC in the case of a software failure.
+
+A secondary driving dataset could be collected once the input controller has been integrated into
+the software control system. This driving dataset would contain joystick data and other wheelchair data
+as well as the \texttt{svo} files used to record data from the ZED Mini. A simple method of storing joystick
+data would be to use a csv file; alternatively, a more complex data format such as HDF5 could be used
+to compress this data and store it in a binary format.
+
+This thesis has involved implementation and testing
+of various components of smart wheelchair technology. The future work detailed in
+this section shows the steps needed to move from this initial research to a complete
+smart wheelchair system, which can improve the safety and independence of wheelchair users.
+
+%The positional tracking API is a high-level interface that estimates the pose of the wheelchair,
+%however does not allow sensor fusion from additional sensors outside of the ZED Mini.
+%One way to integrate wheel odometry sensors into the positional tracking system would
+%be to use the sensors API to retrieve raw sensor data and a Kalman filter to eliminate sensor noise.
+
 
 %Future work of this project involves remaining technical progress detailed in the methodology,
 %and the final thesis write-up.
