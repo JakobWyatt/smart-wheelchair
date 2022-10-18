@@ -1,0 +1,84 @@
+\section*{APPENDIX C - Manual for assistive control system}
+\addcontentsline{toc}{section}{APPENDIX C - Manual for assistive control system}
+
+Appendix B details the location of the code and datasets used in this thesis project.
+This appendix outlines how to run the code and reproduce the results found in this thesis.
+
+First, install the \href{https://www.stereolabs.com/developers/release/}{\underline{ZED SDK}} on your machine.
+A windows machine is recommended, and a CUDA-enabled GPU is necessary to install this SDK.
+CUDA GPU drivers will be installed automatically alongside the ZED SDK.
+Additionally, install \href{https://conda.io/miniconda.html}{\underline{Miniconda}} for python package management.
+Clone the GitHub repository containing the code and download submodules by using the commands in \cref{lst:submodule}.
+
+\begin{listing}[H]
+\begin{minted}{bash}
+git clone <URL>
+git submodule init
+git submodule update
+\end{minted}
+\caption{Update git submodules}
+\label{lst:submodule}
+\end{listing}
+
+All code is run using the \texttt{environments/environment-glide.yml} conda environment. \Cref{lst:conda} shows the necessary commands
+used to create and activate this environment. The ZED SDK python API should also be installed into this environment so that
+it can be imported within the python scripts. Additionally, the \texttt{opencv-python-headless} package is uninstalled so
+that OpenCV can create windows and display videos.
+
+\begin{listing}[H]
+\begin{minted}{bash}
+conda env create -f environment-glide.yml
+conda activate glide
+cp 'C:\Program Files (x86)\ZED SDK\get_python_api.py' get_python_api.py
+python get_python_api.py
+pip uninstall opencv-python-headless
+\end{minted}
+\caption{Create conda environment}
+\label{lst:conda}
+\end{listing}
+
+Once the environment is set up, python scripts can be run to demonstrate different algorithms.
+\Cref{lst:script_examples} describes the purpose of each script and how they can be invoked.
+Many of these scripts output the displayed video stream to a file in the current working directory
+after processing has finished.
+
+\begin{listing}[H]
+\begin{minted}{bash}
+# Tests segmentation and object detection algorithms on video dataset
+# --weights is optional and specifies which trained model weights should be used
+# --drop-frames is optional and used to run segmentation in real time
+python segmentation.py --source <dataset>.mp4 --model hybridnets|deeplab|yolo
+    --weights hybridnet_epoch_1.pth --drop-frames
+
+# Exports a proprietary .svo file to a .avi video file
+python svo_export.py <input>.svo <output>.avi 0
+
+# Connects to the ZED Mini camera and starts a new recording
+python zedm_record.py <record>.svo
+
+# Performs segmentation and generates occupancy map
+python zedm_stream_seg.py --source <input>.svo
+
+# Performs point cloud obstacle detection and generates occupancy map
+# Passes occupancy map to VFH+ controller and records results
+# Requires MATLAB R2022b, Navigation toolbox, and MATLAB Engine API for Python to be installed
+python zedm_stream_pointcloud.py --source <input>.svo
+
+# Outputs ZED Mini translation and Euler angles using Sensors API
+python zedm_sensors.py --source <input>.svo
+
+# Plots ZED Mini movement on 2D map using Positional Tracking API
+python zedm_positionaltracking.py --source <input>.svo
+\end{minted}
+\caption{Command line arguments for python scripts}
+\label{lst:script_examples}
+\end{listing}
+
+The `colab' folder in the GitHub repository contains notebooks that
+can be uploaded to Google Colab to reproduce model training.
+Note that running these notebooks will require:
+\begin{enumerate}
+    \item Mounting Google Drive to the Colab notebook.
+    \item Uploading the BDD100K and Cityscapes datasets to Google Drive. This may require Google One for additional storage.
+    \item Access to an Nvidia V100 GPU (or similar GPU with 32GB of memory). Colab Pro may be required for access to more powerful GPUs.
+\end{enumerate}

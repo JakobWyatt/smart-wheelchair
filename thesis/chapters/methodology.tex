@@ -20,7 +20,7 @@ joystick control unit was selected for the reasons below:
 Some considerations must be addressed when using this mounting point.
 \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
     \item Unstable video footage could be observed due to low rigidity in the joystick control unit mount.
-    \item Mount point is \SI{790}{\milli\metre} forward from the back of the wheelchair, impacting
+    \item Mount point is \SI{790}{\milli\metre} forward from the rear of the wheelchair, impacting
             the visibility of the rear and side of the wheelchair.
     \item Doorway maneuverability is impacted if RGB-D camera width exceeds \SI{150}{\milli\metre}.
 \end{enumerate}
@@ -47,7 +47,7 @@ with several major modifications made using Autodesk Inventor:
 \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
     \item Width of the mount was greatly reduced to improve maneuverability.
     \item A mounting plate was added, allowing the sensor mount to bolt onto
-            the existing joystick control unit.
+            the existing joystick control unit. Bolt holes are \SI{8}{\milli\metre} in diameter.
     \item Some sensor clips were modified to make sensor removal more convenient.
     \item Sharp corners were rounded to reduce the risk of injury to a user.
 \end{enumerate}
@@ -111,7 +111,7 @@ Additionally, a motor controller was developed by project student
 Kosma Egan, which receives commands from the input controller to drive and monitor the motors.
 \pagebreak
 
-\subsection{Data Collection}
+\subsection{Data collection}
 \label{sec:dataset_collection}
 
 An RGB-D wheelchair driving dataset was collected around Curtin university
@@ -125,6 +125,8 @@ This dataset was collected using the ZED Mini and is encoded in the proprietary 
 This format includes image data from left and right cameras, IMU data, and metadata such as
 timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
 the file is read using the ZED SDK. Image data was recorded at 1080p, 30fps for the left and right cameras.
+A \SI{6}{\minute} segment of the Curtin driving dataset was coarsely labelled with drivable areas to
+test the V7 Labs Darwin labelling software; refer to appendix D for further information.
 
 Four compression modes are available during data collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
 and H.265. Both video compression modes require a CUDA-enabled device during data collection.
@@ -227,7 +229,9 @@ The software system involves several scene recognition algorithms to update an i
 map of the surrounding area, keeping track of suitable driving paths and static obstacles
 such as walls and stairs. Once this map is created, an algorithm blends the
 user's input with this information to determine a safe path forward.
-Appendix B contains a link to the source code. A block diagram of the software system
+Appendix B contains a link to the source code, and appendix C contains
+instructions on how to run this source code so that the results can be reproduced.
+A block diagram of the software system
 and how it interacts with the hardware is shown in \cref{fig:block_diagram}.
 
 \subsubsection{Evaluation of ML models on preliminary dataset}
@@ -281,7 +285,7 @@ to improve its performance on non-uniform surfaces such as paved brick.
 
 Machine learning was done within the Google Colaboratory environment,
 and a Colab Pro subscription was purchased to enable access to
-a faster Nvidia V100 GPU (with 16GB memory \cite{nvidiaNvidiaTeslaV1002018}).
+a faster Nvidia V100 GPU (with 32GB memory \cite{nvidiaNvidiaTeslaV1002018}).
 Datasets were uploaded onto Google Drive so that they could be mounted onto Colab
 and unzipped into the allocated machine's storage. Pytorch was used to train
 the model, with \texttt{torchvision.datasets.Cityscapes} used to load the Cityscapes

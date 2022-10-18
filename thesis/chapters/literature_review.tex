@@ -6,11 +6,11 @@
 %has been used to improve awareness of the surrounding environment and make indoor navigation safer.
 
 
-\subsection{Sensors and Hardware}
+\subsection{Sensors and hardware}
 %To perceive the environment, the wheelchair should be fitted with various sensors and
 %a compute element to process the sensors output.
 
-\subsubsection{Sensor Types}
+\subsubsection{Sensor types}
 Smart wheelchairs have used a varied range of sensor types to perceive the surrounding environment.
 RGB-D stereo cameras have been widely used in the field \cite{wangS2P2SelfSupervisedGoalDirected2021}\cite{wangSelfSupervisedDrivableArea2019}\cite{jainAutomatedPerceptionSafe2014},
 alongside 2D Lidar \cite{scudellariSelfdrivingWheelchairsDebut2017} and ultrasonic sensors \cite{levineNavChairAssistiveWheelchair1999}.
@@ -46,7 +46,7 @@ taking into account factors such as resolution, cost, and accuracy.
 
 % Description of different sensor types?
 
-\subsubsection{RGB-D Cameras}
+\subsubsection{RGB-D cameras}
 One advantage RGB-D cameras have over alternative sensors is high RGB resolution,
 allowing them to utilise advances in machine learning and computer vision.
 Technologies such as Lidar may fail at path detection, as path markings
@@ -116,7 +116,7 @@ A caveat of the Stereolabs products is that they require a separate CUDA-enabled
 and RGB-D image. In contrast, the Kinect DK only requires a CPU for processing, while the Intel RealSense performs processing onboard
 and requires a USB-C 3.1 interface to communicate.
 
-\subsubsection{Compute Element}
+\subsubsection{Compute element}
 A compute element inside a semi-autonomous driving system generally consists of several components -
 a microcontroller to process user inputs and
 send signals to the motors, a general-purpose computer to run pathfinding algorithms and log information,
@@ -140,13 +140,13 @@ The Nvidia Jetson and Google Coral products are both popular options for embedde
 in \Cref{table:compute_element} alongside a gaming GPU. 
 
 \pagebreak
-\subsection{Scene Understanding}
+\subsection{Scene understanding}
 Scene understanding is a broad field and involves using computer vision methods
 on visual or spatial data to gain better knowledge about the surrounding environment.
 Convolutional Neural Networks (CNNs) are commonly used for this application, as they
 can exploit the local nature of image features to reduce the number of required computations.
 
-\subsubsection{Image Classification}
+\subsubsection{Image classification}
 Image classification is a core problem within this field and involves identifying the subject of an image (such as an animal or object).
 AlexNet \cite{krizhevskyImageNetClassificationDeep2012}, based on the earlier digit-recognition CNN LeNet-5
 \cite{lecunGradientbasedLearningApplied1998}, was one of the first deep CNNs
@@ -171,7 +171,7 @@ and exceeds human performance at image classification with an error of 3.57\%.
 ResNet uses a 'skipping' architecture to improve network training, where the output of a layer relies directly on
 the input of a previous layer.
 
-\subsubsection{Object Localisation}
+\subsubsection{Object localisation}
 Object localisation is another core problem within this field, and involves identifying the location of objects within an image as well as classifying them.
 Object localisation can be used on a semi-autonomous wheelchair to identify
 a pedestrian or obstacle within the environment. R-CNN \cite{girshickRichFeatureHierarchies2013} was one of the
@@ -188,7 +188,7 @@ YOLO divides an image into an $S\times S$ grid, and uses a single convolutional 
 an image classification for each grid square. Low probability and overlapping bounding boxes are then removed before the final output.
 %YOLOv4 uses a backbone-neck-head architecture
 
-\subsubsection{Semantic Segmentation}
+\subsubsection{Semantic segmentation}
 Semantic segmentation involves labelling each pixel of an object, rather than drawing a bounding box around the entire object.
 This technique is often used in medical applications, where different components of a scan need to be labelled.
 Another application semantic segmentation can be used for is drivable area detection, as a bounding box would not be able to cleanly
@@ -227,7 +227,7 @@ These techniques improve both the accuracy and speed of the network - DeepLabv3 
 \end{figure}
 
 \pagebreak
-\subsubsection{Autonomous Driving}
+\subsubsection{Autonomous driving}
 Autonomous driving and autonomous wheelchair control involve similar challenges,
 including drivable area segmentation and object detection. As described previously, many machine learning
 models utilise an image classification backbone to extract features from an image, with a `detection head'
@@ -268,7 +268,7 @@ synthetic dataset for training.
 % Transfer Learning & Datasets
 
 \pagebreak
-\subsection{Assistive Control}
+\subsection{Assistive control}
 Once an understanding of the 3D scene has been built, the user can be navigated through the environment.
 The surrounding environment is generally represented as an occupancy grid \cite{elfesUsingOccupancyGrids1989},
 which is a top-down view of the area where each grid cell indicates the probability that it is occupied
@@ -281,7 +281,7 @@ desired end goal and the wheelchair navigates to that goal \cite{wangS2P2SelfSup
 %In full autonomous control, SLAM is required to build a global map of the surroundings - this is not necessary
 %for semi-autonomous control, as only a local map is needed for navigation assistance.
 
-\subsubsection{Path-Based Algorithms}
+\subsubsection{Path-based algorithms}
 Path-based algorithms take an occupancy grid as an input and output a path between the start point and a goal point.
 A* is an example of this and uses a heuristic to efficiently find the shortest path between the start and end point.
 Other algorithms such as RRT* (rapidly-exploring random tree) \cite{karamanSamplingbasedAlgorithmsOptimal2011} build a tree from randomly sampled points
@@ -307,7 +307,7 @@ local path in an example scenario.
 It should be noted that this algorithm still requires a reference path, which could be generated
 with one of the pathfinding algorithms mentioned above.
 
-\subsubsection{Local Algorithms}
+\subsubsection{Local algorithms}
 Local algorithms only consider obstacles currently in the proximity of the wheelchair,
 and use this information to set the current speed and direction of the wheelchair.
 VFH+ (vector field histogram) \cite{ulrichVFHReliableObstacle1998} is one example, which

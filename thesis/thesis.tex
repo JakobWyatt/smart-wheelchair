@@ -12,28 +12,33 @@
 
 \pagenumbering{roman}
 \section*{ACKNOWLEDGEMENTS}
-The author wishes to thank Glide for providing a powered wheelchair to the research team.
+I would like to thank Glide for collaborating with Curtin University on this thesis project
+and providing a powered wheelchair to the research team.
+
+Further thanks go to Siavash Khaksar and Yifei Ren,
+for supervising this thesis and providing invaluable technical knowledge and support.
+
+I am also grateful to the remaining smart wheelchair thesis project students;
+collaborating with likeminded engineers to research a semi-autonomous smart
+wheelchair was a highlight of this engineering thesis.
+
 % TODO include other acknowledgements
 \cleardoublepage
 
 \section*{ABSTRACT}
-To be completed.
-%This progress report involves the identification and definition of the core thesis problem;
-%creating a semi-autonomous wheelchair that prioritises user safety and independence.
-%A literature review details prior work in this field, and identifies potential algorithms
-%for scene recognition and assistive control. Additionally, the literature review identifies and evaluates
-%sensors that could be used to perceive the wheelchairs environment.
-
-%A preliminary wheelchair driving video dataset has been collected around Curtin university.
-%This dataset has been used to evaluate algorithms such as YOLOv5, DeepLabv3, and Hybridnet on
-%the problem of scene recognition, with promising results. VFH+ has been evaluated as an assistive
-%control algorithm after being implemented in MATLAB. Additionally, sensors and hardware to be used
-%alongside the wheelchair have been identified and evaluated.
-
-%The methodology and technical roadmap of this project have been planned, and future work identified (to be completed
-%next semester). This involves the collection of a second dataset using the final sensors, retraining of
-%scene recognition models, and final integration of the semi-autonomous system with the wheelchair.
-
+Semi-autonomous smart wheelchair technology can enable visually impaired users to drive a wheelchair
+safely. In collaboration with wheelchair manufacturer Glide, a navigation assistance system for a
+smart wheelchair is implemented and evaluated. This smart wheelchair uses a CentroGlide wheelchair
+as a powered base and a ZED Mini RGB-D stereo camera to detect the surrounding environment.
+A semantic segmentation ML model was retrained to identify footpaths and other drivable areas around the wheelchair.
+Additionally, an algorithm was developed to identify obstacles and hazards using 3D point cloud data from the stereo camera.
+A birds-eye view occupancy map is generated to indicate the location of obstacles and drivable areas
+around the wheelchair. This occupancy map is used to determine a safe target direction for the wheelchair.
+To evaluate this navigation assistance system, an RGB-D wheelchair driving dataset was collected
+around Curtin University. It was found that the identification of drivable areas using semantic segmentation was effective in outdoor
+areas but less effective indoors. Obstacle detection was effective at identifying environmental obstacles such as
+walls and handrails. The assistive control algorithm successfully modifies the wheelchair's direction to avoid obstacles,
+however, can fail in some edge cases due to the low FOV of the stereo camera. Suggestions for future work are also discussed.
 \cleardoublepage
 
 \section*{DECLARATION OF PUBLISHED WORKS}
@@ -81,7 +86,9 @@ published by any other person except where due acknowledgment has been made.
 \input{appendicies/A.tex}
 \cleardoublepage
 \input{appendicies/B.tex}
-%\cleardoublepage
-%\input{appendicies/C.tex}
+\cleardoublepage
+\input{appendicies/C.tex}
+\cleardoublepage
+\input{appendicies/D.tex}
 
 \end{document}
