@@ -60,12 +60,7 @@ new components required for a final smart wheelchair implementation,
 and integrating components developed by different project students into 
 one cohesive system.
 
-\begin{figure}[b]
-    \centering
-    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
-    \caption{Block diagram for future smart wheelchair system (drawn by Avinash Sudhakaran)}
-    \label{fig:top_level_software_pipeline}
-\end{figure}
+\subsection{Improvements to navigation assistance system}
 
 Although retraining the Hybridnets model was effective at improving
 accuracy on pathways such as paved brick, this came at the cost
@@ -132,6 +127,8 @@ loop closures, which would help to keep an accurate model of the surrounding env
 As the SLAM algorithm performs relocalization, the positional tracking API may not
 be necessary to determine the location of the wheelchair in this case.
 
+\subsection{Implementation of smart wheelchair system}
+
 \Cref{fig:top_level_software_pipeline} shows the top-level block diagram for a future
 smart wheelchair system. The block diagram was planned alongside Krishnadas Suresh and
 Avinash Sudhakaran, and shows how the software components developed by thesis project students
@@ -140,6 +137,13 @@ of the smart wheelchair is semi-autonomous, in which path segmentation and point
 (explored in this thesis project) are used to generate a top-down occupancy map. Object detection,
 which was the focus of Krishnadas' thesis, would also be used to add moving objects such as
 pedestrians to the occupancy map. A SLAM algorithm could be used to update the occupancy map, as detailed above.
+
+\begin{figure}[b]
+    \centering
+    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
+    \caption{Block diagram for future smart wheelchair system (drawn by Avinash Sudhakaran)}
+    \label{fig:top_level_software_pipeline}
+\end{figure}
 
 %These systems would work by running detection algorithms
 %in the background, and prompting the user to enter fully autonomous navigation using a button
