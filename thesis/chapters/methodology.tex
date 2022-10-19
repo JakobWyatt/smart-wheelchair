@@ -121,17 +121,18 @@ and includes features such as indoor and outdoor navigation, doorways, pedestria
 elevator use, wheelchair access ramps, and car parks. A link to the dataset
 can be found in Appendix B.
 
-This dataset was collected using the ZED Mini and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
+This dataset was collected using the ZED Mini camera and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
 This format includes image data from left and right cameras, IMU data, and metadata such as
 timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
 the file is read using the ZED SDK. Image data was recorded at 1080p, 30fps for the left and right cameras.
-A \SI{6}{\minute} segment of the Curtin driving dataset was coarsely labelled with drivable areas to
-test the V7 Labs Darwin labelling software; refer to appendix D for further information.
+A \SI{6}{\minute} segment of the Curtin driving dataset was coarsely labelled with drivable areas;
+refer to appendix D for further information about the labelling process.
 
 Four compression modes are available during data collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
 and H.265. Both video compression modes require a CUDA-enabled device during data collection.
 A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
-file size (results in \cref{table:dataset_compression_modes}). Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
+file size (results in \cref{table:dataset_compression_modes}). H.264 compression was used when collecting the wheelchair driving dataset due to
+the higher compression ratio provided.
 \Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
 
 \begin{table}[H]
@@ -152,6 +153,38 @@ file size (results in \cref{table:dataset_compression_modes}). Due to the smalle
     \label{table:dataset_compression_modes}
 \end{table}
 
+After some analysis of the raw point cloud data from the Curtin RGB-D driving dataset,
+it was found that the camera was slightly tilted upwards while recording the dataset.
+The tilt angle was consistent between data collection periods
+and was likely due to the ergonomics and tilt of the joystick control unit.
+An example of this tilt can be seen in \cref{fig:meshlab_point_cloud}; note
+that the floor is angled downwards due to the tilt of the RGB-D camera.
+
+Meshlab was used to determine the coordinates of points
+on the ground at a close distance and far distance, and hence calculate the
+sensor tilt angle.
+This was done for two different point clouds (one indoor and one outdoor)
+with the results averaged. Working is shown in \cref{eq:tilt_calculation}.
+
+\begin{equation}
+\begin{split}
+p_{1,1} = (-0.53, -1.30, -3.81) \qquad p_{1,2} &= (-0.54, -2.31, -11.31)\\
+\textrm{gradient}_1 &= \frac{y_2 - y_1}{z_2 - z_1} = -0.135\\
+p_{2,1} = (1.03, -1.29, -4.17) \qquad p_{2,2} &= (0.93, -2.80, -14.03)\\
+\textrm{gradient}_2 = -0.153 \qquad \textrm{gradient}_{avg} &= -0.144\\
+\theta_{tilt} = -\tan^{-1}\left(-0.144\right) &= 8.2\degree
+\end{split}
+\label{eq:tilt_calculation}
+\end{equation}
+
+In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
+Curtin university.
+This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
+and collected using a GoPro Hero 4; the experimental setup used to collect this
+dataset can be seen in \cref{fig:gopro_dataset_collection}.
+This dataset was used to evaluate machine learning scene recognition algorithms
+before the ZED Mini had been ordered.
+
 \begin{figure}[H]
     \centering
     \begin{subfigure}{.48\textwidth}
@@ -168,46 +201,13 @@ file size (results in \cref{table:dataset_compression_modes}). Due to the smalle
     \caption{Sample data from the Curtin university RGB-D wheelchair driving dataset}
     \label{fig:zed_sample_dataset}
 \end{figure}
-\pagebreak
 
-After some analysis of the raw point cloud data from the Curtin RGB-D driving dataset,
-it was found that the camera was slightly tilted upwards while recording the dataset.
-This angle was mostly constant between data collection periods
-and was likely due to the ergonomics and tilt of the joystick control unit.
-An example of this tilt can be seen in \cref{fig:meshlab_point_cloud}; note
-that the floor is angled downwards due to the tilt of the RGB-D camera.
-
-Meshlab was used to determine the coordinates of points
-on the ground at a close distance and far distance, and calculate the gradient.
-This was done for two different point clouds (one indoor and one outdoor)
-with the results averaged. Working is shown in \cref{eq:tilt_calculation}.
-
-\begin{equation}
-\begin{split}
-p_{1,1} = (-0.53, -1.30, -3.81) \qquad p_{1,2} &= (-0.54, -2.31, -11.31)\\
-\textrm{gradient}_1 &= \frac{y_2 - y_1}{z_2 - z_1} = -0.135\\
-p_{2,1} = (1.03, -1.29, -4.17) \qquad p_{2,2} &= (0.93, -2.80, -14.03)\\
-\textrm{gradient}_2 &= -0.153\\
-\textrm{gradient}_{avg} &= -0.144\\
-\theta_{tilt} &= -\tan^{-1}\left(-0.144\right) = 8.2\degree
-\end{split}
-\label{eq:tilt_calculation}
-\end{equation}
-
-\begin{figure}[b]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/meshlab_point_cloud.png}
-    \caption{Point cloud information of indoor hallway (visualized with Meshlab). Note the angle of the floor due to sensor tilt}
+    \includegraphics[width=0.7\linewidth]{images/meshlab_point_cloud.png}
+    \caption{Point cloud information of indoor hallway - note the floor angle due to sensor tilt}
     \label{fig:meshlab_point_cloud}
 \end{figure}
-
-In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
-Curtin university.
-This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
-and collected using a GoPro Hero 4; the experimental setup used to collect this
-dataset can be seen in \cref{fig:gopro_dataset_collection}.
-This dataset was used to evaluate machine learning scene recognition algorithms
-before the ZED Mini had been ordered.
 
 %\vspace{4.0cm}
 \begin{figure}[p]
@@ -316,6 +316,8 @@ surfaces such as paved brick. This dataset includes sidewalks as well as roads;
 this was hypothesised to provide a wider variety of surfaces during training.
 Both sidewalks and roads were classified as drivable areas during evaluation
 and training.
+
+\pagebreak
 
 Recall (true positive rate, $\frac{tp}{tp + fn}$) was used as a metric to quantify the model's
 performance on sidewalks and roads separately.

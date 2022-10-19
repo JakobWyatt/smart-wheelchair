@@ -26,7 +26,7 @@ it can be imported within the python scripts. Additionally, the \texttt{opencv-p
 that OpenCV can create windows and display videos.
 
 \begin{listing}[H]
-\begin{minted}{bash}
+\begin{minted}[breaklines]{bash}
 conda env create -f environment-glide.yml
 conda activate glide
 cp 'C:\Program Files (x86)\ZED SDK\get_python_api.py' get_python_api.py
@@ -43,12 +43,9 @@ Many of these scripts output the displayed video stream to a file in the current
 after processing has finished.
 
 \begin{listing}[H]
-\begin{minted}{bash}
-# Tests segmentation and object detection algorithms on video dataset
-# --weights is optional and specifies which trained model weights should be used
-# --drop-frames is optional and used to run segmentation in real time
-python segmentation.py --source <dataset>.mp4 --model hybridnets|deeplab|yolo
-    --weights hybridnet_epoch_1.pth --drop-frames
+\begin{minted}[breaklines]{bash}
+# Tests segmentation and object detection algorithms on video dataset. --weights is optional and specifies which trained model weights should be used. --drop-frames is optional and used to run segmentation in real time.
+python segmentation.py --source <dataset>.mp4 --model hybridnets|deeplab|yolo --weights hybridnet_epoch_1.pth --drop-frames
 
 # Exports a proprietary .svo file to a .avi video file
 python svo_export.py <input>.svo <output>.avi 0
@@ -59,9 +56,7 @@ python zedm_record.py <record>.svo
 # Performs segmentation and generates occupancy map
 python zedm_stream_seg.py --source <input>.svo
 
-# Performs point cloud obstacle detection and generates occupancy map
-# Passes occupancy map to VFH+ controller and records results
-# Requires MATLAB R2022b, Navigation toolbox, and MATLAB Engine API for Python to be installed
+# Performs point cloud obstacle detection and generates occupancy map. Passes occupancy map to VFH+ controller and records results. Requires MATLAB R2022b, Navigation toolbox, and MATLAB Engine API for Python to be installed.
 python zedm_stream_pointcloud.py --source <input>.svo
 
 # Outputs ZED Mini translation and Euler angles using Sensors API
@@ -74,6 +69,7 @@ python zedm_positionaltracking.py --source <input>.svo
 \label{lst:script_examples}
 \end{listing}
 
+\pagebreak
 The `colab' folder in the GitHub repository contains notebooks that
 can be uploaded to Google Colab to reproduce model training.
 Note that running these notebooks will require:
