@@ -12,7 +12,7 @@
 
 \subsubsection{Sensor types}
 Smart wheelchairs have used a varied range of sensor types to perceive the surrounding environment.
-RGB-D stereo cameras have been widely used in the field \cite{wangS2P2SelfSupervisedGoalDirected2021}\cite{wangSelfSupervisedDrivableArea2019}\cite{jainAutomatedPerceptionSafe2014},
+RGB-D stereo cameras have been widely used in this field \cite{wangS2P2SelfSupervisedGoalDirected2021}\cite{wangSelfSupervisedDrivableArea2019}\cite{jainAutomatedPerceptionSafe2014},
 alongside 2D Lidar \cite{scudellariSelfdrivingWheelchairsDebut2017} and ultrasonic sensors \cite{levineNavChairAssistiveWheelchair1999}.
 Self-driving cars built by companies such as Tesla and Waymo
 use cameras, mmWave Radar, and 3D Lidar to avoid traffic and pedestrians \cite{karpathyTeslaAIDay2021}.
@@ -110,7 +110,7 @@ Several commercial options are compared in \Cref{table:stereo_camera}
 \end{landscape}
 
 \footnotetext[1]{Costs are taken at RRP with an exchange rate of 1 AUD = 0.74 USD}
-\footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes that trade-off between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides good trade-off between operating range and resolution.}
+\footnotetext[2]{The Microsoft Azure Kinect DK has multiple operating modes that trade-off between FOV, operating range, and resolution. The \texttt{NFOV unbinned} mode was compared, which provides a good trade-off between operating range and resolution.}
 
 A caveat of the Stereolabs products is that they require a separate CUDA-enabled GPU (manufactured by Nvidia) to generate the point-cloud
 and RGB-D image. In contrast, the Kinect DK only requires a CPU for processing, while the Intel RealSense performs processing onboard
@@ -254,11 +254,11 @@ autonomous wheelchair control require fast inference times to react to obstacles
     \label{fig:yolop}
 \end{figure}
 
-To train these ML models, a pre-trained model backbone (on a dataset such as ImageNet \cite{jiadengImageNetLargescaleHierarchical2009})
+To train these ML models, a model backbone (pre-trained on a dataset such as ImageNet \cite{jiadengImageNetLargescaleHierarchical2009})
 is retrained on a driving dataset. This technique is known as transfer learning, and can vastly reduce the amount of time required
 to train a new model.
 Driving datasets such as Cityscapes \cite{cordtsCityscapesDatasetSemantic2016} and Berkeley DeepDrive \cite{yuBDD100KDiverseDriving2018}
-can be used for this purpose. Additionally, game-engine based driving simulators such as CARLA \cite{dosovitskiyCARLAOpenUrban2017} can be used to generate a
+can be used for retraining. Additionally, game-engine based driving simulators such as CARLA \cite{dosovitskiyCARLAOpenUrban2017} can be used to generate a
 synthetic dataset for training.
 
 % U-net, deepnet
