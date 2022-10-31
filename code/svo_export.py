@@ -141,7 +141,10 @@ def main():
             svo_position = zed.get_svo_position()
 
             # Retrieve SVO images
-            zed.retrieve_image(left_image, sl.VIEW.LEFT)
+            if app_type == AppType.LEFT_AND_RIGHT:
+                zed.retrieve_image(left_image, sl.VIEW.LEFT)
+            elif app_type == AppType.LEFT_AND_DEPTH:
+                zed.retrieve_image(left_image, sl.VIEW.DEPTH)
 
             #if app_type == AppType.LEFT_AND_RIGHT:
             #    zed.retrieve_image(right_image, sl.VIEW.RIGHT)
