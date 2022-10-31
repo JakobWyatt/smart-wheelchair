@@ -85,3 +85,10 @@
 % improve float placement
 \setcounter{bottomnumber}{1}
 \renewcommand\bottomfraction{10.0}
+
+% break references so they do not intrude into margins
+\bibsetup{
+  \setcounter{abbrvpenalty}{0}
+  \setcounter{highnamepenalty}{0}
+  \setcounter{lownamepenalty}{0}
+}

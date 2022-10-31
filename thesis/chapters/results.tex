@@ -47,8 +47,6 @@ has more difficulty identifying a drivable path for non-uniform surfaces such as
 Hybridnets can also struggle to identify drivable paths indoors in some circumstances.
 This is likely due to problems with domain adaptation, as the Hybridnets model was trained on the
 BDD100K dataset which primarily consists of bitumen roads.
-Hybridnets does not identify drivable area consistently when indoors
-but does work well in some cases.
 
 \begin{figure}[b]
     \centering
@@ -91,17 +89,17 @@ YOLOv5 runs in real-time on our 24fps dataset, and can likely reach much higher 
 
 \pagebreak
 \subsection{Hybridnets drivable area segmentation}
-% do this first
-Evaluating the pretrained Hybridnets model on the BDD100K validation dataset gives a mIoU
-of 0.857. When the same model is evaluated against the Cityscapes dataset,
-the model achieves a mIoU of 0.266. This difference is due to the methodology behind
+The Hybridnets model was evaluated on the Cityscapes dataset before and after training.
+Testing the pretrained Hybridnets model on the BDD100K validation dataset gave a mIoU
+of 85.7\%. The same model achieved a mIoU of 26.6\% when evaluated on the Cityscapes dataset.
+This difference is due to the methodology behind
 the labelling of these datasets: Cityscapes labels all road surfaces as 'road',
 whereas BDD100K only labels the current lane as 'drivable'. This can be seen in \cref{fig:dataset_comparison}.
 
-The recall for road detection on the Cityscapes dataset is 30.6\%, whereas the recall for
-sidewalk detection is only 1.52\%. Sidewalks are a much smaller segmentation target than
-roads in this dataset; refer to \cref{table:pretrained_confusion_matrix} for the
-confusion matrix after evaluation.
+The recall for road detection on the Cityscapes dataset is 30.6\% and the recall for
+sidewalk detection is much poorer at 1.52\%. \Cref{table:pretrained_confusion_matrix} shows
+the confusion matrix before retraining and demonstrates
+the low proportion of sidewalks compared to roads in this dataset.
 
 \begin{table}[H]
     \centering
@@ -128,7 +126,7 @@ confusion matrix after evaluation.
         \caption{BDD100K}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.45\textwidth}
+    \begin{subfigure}{.38\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/cityscapes.png}
         \caption{Cityscapes}
@@ -139,17 +137,17 @@ confusion matrix after evaluation.
 
 The model generalises to the new dataset very quickly during training,
 as seen in \cref{fig:hybridnet_training_curve}. The validation accuracy vastly
-increases after the first epoch, with not much change after that point
+increases after the first epoch, with not much change in mIoU after this point
 apart from a further drop in training loss (which can indicate overfitting).
 
 After epoch 1, the mIoU is 87.5\% (a 56.9\% improvement), with a
 road detection recall of 96.2\% and sidewalk detection recall of
 68.2\%. As seen in the training curve, the sidewalk detection recall
 varies epoch to epoch, with a variance of 4.2\%. This higher variance is
-due to the lower occurance of sidewalks in the dataset (compared to roads).
+due to the lower occurrence of sidewalks in the dataset compared to roads.
 
 \Cref{fig:compare_trained_hybridnets} shows an example of the retrained Hybridnets model
-(epoch 1) compared to the pre-trained model, evaluated on the Curtin driving dataset.
+compared to the pre-trained model when evaluated on the Curtin driving dataset.
 The new model identifies the paved drivable area further away from
 the wheelchair but struggles to identify the drivable area directly in front of the wheelchair.
 This is still an improvement compared to the pre-trained model, which does not identify any drivable
@@ -160,99 +158,36 @@ This could be due to the structure of the Cityscapes dataset - as pedestrian pat
 separated from the road by verges, the drivable area is more likely to be disconnected.
 This is another domain adaptation problem - although the model may identify pedestrian
 pathways easily from the viewpoint of a road, it can struggle with identifying these
-same pathways from a wheelchair user's perspective. This would also explain the
-retrained model struggling to identify the paved drivable area directly in front of the wheelchair.
+same pathways from a wheelchair user's perspective. This would also explain why the
+retrained model struggles to identify the paved drivable area directly in front of the wheelchair.
 
-\begin{figure}[H]
+\begin{figure}[b]
     \centering
-    \includegraphics[width=0.6\linewidth]{images/hybridnet_training_curve.png}
+    \includegraphics[width=0.75\linewidth]{images/hybridnet_training_curve.png}
     \caption{Hybridnets training curve}
     \label{fig:hybridnet_training_curve}
 \end{figure}
 
-\begin{figure}[b]
+\begin{figure}[p]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
-    \begin{subfigure}{.4\textwidth}
+    \begin{subfigure}{.47\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/hybridnets_untrained.PNG}
         \caption{Before retraining}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.4\textwidth}
+    \begin{subfigure}{.47\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/hybridnets_trained.PNG}
         \caption{After retraining}
     \end{subfigure}
-    \caption{Hybridnets segmentation on the Curtin driving dataset (example 1)}
+    \caption{Hybridnets segmentation on the Curtin driving dataset}
     \label{fig:compare_trained_hybridnets}
 \end{figure}
 
-\pagebreak
-\subsection{Efficiacy of birds-eye view occupancy map transform}
-Once the drivable area has been segmented, it is transformed into the XZ plane
-as a birds-eye view occupancy map. This is done by processing the 3D point cloud
-data from the ZED Mini camera.
-Morphological processing is used to improve the density of this occupancy map.
-An example of the segmented output alongside the occupancy map can be seen in \cref{fig:occupancy_map_seg},
-with the drivable area highlighted in green.
-Note that the occupancy map is 15 metres long and 10 metres wide. The location of the ZED Mini camera is depicted
-with an `X'; the camera is mounted to the right-hand side of the wheelchair.
-
-\begin{figure}[H]
-    % 16:6 width ratio
-    % 0.64, 0.24
-    \centering
-    \begin{subfigure}{.55\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/segmentation_1.PNG}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.2\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/occupancy_map1.png}
-    \end{subfigure}
-    \smallskip
-    \begin{subfigure}{.55\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/segmentation_2.PNG}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.2\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/occupancy_map2.png}
-    \end{subfigure}
-    \smallskip
-    \begin{subfigure}{.55\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/segmentation_3.PNG}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}{.2\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/occupancy_map3.png}
-    \end{subfigure}
-    \caption{Segmented image output and corresponding occupancy map for three locations around Curtin university}
-    \label{fig:occupancy_map_seg}
-\end{figure}
-\pagebreak
-
-This segmented image to occupancy map transform works well in all observed cases, as long as the Hybridnets model identifies the
-drivable area accurately. One improvement that could be made to this implementation is its speed.
-The algorithm is bottlenecked by the occupancy map transform code, which takes between \SI{150}{\milli\second}
-and \SI{500}{\milli\second} to execute, depending on the size of the drivable area.
-
-Although this approach reliably maps drivable areas to an occupancy grid,
-the area directly in front of the wheelchair (approx. \SI{2.6}{\metre}) and behind the wheelchair is unknown due to the FOV of the camera.
-Several approaches to rectify this are explored in \cref{sec:future_work}.
-
-A comparison of the occupancy map before and after morphological processing is shown in \cref{fig:morphological_processing}.
-Although the occupancy map has a higher resolution before this transformation, the poor density of the map
-could make it more difficult to process. The time taken to perform this morphological processing is negligible
-when compared to other sections of this code.
-
-\begin{figure}[b]
+\begin{figure}[p]
     % 16:6 width ratio
     % 0.64, 0.24
     \centering
@@ -264,18 +199,80 @@ when compared to other sections of this code.
     \quad
     \begin{subfigure}{.4\textwidth}
         \centering
-        \includegraphics[width=\linewidth,frame]{images/occupancy_map1.png}
+        \includegraphics[width=0.98\linewidth,frame]{images/occupancy_map1.png}
         \caption{After processing}
     \end{subfigure}
     \caption{Comparison of occupancy map before and after morphological processing}
     \label{fig:morphological_processing}
 \end{figure}
+
+\subsection{Efficiacy of birds-eye view occupancy map transform}
+Once the drivable area has been segmented, it is transformed into the XZ plane
+as a birds-eye view occupancy map. This is done by processing the 3D point cloud
+data from the ZED Mini camera.
+An example of the segmented output alongside the occupancy map can be seen in \cref{fig:occupancy_map_seg},
+with the drivable area highlighted in green.
+Note that the occupancy map is 15 metres long and 10 metres wide. The location of the ZED Mini camera is depicted
+with an `X'; the camera is mounted to the right-hand side of the wheelchair.
+
+\begin{figure}[p]
+    % 16:6 width ratio
+    % 0.64, 0.24
+    \centering
+    \begin{subfigure}{.55\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/segmentation_1.PNG}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/occupancy_map1.png}
+    \end{subfigure}
+    \smallskip
+    \begin{subfigure}{.55\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/segmentation_2.PNG}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/occupancy_map2.png}
+    \end{subfigure}
+    \smallskip
+    \begin{subfigure}{.55\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/segmentation_3.PNG}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{.2\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,frame]{images/occupancy_map3.png}
+    \end{subfigure}
+    \caption{Segmented image output and corresponding occupancy map for three locations around Curtin University}
+    \label{fig:occupancy_map_seg}
+\end{figure}
+\pagebreak
+
+The image to occupancy map transform works well in all observed cases, as long as the Hybridnets model identifies the
+drivable area accurately. One improvement that could be made to this implementation is its speed.
+The algorithm is bottlenecked by the occupancy map transform code, which takes between \SI{150}{\milli\second}
+and \SI{500}{\milli\second} to execute depending on the size of the drivable area.
+
+Although this approach reliably maps drivable areas to an occupancy grid,
+the area directly in front of the wheelchair (approx. \SI{2.6}{\metre}) and behind the wheelchair is unknown due to the FOV of the camera.
+Several approaches to rectify this are explored in the future work section of this thesis.
+
+A comparison of the occupancy map before and after morphological processing is shown in \cref{fig:morphological_processing}.
+Although the occupancy map has a higher resolution before this transformation, the low density of the map
+could make it more difficult to process. The time taken to perform this morphological processing is negligible
+when compared to other sections of this code.
+
 \pagebreak
 \subsection{Evaluation of 3D point cloud obstacle detection algorithms}
 % sensor tilt, find_floor_plane
 % compare performance vs ultra depth mode
 Direct processing of the 3D point cloud data was tested to identify environmental obstacles and drivable areas.
-One such approach involved using the inbuilt ZED SDK function \texttt{find\_floor\_plane},
+One such approach involved using the inbuilt ZED SDK function \texttt{find\_floor\_plane}
 which outputs a polygon of the floor plane.
 This is shown in \cref{fig:find_floor_plane} and compared alongside the segmentation occupancy map.
 This approach is very poor at identifying the floor plane accurately and has large frame-to-frame
@@ -292,7 +289,7 @@ as the function is GPU accelerated, this calculation takes approximately \SI{60}
         \caption{Video footage}
     \end{subfigure}
     \quad
-    \begin{subfigure}{.2\textwidth}
+    \begin{subfigure}{.23\textwidth}
         \centering
         \includegraphics[width=\linewidth,frame]{images/find_floor_plane_seg.PNG}
         \caption{Segmentation occupancy map}
@@ -322,8 +319,8 @@ mistakenly identifying grassy and uneven terrain as drivable, but not identifyin
 path as drivable.
 
 This algorithm is slower than the segmentation approach, with a mean latency of \SI{550}{\milli\second}.
-Due to this limitation, it is more suited for identifying non-moving objects such as walls
-as opposed to identifying moving objects such as people and vehicles.
+Due to this limitation, it is more suitable for identifying non-moving objects such as walls,
+and less suitable for identifying moving objects such as people and vehicles.
 
 % squeeze in!
 \begin{figure}[p]
@@ -413,8 +410,8 @@ generated by these modes can be seen in \cref{fig:depth_mode_comparison}.
 The \texttt{ULTRA} depth mode accurately identifies the back wall as flat.
 However, the \texttt{PERFORMANCE} depth mode does not identify the back wall
 as flat, and incorrectly classifies an area beyond the wall as drivable.
-Due to the high latency of the rest of this algorithm, the difference in speed between these two depth modes is negligible,
-and therefore the \texttt{ULTRA} depth mode was selected.
+Due to the high latency of the rest of this algorithm, the difference in speed between these two depth modes is negligible
+and hence the \texttt{ULTRA} depth mode was selected.
 
 %% can include some ramp comparisons if need be, but probably not
 
@@ -445,7 +442,7 @@ which would cause a crash with the walls directly to the left of the wheelchair.
 This occurs because these walls are not in the occupancy map, and so the VFH+ algorithm
 assumes that there is free space in this area.
 Several approaches that could improve the occupancy map and rectify this issue
-are suggested in \cref{sec:future_work}.
+are suggested in the future work section of this thesis.
 
 \setlength{\abovecaptionskip}{4pt}
 \begin{figure}[p]

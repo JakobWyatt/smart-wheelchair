@@ -1,0 +1,65 @@
+\documentclass[12pt,twoside]{article}
+\input{chapters/preamble.tex}
+
+\begin{document}
+
+\includepdf{ThesisTitle.pdf}
+% Navigation Assistance for a Semi-autonomous Smart Wheelchair
+\thispagestyle{empty}\null\clearpage
+
+\includepdf{RedactedForm.pdf}
+\thispagestyle{empty}\null\clearpage
+
+\pagenumbering{roman}
+\input{chapters/abstract.tex}
+\cleardoublepage
+
+\renewcommand{\contentsname}{TABLE OF CONTENTS}
+\tableofcontents
+\pagebreak
+\listoffigures
+\listoftables
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{INTRODUCTION}
+\input{chapters/introduction.tex}
+\cleardoublepage
+
+\section{LITERATURE REVIEW}
+\input{chapters/literature_review.tex}
+\cleardoublepage
+
+\section{METHODOLOGY}
+\input{chapters/methodology.tex}
+\cleardoublepage
+
+\section{RESULTS AND DISCUSSION}
+\input{chapters/results.tex}
+\cleardoublepage
+
+\section{CONCLUSION AND FUTURE WORK}
+\input{chapters/conclusion_and_future_work.tex}
+\cleardoublepage
+
+\printbibliography[title={REFERENCES},heading=bibnumbered]
+\cleardoublepage
+
+\appendix
+
+\section*{APPENDIX A - Thesis completion form}
+\addcontentsline{toc}{section}{APPENDIX A - Thesis completion form}
+This form was signed by my academic supervisor rather than a Mechatronics engineering technical staff member,
+as all equipment used throughout the thesis was borrowed from the School of Electrical Engineering, Computing, and
+Mathematical Sciences (EECMS).
+
+\includepdf{RedactedForm.pdf}
+
+\cleardoublepage
+\input{appendicies/B.tex}
+\cleardoublepage
+\input{appendicies/C.tex}
+\cleardoublepage
+\input{appendicies/D.tex}
+
+\end{document}

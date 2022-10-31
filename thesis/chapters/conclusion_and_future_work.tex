@@ -23,17 +23,16 @@ a bounding box.
 
 The birds-eye view occupancy map was effective at combining information
 from several separate scene recognition algorithms into one
-map of the local environment. Morphological processing was found
-to improve the density of the occupancy map, however, did impact the resolution
+map of the local environment. Morphological processing improved the density of the occupancy map, however, did impact the resolution
 of the map. Due to the FOV of the ZED Mini camera, the occupancy map
 did not contain obstacles behind, to the side of, or directly in front
 of the wheelchair.
 
 VFH+ was used as a proof-of-concept assistive control algorithm and successfully
-steered to avoid obstacles identified in the occupancy map. As VFH+ does not change
+steered the wheelchair to avoid obstacles identified in the occupancy map. As VFH+ does not change
 the speed of the wheelchair, it is not likely to be suitable for a final smart wheelchair
-implementation. However, the algorithm was effective at demonstrating the end-to-end
-navigation assistance pipeline, from obstacle detection to avoidance.
+implementation. However, this algorithm was effective at demonstrating the end-to-end
+navigation assistance pipeline from obstacle detection to avoidance.
 
 Pose estimation is likely to form an important part of future mapping and control algorithms.
 The ZED Positional Tracking API was found to be much more effective
@@ -60,17 +59,12 @@ new components required for a final smart wheelchair implementation,
 and integrating components developed by different project students into 
 one cohesive system.
 
-\begin{figure}[b]
-    \centering
-    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
-    \caption{Block diagram for future smart wheelchair system (drawn by Avinash Sudhakaran)}
-    \label{fig:top_level_software_pipeline}
-\end{figure}
+\subsubsection{Improvements to navigation assistance system}
 
 Although retraining the Hybridnets model was effective at improving
 accuracy on pathways such as paved brick, this came at the cost
 of greater noise. The effect of this noise on model accuracy
-could not be quantitatively determined, as the Curtin driving dataset
+could not be quantitatively determined, as the full Curtin driving dataset
 was not labelled with drivable areas. Future work could involve labelling sections of the
 dataset to evaluate model performance; refer to appendix D for further comments on segmentation labelling.
 A drivable area labelled dataset could
@@ -82,14 +76,14 @@ segmentation, however, could not be tested in this thesis due to time constraint
 These models could be retrained and compared to Hybridnets
 to choose the most effective model for this task.
 Models such as YOLOP and Hybridnets can perform
-lane segmentation on roads. This functionality could be repurposed
+lane line segmentation as well as drivable area segmentation. This functionality could be repurposed
 during retraining to enable the segmentation and identification of kerbs,
 which can present a serious risk to a wheelchair user. Kerbs can be difficult
 to identify using 3D point cloud data as some kerbs only rise above
 the ground by a small amount.
 
 The joystick controller of the wheelchair allows the user to choose between
-indoor and outdoor mode to control the speed of the wheelchair. This information could be intercepted using
+indoor and outdoor modes to control the speed of the wheelchair. This information could be intercepted using
 the input controller and passed to the software system, allowing different modes
 of operation for indoor and outdoor use. For example, it is likely that
 most indoor flooring will be drivable, making obstacle detection more important
@@ -132,6 +126,8 @@ loop closures, which would help to keep an accurate model of the surrounding env
 As the SLAM algorithm performs relocalization, the positional tracking API may not
 be necessary to determine the location of the wheelchair in this case.
 
+\subsubsection{Implementation of smart wheelchair system}
+
 \Cref{fig:top_level_software_pipeline} shows the top-level block diagram for a future
 smart wheelchair system. The block diagram was planned alongside Krishnadas Suresh and
 Avinash Sudhakaran, and shows how the software components developed by thesis project students
@@ -140,6 +136,15 @@ of the smart wheelchair is semi-autonomous, in which path segmentation and point
 (explored in this thesis project) are used to generate a top-down occupancy map. Object detection,
 which was the focus of Krishnadas' thesis, would also be used to add moving objects such as
 pedestrians to the occupancy map. A SLAM algorithm could be used to update the occupancy map, as detailed above.
+
+\begin{landscape}
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\linewidth]{images/top_level_software_pipeline.png}
+    \caption{Block diagram for future smart wheelchair system (drawn by Avinash Sudhakaran)}
+    \label{fig:top_level_software_pipeline}
+\end{figure}
+\end{landscape}
 
 %These systems would work by running detection algorithms
 %in the background, and prompting the user to enter fully autonomous navigation using a button
@@ -154,28 +159,26 @@ pedestrians to the occupancy map. A SLAM algorithm could be used to update the o
 % integration with odometry and sensors API
 
 Once this occupancy map is built, it is passed to the software control system and used to determine
-a safe speed and direction for the wheelchair using user input.
+a safe speed and direction for the wheelchair.
 A proof-of-concept assistive control system was developed in this thesis using VFH+,
-but a more robust solution would likely be required for a final implementation. The wheelchair has
-two modes of operation for fully autonomous control, which are ramp/vehicle navigation (Nicolas Lee)
-and doorway navigation (Avinash Sudhakaran). These modes of operation will require the user to
-press a button to begin autonomous navigation when a valid ramp or doorway is detected.
+but a more robust solution would likely be required for a final implementation. The wheelchair enters into fully autonomous control
+in two scenarios: ramp/vehicle navigation (Nicolas Lee),
+and doorway navigation (Avinash Sudhakaran). These fully autonomous navigation modes will require the user to
+press a button to begin autonomous navigation once a valid ramp or doorway is detected.
 These systems will send a goal pose to the software control system, which plans a safe path
 using the occupancy map and drives the wheelchair to this pose. Once this has been performed,
 semi-autonomous wheelchair control can resume.
 
 To communicate between different software components, a publish/subscribe architecture
-is proposed. Using a framework such as ROS (robot operating system), each component would
-be defined as a node. These nodes can subscribe to other nodes to recieve data,
-and publish data to a topic (recieved by other nodes) once processed. ROS supports Python and C++, which would allow
-high-performance components in C++ and prototype or machine learning components in Python
-to communicate. An advantage of this approach is that interfaces between nodes
-are well defined, which speeds up development when multiple project students
+is proposed. Using a framework such as ROS (robot operating system), each component of the smart wheelchair system would
+be defined as a node. These nodes can subscribe to other nodes to receive data,
+and publish data to a topic once processed. An advantage of this approach is that the interfaces between nodes
+are well-defined, which speeds up development when multiple project students
 are working on the same system.
 
-System resources must be considered when designing a large system with many software components.
+Compute resources must be considered when designing a large system with many software components.
 If too many processes are using the CPU or GPU accelerator, the performance of the system
-will be impacted. In particular, an AI accelerator may not have enough memory or compute capability to run many complex
+could be impacted. In particular, an AI accelerator may not have enough memory or compute capability to run many complex
 models at once. One way to improve the performance of the AI accelerator would be to use a shared-backbone model
 architecture, which is used by Hybridnets and YOLOP. In this architecture, a complex model backbone
 is used to generate image features before several smaller `heads' utilise these features for different purposes.
@@ -186,7 +189,7 @@ to run at once with only a small performance impact.
 To communicate with the wheelchair hardware, an interface between the software control system and the
 input controller/joystick controller must be implemented. The simplest way to implement this
 interface would be to use a USB serial port to communicate between the microcontroller and
-SBC (single board computer), with packets of data sent between the machines.
+SBC (single board computer).
 The input controller would send information such as joystick position,
 seat position, and operation mode (indoor or outdoor) to the SBC. The SBC would relay back the
 desired velocity and direction of the wheelchair. Additional low-bandwidth sensors, such as

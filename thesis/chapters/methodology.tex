@@ -3,13 +3,13 @@ The smart wheelchair must sense the environment, process this information,
 and maneuver within the environment. Doing so requires hardware, including a
 sensor system, compute unit, and motor controller.
 
-The literature review compares several types of sensors and manufacturers for these sensors.
-An RGB-D camera was selected for this application, as they provide high-resolution images and depth
-information at a commercially viable price point. High-resolution image data builds flexibility into
-the system, as popular machine learning algorithms can be utilised.
+The literature review compares several types of sensors and sensor manufacturers.
+An RGB-D camera was selected as the primary wheelchair sensor, as it provides high-resolution images and depth
+information at a commercially viable price point. Capturing high-resolution image data builds flexibility into
+the system and enables the utilisation of popular machine learning algorithms.
 
 This RGB-D camera must be mounted to the wheelchair at an appropriate point. The front of the
-joystick control unit was selected for the reasons below:
+joystick control unit was selected for several reasons:
 \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
     \item A clear view of the environment in front of the wheelchair is provided.
     \item The user does not obstruct the camera's view in any wheelchair configuration.
@@ -33,12 +33,12 @@ to generate a depth map. Active IR RGB-D cameras were not viable for this applic
 due to their poor outdoor performance and range. The width of the ZED Mini also fulfils the
 size requirements of the selected mounting point.
 
-Smart wheelchair applications such as wheelchair docking require
-obstacle detection on all sides of the wheelchair. To satisfy this requirement, a
-Cygbot CygLiDAR D1 was procured for short-range detection of obstacles at the rear of the
-wheelchair. Nicolas Lee, a project student focused on
-wheelchair navigation to personal vehicles, selected this sensor. It should be noted that
-this sensor was not used for navigation assistance as part of this thesis.
+%Smart wheelchair applications such as wheelchair docking require
+%obstacle detection on all sides of the wheelchair. To satisfy this requirement, a
+%Cygbot CygLiDAR D1 was procured for short-range detection of obstacles at the rear of the
+%wheelchair. Nicolas Lee, a project student focused on
+%wheelchair navigation to personal vehicles, selected this sensor. It should be noted that
+%this sensor was not used for navigation assistance as part of this thesis.
 
 % Sensor mount design
 A 3D printed sensor mount was designed to fix the ZED Mini to the wheelchair mounting point.
@@ -114,24 +114,25 @@ Kosma Egan, which receives commands from the input controller to drive and monit
 \subsection{Data collection}
 \label{sec:dataset_collection}
 
-An RGB-D wheelchair driving dataset was collected around Curtin university
+An RGB-D wheelchair driving dataset was collected around Curtin University
 to test and evaluate the performance of the navigation assistance system.
 This dataset is \SI{7.14}{\giga\byte} in size and \SI{47}{\minute} in length
 and includes features such as indoor and outdoor navigation, doorways, pedestrians,
 elevator use, wheelchair access ramps, and car parks. A link to the dataset
 can be found in Appendix B.
 
-This dataset was collected using the ZED Mini and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
+This dataset was collected using the ZED Mini camera and is encoded in the proprietary Stereolabs SVO file format, which can be read using the ZED SDK.
 This format includes image data from left and right cameras, IMU data, and metadata such as
 timestamps. Depth map and point cloud data are not stored in the dataset and are instead generated when
 the file is read using the ZED SDK. Image data was recorded at 1080p, 30fps for the left and right cameras.
-A \SI{6}{\minute} segment of the Curtin driving dataset was coarsely labelled with drivable areas to
-test the V7 Labs Darwin labelling software; refer to appendix D for further information.
+A \SI{6}{\minute} segment of the Curtin driving dataset was coarsely labelled with drivable areas;
+refer to appendix D for further information about the labelling process.
 
 Four compression modes are available during data collection: Lossless (PNG), Lossy (JPG), H.264 (Video),
 and H.265. Both video compression modes require a CUDA-enabled device during data collection.
 A 10-second sample dataset was recorded for each compression mode to evaluate image quality and
-file size (results in \cref{table:dataset_compression_modes}). Due to the smaller file size, H.264 compression was used when collecting the wheelchair driving dataset.
+file size (results in \cref{table:dataset_compression_modes}). H.264 compression was used when collecting the wheelchair driving dataset due to
+the higher compression ratio provided.
 \Cref{fig:zed_sample_dataset} shows an example image frame and depth map from the dataset.
 
 \begin{table}[H]
@@ -152,6 +153,38 @@ file size (results in \cref{table:dataset_compression_modes}). Due to the smalle
     \label{table:dataset_compression_modes}
 \end{table}
 
+After some analysis of the raw point cloud data from the Curtin RGB-D driving dataset,
+it was found that the camera was slightly tilted upwards while recording the dataset.
+The tilt angle was consistent between data collection periods
+and was likely due to the ergonomics and tilt of the joystick control unit.
+An example of this tilt can be seen in \cref{fig:meshlab_point_cloud}; note
+that the floor is angled downwards due to the tilt of the RGB-D camera.
+
+Meshlab was used to determine the coordinates of points
+on the ground at a close distance and far distance, and hence calculate the
+sensor tilt angle.
+This was done for two different point clouds (one indoor and one outdoor)
+with the results averaged. Working is shown in \cref{eq:tilt_calculation}.
+
+\begin{equation}
+\begin{split}
+p_{1,1} = (-0.53, -1.30, -3.81) \qquad p_{1,2} &= (-0.54, -2.31, -11.31)\\
+\textrm{gradient}_1 &= \frac{y_2 - y_1}{z_2 - z_1} = -0.135\\
+p_{2,1} = (1.03, -1.29, -4.17) \qquad p_{2,2} &= (0.93, -2.80, -14.03)\\
+\textrm{gradient}_2 = -0.153 \qquad \textrm{gradient}_{avg} &= -0.144\\
+\theta_{tilt} = -\tan^{-1}\left(-0.144\right) &= 8.2\degree
+\end{split}
+\label{eq:tilt_calculation}
+\end{equation}
+
+In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
+Curtin University.
+This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
+and collected using a GoPro Hero 4; the experimental setup used to collect this
+dataset can be seen in \cref{fig:gopro_dataset_collection}.
+This dataset was used to evaluate machine learning scene recognition algorithms
+before the ZED Mini had been ordered.
+
 \begin{figure}[H]
     \centering
     \begin{subfigure}{.48\textwidth}
@@ -165,49 +198,16 @@ file size (results in \cref{table:dataset_compression_modes}). Due to the smalle
         \includegraphics[width=\linewidth]{images/zed_sample_depth.png}
         \caption{Depth map}
     \end{subfigure}
-    \caption{Sample data from the Curtin university RGB-D wheelchair driving dataset}
+    \caption{Sample data from the Curtin University RGB-D wheelchair driving dataset}
     \label{fig:zed_sample_dataset}
 \end{figure}
-\pagebreak
 
-After some analysis of the raw point cloud data from the Curtin RGB-D driving dataset,
-it was found that the camera was slightly tilted upwards while recording the dataset.
-This angle was mostly constant between data collection periods
-and was likely due to the ergonomics and tilt of the joystick control unit.
-An example of this tilt can be seen in \cref{fig:meshlab_point_cloud}; note
-that the floor is angled downwards due to the tilt of the RGB-D camera.
-
-Meshlab was used to determine the coordinates of points
-on the ground at a close distance and far distance, and calculate the gradient.
-This was done for two different point clouds (one indoor and one outdoor)
-with the results averaged. Working is shown in \cref{eq:tilt_calculation}.
-
-\begin{equation}
-\begin{split}
-p_{1,1} = (-0.53, -1.30, -3.81) \qquad p_{1,2} &= (-0.54, -2.31, -11.31)\\
-\textrm{gradient}_1 &= \frac{y_2 - y_1}{z_2 - z_1} = -0.135\\
-p_{2,1} = (1.03, -1.29, -4.17) \qquad p_{2,2} &= (0.93, -2.80, -14.03)\\
-\textrm{gradient}_2 &= -0.153\\
-\textrm{gradient}_{avg} &= -0.144\\
-\theta_{tilt} &= -\tan^{-1}\left(-0.144\right) = 8.2\degree
-\end{split}
-\label{eq:tilt_calculation}
-\end{equation}
-
-\begin{figure}[b]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/meshlab_point_cloud.png}
-    \caption{Point cloud information of indoor hallway (visualized with Meshlab). Note the angle of the floor due to sensor tilt}
+    \includegraphics[width=0.7\linewidth]{images/meshlab_point_cloud.png}
+    \caption{Point cloud information of indoor hallway - note the floor angle due to sensor tilt}
     \label{fig:meshlab_point_cloud}
 \end{figure}
-
-In addition to the RGB-D dataset, a preliminary wheelchair driving video-only dataset was collected around
-Curtin university.
-This dataset was \SI{34}{\minute} in length and \SI{7.08}{\giga\byte} in size (1920x1080 @ 24 fps)
-and collected using a GoPro Hero 4; the experimental setup used to collect this
-dataset can be seen in \cref{fig:gopro_dataset_collection}.
-This dataset was used to evaluate machine learning scene recognition algorithms
-before the ZED Mini had been ordered.
 
 %\vspace{4.0cm}
 \begin{figure}[p]
@@ -244,7 +244,7 @@ performs drivable area segmentation and object detection on the same backbone, w
 this dataset.
 
 To evaluate these models, a video encoder and decoder needed to be created
-to feed image frames into the model. This was implemented using a python generator
+to feed image frames into the model. This was implemented using a Python generator
 so that frames in the video could be iterated over within a for loop and only decoded
 when required. OpenCV \cite{bradskiOpenCVLibrary2000} was the underlying library used
 to decode each video frame into a BGR pixel array.
@@ -288,7 +288,7 @@ and a Colab Pro subscription was purchased to enable access to
 a faster Nvidia V100 GPU (with 32GB memory \cite{nvidiaNvidiaTeslaV1002018}).
 Datasets were uploaded onto Google Drive so that they could be mounted onto Colab
 and unzipped into the allocated machine's storage. Pytorch was used to train
-the model, with \texttt{torchvision.datasets.Cityscapes} used to load the Cityscapes
+the model and \texttt{torchvision.datasets.Cityscapes} was used to load the Cityscapes
 dataset. To load the BDD100K dataset, a data loader within the Hybridnets source code
 was used.
 
@@ -311,11 +311,13 @@ mIoU = \frac{1}{N} \sum_{i=1}^{N} \frac{tp_i}{tp_i + fp_i + fn_i}
 \label{eq:miou}
 \end{equation}
 
-The Cityscapes dataset was selected to improve the model's performance on non-uniform
-surfaces such as paved brick. This dataset includes sidewalks as well as roads;
-this was hypothesised to provide a wider variety of surfaces during training.
+The Cityscapes dataset was selected in order to improve the model's performance on non-uniform
+surfaces such as paved brick. This dataset categorises sidewalks as well as roads,
+which was hypothesised to provide a wider variety of surfaces during training.
 Both sidewalks and roads were classified as drivable areas during evaluation
 and training.
+
+\pagebreak
 
 Recall (true positive rate, $\frac{tp}{tp + fn}$) was used as a metric to quantify the model's
 performance on sidewalks and roads separately.
@@ -394,8 +396,8 @@ An issue with the occupancy map at this stage is that it is rather sparse
 due to the one-to-one mapping between segmented pixels and grid cells.
 Morphological image processing techniques were used to improve the density of the occupancy map.
 The OpenCV \cite{bradskiOpenCVLibrary2000} implementation of morphological dilation was used to
-join the space between drivable pixels, to create a continuous driving surface in the occupancy map
-rather than many separate pixels. A $10\times 10$ kernel was used to perform this dilation.
+join the space between drivable pixels to create a continuous driving surface.
+A $10\times 10$ kernel was used to perform this dilation.
 
 \pagebreak
 \subsubsection{3D point cloud obstacle detection}
@@ -407,31 +409,30 @@ One approach that was tested was the inbuilt ZED SDK function \texttt{find\_floo
 This function takes the current floor height and camera orientation as arguments
 and uses them to identify the floor plane. The \texttt{find\_floor\_plane} function
 returns a 3D polygon of the floor plane boundary, which was projected onto the 2D XZ plane
-and displayed using the python Pillow library.
+and displayed using Pillow (a Python image processing library).
 % add find_floor_plane results
 
 Another approach that was tested was a custom algorithm that processes the 3D point cloud data
 to identify the drivable area.
-The inequality in \cref{eq:flat_filter} was initially used to filter the points
-which were identified as drivable,
+The inequality in \cref{eq:flat_filter} was initially used to filter and identify points as drivable,
 using a measured camera height $y_{camera} = \SI{740}{\milli\metre}$
 and an initial error parameter $y_{error} = \SI{150}{\milli\metre}$.
-\Cref{eq:flat_filter} only retains 3D points within a certain error margin of the floor plane.
+\Cref{eq:flat_filter} retains 3D points within a certain error margin of the floor plane.
 
 \begin{equation}
 -y_{error} \leq p_y + y_{camera} \leq y_{error}
 \label{eq:flat_filter}
 \end{equation}
 
-An issue with this equation is that it does not take camera tilt into account.
-Additionally, a wheelchair ramp may not be recognised as drivable, as the gradient of a ramp
-may cause sections of the ramp to fall outside the $y_{error}$ margin.
-Australian Standard 1428.1:2021 \cite{standardsaustralia14282021Design2021} specifies that
-the maximum gradient of a wheelchair ramp should not be greater than 1:14 (section 7.3a).
+An issue with this equation is that it does not take the tilt of the camera into account.
+Additionally, a wheelchair ramp may not be recognised as drivable, as the gradient of a wheelchair ramp
+may cause sections of the ramp to fall outside the error margin.
+Australian Standard 1428.1:2021 7.3a \cite{standardsaustralia14282021Design2021} specifies that
+the maximum gradient of a wheelchair ramp should not be greater than 1:14.
 
 To rectify these issues, \cref{eq:tilt_filter} was also tested to identify the drivable area.
 This approach takes sensor tilt and wheelchair ramps into account,
-assuming that any ramps will be encountered face-on (along the z-axis) and that
+and assumes that any ramps will be encountered face-on (along the z-axis) and that
 sensor tilt remains constant. Note that in our coordinate system,
 $p_z$ is negative in front of the wheelchair.
 
@@ -457,7 +458,7 @@ Once the 3D points for drivable areas and environmental obstacles have been iden
 they must be placed on the birds-eye view occupancy map. The approach used to do this
 is identical to the approach outlined in \cref{sec:birds_eye_view_occupancy_map};
 each point is scaled to fit on the map and morphology is used to improve the density
-of this map.
+of the map.
 
 \subsubsection{Assistive control algorithm}
 The VFH+ (vector field histogram) algorithm \cite{ulrichVFHReliableObstacle1998} was used to blend
@@ -466,9 +467,9 @@ One limitation of the VFH+ algorithm is that it only adjusts the direction of th
 and not the wheelchairs speed; as such, this algorithm was implemented as a
 proof of concept rather than a complete assistive control algorithm.
 The occupancy map generated by the 3D obstacle detection algorithm (detailed in \cref{sec:point_cloud_obstacle_detection})
-was used as the input into the VFH+ algorithm.
+was input into the VFH+ algorithm.
 
-This algorithm was implemented in MATLAB using the Navigation toolbox and encapsulated into a MATLAB function.
+This algorithm was implemented in MATLAB using the Navigation toolbox and was encapsulated into a MATLAB function.
 The `MATLAB Engine' Python API was used to call the assistive control algorithm from within Python code.
 Full implementation of a control algorithm would require the ability to log joystick commands during
 data collection, and to intercept joystick commands from the user. As the input controller had not
@@ -477,12 +478,12 @@ of the wheelchair.
 
 As the VFH+ control algorithm had already been implemented within the Navigation toolbox,
 the MATLAB implementation was relatively simple. \Cref{eq:pose_adjustment} was used to adjust
-the pose from the RGB-D camera to the centre of the wheelchair.
+the pose from the RGB-D camera to the centre of the wheelchair (dimensions in metres).
 
 \begin{equation}
 \begin{split}
-p_{wheelchair,x} &= p_{camera,x} - \frac{w_{wheelchair}}{2}\\
-p_{wheelchair,y} &= p_{camera,y} + \mathrm{offset_{sensor}} - \frac{l_{wheelchair}}{2}
+p_{wheelchair,x} &= p_{camera,x} - \frac{0.62}{2}\\
+p_{wheelchair,y} &= p_{camera,y} + \mathrm{offset_{sensor}} - \frac{1.1}{2}
 \end{split}
 \label{eq:pose_adjustment}
 \end{equation}
