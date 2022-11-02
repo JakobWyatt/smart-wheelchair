@@ -19,7 +19,7 @@ def StreamInitParams(params):
     if args.source is None:
         return params
     params.set_from_svo_file(args.source)
-    params.svo_real_time_mode = True
+    params.svo_real_time_mode = False
     return params
 
 
@@ -109,10 +109,8 @@ def main():
     p = seg.VideoProperties(30, 1920, 1080)
     generate_frame = GenerateFrameZed(cleanup.zed)
     cleanup.push_frame = seg.PushFrame((p, "capture.mp4"), "camera", cv2.WINDOW_FULLSCREEN)
-    push_frame_floor_plane = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "floor_plane.mp4"), "floor_plane")
-    push_frame_segmentation = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "segmentation.mp4"), "segmentation")
-    cleanup.push_frame_floor_cloud = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "pcloud.mp4"), "floor_cloud")
-    model, draw_frame = seg.HybridnetLoader(p, "../models/hybridnet_epoch_1.pth")
+    cleanup.push_frame_segmentation = seg.PushFrame((seg.VideoProperties(fps, img_dims[0], img_dims[1]), "segmentation.mp4"), "segmentation")
+    model, draw_frame = seg.HybridnetLoader(p)
     #kernel_sz = max(2, round(1 / scale * 100))
     #print(f"Kernel size: {kernel_sz}")
     kernel = np.ones((10, 10), np.uint8)
@@ -121,8 +119,6 @@ def main():
     for i, image in enumerate(generate_frame()):
         image_rgb = np.delete(image, 3, 2)
         if skip_frames != 0 and i % skip_frames != 0:
-            push_frame_segmentation(floor_seg)
-            #cleanup.push_frame_floor_cloud(floor_cloud)
             cleanup.push_frame(image_seg)
             continue
         start_time = time.time()
@@ -138,24 +134,18 @@ def main():
         floor_seg = project_segmentation(cleanup.zed, out)
         if floor_seg is not None:
             floor_seg = cv2.erode(floor_seg, kernel)
-            push_frame_segmentation(floor_seg)
+            cleanup.push_frame_segmentation(floor_seg)
 
         cleanup.push_frame(image_seg)
         elapsed_time = time.time() - start_time
         print(f"Frame count: {i}, FPS: {1 / elapsed_time}", end="\r")
-    # Cleanup
-    #push_frame(None)
-    #push_frame_floor_plane(None)
-    push_frame_segmentation(None)
-    #push_frame_floor_cloud(None)
-    #push_frame_floor_plane(None)
 
 class Cleanup:
     def __init__(self):
         signal(SIGINT, self.syshandler)
         self.zed = sl.Camera()
         self.push_frame = None
-        self.push_frame_floor_cloud = None
+        self.push_frame_segmentation = None
         self.vfh_frame = []
         self.control_frame = []
 
@@ -164,7 +154,7 @@ class Cleanup:
 
     def handler(self):
         self.push_frame(None)
-        self.push_frame_floor_cloud(None)
+        self.push_frame_segmentation(None)
         self.zed.close()
         sys.exit(0)
 
