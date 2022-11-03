@@ -189,6 +189,7 @@ def main():
         floor_cloud = find_floor(cleanup.zed)
         if floor_cloud is not None:
             floor_cloud = cv2.erode(floor_cloud, kernel)
+            #floor_cloud = cv2.morphologyEx(floor_cloud, cv2.MORPH_CLOSE, np.ones((12, 12), np.uint8))
             replace_pixels(floor_cloud, (0, 0, 0), (0, 0, 200))
             cleanup.push_frame_floor_cloud(floor_cloud)
 
@@ -227,7 +228,7 @@ class Cleanup:
 
 
 if __name__ == "__main__":
-    fps = 1
+    fps = 5
     cleanup = Cleanup()
     main()
     cleanup.handler()
