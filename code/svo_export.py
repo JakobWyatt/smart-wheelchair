@@ -18,6 +18,9 @@
 #
 ########################################################################
 
+## NOTE: Currently uses .avi and M4S2, which is incompatible with Mac.
+## TODO: Change to .mp4 format
+
 import sys
 import pyzed.sl as sl
 import numpy as np
